@@ -11,7 +11,10 @@ ready to merge yet.
 ## The More Features the Better
 Most features will be accepted, becasue that is the point of this game. But you 
 must make sure that by adding your feature it does not break previous features
-and it should be able to be turned on or off.
+and it should be able to be turned on or off. When I say most features will be
+accepted I am saying if the code to implement the feature is completed by 
+someone else. I currently have my own agenda for what features need to be 
+added next to the game.
 ## Professionalism
 Please be respectful of others and mind your language, this is a public forum. 
 Disagreements happen but can be settled if both parties are open minded.
