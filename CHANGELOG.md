@@ -12,7 +12,7 @@
 - Finished Indoor or Outdoor mode support and cone.
 ### Changed
 - Increased the size of widgets to make them easier to touch on small screens.
-- Changed "Connect Weapon" button into gun image 
+- Changed "Connect Weapon" button into gun image created by Prestonnovation.
 ### Fixed
 - Fixed vibrate on android causing crash.
 ### Removed
