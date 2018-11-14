@@ -3,7 +3,7 @@
 ### LazerCoiL version:
 <!-- Specify commit hash if not an official release. -->
 ### OS/device including version:
-<!-- Android? Windows? / Samsung? Something?>
+<!-- Android? Windows? / Samsung? Something? -->
 ### What is the Bug?:
 <!-- What went wrong? -->
 ### What should have happened?:
