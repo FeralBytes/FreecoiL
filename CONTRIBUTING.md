@@ -5,7 +5,10 @@ The golden rule is to always open one issue for one bug. If you notice several b
 and want to report them, make sure to create one new issue for each of them.
 ## Contributing with a Merge or Pull Request
 Please make all MR's or PR's against the "develop" branch, unless directed to do 
-otherwise. Also make sure you update the CHANGELOG.md with an appropriate comment.
+otherwise. Please name your branch something like "feature/awesome_xyz" or 
+"fix/broken_abc". Using the directory like path name, helps distinguish better what 
+the commit is for and reduces name collisions. Also make sure you update the 
+CHANGELOG.md with an appropriate comment.
 Make sure that your PR leaves the game in a stable state before requesting that it 
 is merged into develop. Otherwise use the WIP tag to identify that the PR is not 
 ready to merge yet.
