@@ -1,0 +1,6 @@
+.import
+.mono
+.vs
+*.iml
+.gradle
+.idea

@@ -1,6 +1,6 @@
-# LazerCoiL
-## What is LazerCoiL?
-LazerCoil is a laser tag application for the RECOIL[2] system for Android[6]. The focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replayability. 
+# FreecoiL
+## What is FreecoiL?
+FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability. 
 
 ### Features like:
 * No Network: Independent game play. Just like SIMPLECOIL[3].
@@ -17,17 +17,18 @@ LazerCoil is a laser tag application for the RECOIL[2] system for Android[6]. Th
   * Ammunition 1-253 rounds per reload.   
 * More Features are planned.
 
-## How to Get LazerCoiL:
+## How to Get FreecoiL:
 [Signup for further updates by providing your email here](https://docs.google.com/forms/d/e/1FAIpQLSd-ZglY7iiT7ToqPvR-o6Bv0AsBIz9rJWOAWz83Mygj_GL-Yw/viewform).
 Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! Expected Price $0.00. We will open source it and accept donations to help us pay for the PLAY STORE and the cost of development for iTunes.
 
 ### How to Donate:
-* Donate to [FeralBytes the Creators of LazerCoiL here](https://www.paypal.me/FeralBytes).
+* Donate to [FeralBytes the Creators of FreecoiL here](https://www.paypal.me/FeralBytes).
 * Don't forget to donate to Dees-Troy the creator of SimpleCoil: his PayPal email is dees_troy@yahoo.com. [9]
 
 ### The Release Plan So Far: If we are able to speed up the timeline below, we will.
 * ~~Version 0.1.0 on 23OCT2018~~
 * Version 0.2.0 on 17NOV2018
+* Version 0.2.5 on 25NOV2018 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
 * Version 0.3.0 on 06DEC2018
 * Version 0.4.0 on 27DEC2018
 * Version 0.5.0 on 17JAN2019
@@ -40,15 +41,15 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 * Version 1.0.0 on 02MAY2019
 * Official 1.0.0 release most Beta bugs should be fixed.
 
-## Why LazerCoiL?
-LazerCoil was created because we wanted more features and flexibility than what was offered by the RECOIL[2] app. When we found SIMPLECOIL[3], it inspired us to begin coding our desired features. We wanted more than those offered by either RECOIL[2] or SIMPLECOIL[3].
+## Why FreecoiL?
+FreecoiL was created because we wanted more features and flexibility than what was offered by the RECOIL[2] app. When we found SIMPLECOIL[3], it inspired us to begin coding our desired features. We wanted more than those offered by either RECOIL[2] or SIMPLECOIL[3].
 
 ## Frequently Asked Questions:
 * Does this really work or are you creating a hoax? 
 * * Actually our app already works, it has worked for months now, but we are improving and adding features. It communicates with the guns and already supports team and individual play.
 
 ## Note To SkyRocket LLC
-SkyRocket we would love to help you develop your future products. We would even enjoy becoming an official app for the RECOIL[2] laser tag system. Also please don't sue us for loving your product, just warn us and we will comply.
+SkyRocket we would love to help you develop your future products. We would even enjoy becoming an official app for the RECOIL[2] laser tag system.
 
 ## Notes:
 1. GOOGLE PLAY and the Google Play logo are trademarks of Google LLC.
@@ -56,7 +57,7 @@ SkyRocket we would love to help you develop your future products. We would even 
 3. SIMPLECOIL is copyright of Dees-Troy.
 4. This feature has not been tested completely, but the software and hardware can, in theory and as programmed, support the capability. If you test this feature to its maximum extent, please let us know if it worked as promised. If it did not, please inform us of limitations or bugs encountered.
 5. Some game modes may require all players to stay on the network at all times. But it is our goal to not have this be the case. Currently, all of our game modes support network drop-out with little affect to game play. However, it is important to realize that, due to the way the guns work, if a player is killed outside the network, determining who killed him will not be updated until the killed player returns to the network.
-6. Our work is portable to iOS / iPhone, but at this time we have not begun development for iOS. The GUI is already compatable with iOS though. The backend needs to be written in swift.
-7. OSX will likely be supported but has not been tested. The GUI is technically comptabale with OSX already.
+6. Our work is portable to iOS / iPhone, but at this time we have not begun development for iOS. The GUI is already compatible with iOS though. The back-end needs to be written in swift or Objective-C.
+7. OSX will likely be supported but has not been tested. The GUI is technically compatible with OSX already.
 8. Weapon Profiles do not affect range, only the way in which the weapon fires and reloads. There may be a few ways to figure out range, but no time has been dedicated to this yet.
 9. Dees-Troy's research was critical to enabling us to make our application. 
