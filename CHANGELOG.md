@@ -1,4 +1,4 @@
-# CHANGELOG for LazerCoiL Format based on https://keepachangelog.com/
+# CHANGELOG for FreeoiL Format based on https://keepachangelog.com/
 
 ## [Unreleased] - 
 ### Added
@@ -15,6 +15,7 @@
 - Changed "Connect Weapon" button into gun image created by Prestonnovation.
 ### Fixed
 - Fixed vibrate on android causing crash.
+- Improved Android Bluetooth LE GATT implementation for more devices.
 ### Removed
 - Unnecessary Java code. 
 
