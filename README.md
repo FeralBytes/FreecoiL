@@ -20,11 +20,10 @@ FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The
 
 ## How to Get FreecoiL:
 [Signup for further updates by providing your email here](https://docs.google.com/forms/d/e/1FAIpQLSd-ZglY7iiT7ToqPvR-o6Bv0AsBIz9rJWOAWz83Mygj_GL-Yw/viewform).
-Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! Expected Price $0.00. We will open source it and accept donations to help us pay for the PLAY STORE and the cost of development for iTunes.
+Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! Expected Price $0.00. The project is now open source and we will accept donations to help pay for the PLAY STORE and iTunes submissions.
 
 ### How to Donate:
 * Donate to [FeralBytes the Creators of FreecoiL here](https://www.paypal.me/FeralBytes).
-* Don't forget to donate to Dees-Troy the creator of SimpleCoil: his PayPal email is dees_troy@yahoo.com. [9]
 
 ### The Release Plan So Far: If we are able to speed up the timeline below, we will.
 * ~~Version 0.1.0 on 23OCT2018~~
