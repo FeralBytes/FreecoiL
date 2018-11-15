@@ -1,6 +1,10 @@
+# Godot Build Artifacts
 .import
 .mono
 .vs
+# Android Build Artifacts & Gradle
 *.iml
 .gradle
 .idea
+# Sphinx documentation build Artifacts
+docs/build/
