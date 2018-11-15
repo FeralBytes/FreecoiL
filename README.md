@@ -1,5 +1,6 @@
 # FreecoiL
 ### Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/milestones/1).
+### [Our Limited Documentation](https://freecoil.readthedocs.io/en/latest/) is on ReadTheDocs, please read to learn how to compile the game.
 ## What is FreecoiL?
 FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability. 
 
