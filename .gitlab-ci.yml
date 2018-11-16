@@ -47,7 +47,7 @@ build_linux_editor:
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
-    - "echp "Hello"
+    - "echo Hello"
   artifacts: 
     paths:
     - app/build/outputs/
