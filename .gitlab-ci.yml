@@ -1,0 +1,71 @@
+image: openjdk:8-jdk
+
+variables:
+  ANDROID_COMPILE_SDK: "28"
+  ANDROID_BUILD_TOOLS: "28.0.2"
+  ANDROID_SDK_TOOLS:   "4333796"
+
+before_script:
+  - apt-get --quiet update --yes
+  # For Android Build Support
+  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  # For Godot Build Support
+  - apt-get --quiet install --yes build-essential cmake g++-8 gcc-8 libcairo2 libx11-dev libxcursor-dev libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev
+  - apt-get --quiet install --yes libpulse-dev libfreetype6-dev libssl-dev libudev-dev libxi-dev libxrandr-dev pkg-config scons yasm zip
+  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+  - unzip -d android-sdk-linux android-sdk.zip
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
+  - export DOCKER_HOME=$PWD
+  - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+  - echo y | ls -a $PWD/android-sdk-linux/ndk-bundle
+  - echo "##############################################"
+  - echo y | ls -a $PWD
+  - echo "##############################################"
+  - export ANDROID_NDK_ROOT=$PWD/android-sdk-linux/ndk-bundle
+  - chmod +x ./gradlew
+  # temporarily disable checking for EPIPE error and use yes to accept all licenses
+  - set +o pipefail
+  - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
+  - set -o pipefail
+  #- git --depth=1 clone https://github.com/godotengine/godot.git
+  - cd ./godot && git checkout master
+  - cd $DOCKER_HOME
+  # Copy user-supplied modules into the Godot directory
+  # (don't fail in case no modules are present)
+  #- cp "$CI_PROJECT_DIR"/modules/* "$GODOT_DIR/modules/" || true
+
+stages:
+  - build_apk
+  #- test
+
+# Linux editor
+build_linux_editor:
+  stage: build_apk
+  variables:
+    DEBIAN_FRONTEND: noninteractive
+  script:
+    - "echp "Hello"
+  artifacts: 
+    paths:
+    - app/build/outputs/
+
+#lintDebug:
+#  stage: build
+# script:
+#   - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+
+#assembleDebug:
+#  stage: build
+#  script:
+#    - ./gradlew assembleDebug
+#  artifacts:
+#    paths:
+#    - app/build/outputs/
+
+#debugTests:
+  #stage: test
+  #script:
+    #- ./gradlew -Pci --console=plain :app:testDebug
