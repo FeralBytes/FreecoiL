@@ -1,8 +1,6 @@
 extends Control
 
-onready var ReadyGameBtn = get_node("ReadyGameBtn")
 onready var ConnectPopup = get_node("ConnectToHostPopup")
-onready var HostIP = get_node("ColorRect3/HostIP")
 
 func _ready():
     add_to_group("lobby")

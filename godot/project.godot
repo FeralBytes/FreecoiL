@@ -34,6 +34,7 @@ LazerInterface="*res://code/LazerInterface.gd"
 SceneManager="*res://scenes/SceneManager/SceneManager.tscn"
 SettingsConf="*res://code/SettingsConf.gd"
 NetworkingCode="*res://code/NetworkingCode.gd"
+Helpers="*res://code/Helpers.gd"
 
 [debug]
 

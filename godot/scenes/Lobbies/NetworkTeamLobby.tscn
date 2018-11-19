@@ -16,7 +16,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=2]
 
@@ -26,7 +25,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=3]
 
@@ -36,7 +34,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=4]
 
@@ -46,7 +43,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=5]
 
@@ -56,7 +52,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=6]
 
@@ -66,7 +61,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=7]
 
@@ -76,7 +70,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [node name="NetworkTeamLobby" type="Control"]
 anchor_left = 0.0
@@ -90,7 +83,6 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 script = ExtResource( 1 )
-_sections_unfolded = [ "Script" ]
 
 [node name="Background" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -146,7 +138,6 @@ align = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="Label3" type="Label" parent="ColorRect3"]
 anchor_left = 0.0
@@ -170,7 +161,6 @@ align = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="HostIP" type="Label" parent="ColorRect3"]
 anchor_left = 0.0
@@ -192,7 +182,6 @@ align = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="ChooseTeam" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -210,7 +199,6 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 color = Color( 0.576471, 0.513726, 0.231373, 1 )
-_sections_unfolded = [ "Script" ]
 
 [node name="TeamLbl" type="Label" parent="ChooseTeam"]
 anchor_left = 0.0
@@ -232,7 +220,6 @@ text = "Choose Your Team >"
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_colors", "custom_fonts", "custom_fonts/font" ]
 
 [node name="TeamWidget" parent="ChooseTeam" instance=ExtResource( 4 )]
 margin_left = 340.0
@@ -257,7 +244,6 @@ size_flags_horizontal = 1
 size_flags_vertical = 1
 color = Color( 0.576471, 0.513726, 0.231373, 1 )
 script = ExtResource( 5 )
-_sections_unfolded = [ "Script" ]
 
 [node name="Label" type="Label" parent="LobbyPlayers"]
 anchor_left = 0.0
@@ -279,7 +265,6 @@ align = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="TeamsLeftRightWidget" parent="LobbyPlayers" instance=ExtResource( 6 )]
 margin_left = 198.0
@@ -306,7 +291,6 @@ scroll_horizontal = 0
 scroll_vertical_enabled = true
 scroll_vertical = 0
 scroll_deadzone = 0
-_sections_unfolded = [ "Rect", "Scroll" ]
 
 [node name="TeamGrid" type="VBoxContainer" parent="LobbyPlayers/ScrollContainer"]
 anchor_left = 0.0
@@ -321,7 +305,6 @@ size_flags_horizontal = 1
 size_flags_vertical = 1
 custom_constants/separation = 10
 alignment = 0
-_sections_unfolded = [ "Rect", "custom_constants" ]
 
 [node name="ReadyGameBtn" type="Button" parent="."]
 anchor_left = 0.0
@@ -348,7 +331,6 @@ group = null
 text = "Confirm Ready"
 flat = false
 align = 1
-_sections_unfolded = [ "Script", "Size Flags", "custom_fonts", "custom_fonts/font" ]
 
 [node name="BackToSetupBtn" type="Button" parent="."]
 anchor_left = 0.0
@@ -374,7 +356,6 @@ group = null
 text = "<Back To Setup"
 flat = false
 align = 1
-_sections_unfolded = [ "Script", "custom_fonts", "custom_fonts/font" ]
 
 [node name="ConnectToHostPopup" parent="." instance=ExtResource( 7 )]
 visible = false

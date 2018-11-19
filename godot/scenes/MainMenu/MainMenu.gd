@@ -30,9 +30,6 @@ func _on_Testing_pressed():
 
 
 func _on_QuickStart_pressed():
-    SettingsConf.S.QuickStart.player_team
-    SettingsConf.S.QuickStart.player_number
-    SettingsConf.S.QuickStart.player_id
     if not LazerInterface.state_lazer_gun_is_connected:
         get_tree().call_group("connect_weapon", "connect_weapon_guard", "res://scenes/InGame/InGameNoNetwork.tscn")
     else:
