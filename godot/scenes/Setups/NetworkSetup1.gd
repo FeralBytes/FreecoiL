@@ -22,11 +22,13 @@ func _on_GoToLobby_pressed():
 # "networking" group calls
 ##########################################
 func nw_too_many_inet_facing_addresses(addresses):
+    addresses = null
     HostPopup.clear_content()
     HostPopup.add_content("res://scenes/Popups/HostTooManyAddressesPopup.tscn")
     HostPopup.popup()
     
 func nw_inet_bound_address(address):
+    address = null
     HostPopup.clear_content()
     HostPopup.add_content("res://scenes/Popups/HostBoundAddressPopup.tscn")
     HostPopup.popup()

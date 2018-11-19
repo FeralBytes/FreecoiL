@@ -253,6 +253,8 @@ func _changed_lazer_telem_commandId(commandId):
 
 func _changed_lazer_telem_playerId(playerId):
     get_tree().call_group("lazercoil", "li_player_id_changed")
+    # TODO: Set or update player id.
+    playerId = null
 
 func _changed_lazer_telem_shotsRemaining(shotsRemaining):
     shots_remaining = shotsRemaining
@@ -293,7 +295,6 @@ func _lazer_telem_batteryLvl(batteryLvl):
         get_tree().call_group("lazercoil", "li_battery_lvl_changed")
         prev_battery_lvl_avg = battery_lvl_avg
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
-    print("here still connected, telemetry")
     _on_lazer_gun_still_connected()
     
 func _changed_lazer_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2):
@@ -327,6 +328,7 @@ func _changed_telem_button_pressed(buttonsPressed):
     #reload + back + power = 22
     #triger + reload + back + power = 23
     pass
+    buttonsPressed = null
 
 func _new_status(status, level):
     # Debug Levels:

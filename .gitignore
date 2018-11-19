@@ -1,5 +1,6 @@
 # Godot Build Artifacts
-.import
+# For the server to be able to test via CI it needs the imports.
+#.import
 .mono
 .vs
 # Android Build Artifacts & Gradle

@@ -13,7 +13,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=2]
 
@@ -23,7 +22,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=3]
 
@@ -33,7 +31,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings", "font_data" ]
 
 [node name="MainMenu" type="Control"]
 anchor_left = 0.0
@@ -47,7 +44,6 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 script = ExtResource( 1 )
-_sections_unfolded = [ "Script" ]
 
 [node name="Background" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -106,7 +102,6 @@ group = null
 text = "Quick Start Game"
 flat = false
 align = 1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="ColorRect2" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -148,7 +143,6 @@ group = null
 text = "Start A Networked Game"
 flat = false
 align = 1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="ColorRect1" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -190,7 +184,6 @@ group = null
 text = "Start A Game Without Network"
 flat = false
 align = 1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="NonBlockingPopup" parent="." instance=ExtResource( 4 )]
 visible = false

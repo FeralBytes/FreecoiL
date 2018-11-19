@@ -1,6 +1,6 @@
 extends Control
 
-var ColorPick = preload("res://scenes/Widgets/TeamColorPicker.tscn")
+var ColorPick = load("res://scenes/Widgets/TeamColorPicker.tscn") 
 
 onready var TeamsColors = get_node("ColorRect/ScrollContainer/TeamsColorsContainer")
 
@@ -30,10 +30,12 @@ func on_teams_changed():
 
 
 func _on_TeamSetupSection_on_teams_changed(teams_active):
+    teams_active = null
     on_teams_changed()
 
 
 func _on_TeamSetupSection_on_num_of_teams_changed(num_of_teams):
+    num_of_teams = null
     on_teams_changed()
 
 

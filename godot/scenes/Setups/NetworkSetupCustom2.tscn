@@ -14,7 +14,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=2]
 
@@ -24,7 +23,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=3]
 
@@ -34,7 +32,6 @@ outline_color = Color( 1, 1, 1, 1 )
 use_mipmaps = false
 use_filter = false
 font_data = ExtResource( 3 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [node name="NetworkSetupCustom2" type="Control"]
 anchor_left = 0.0
@@ -48,7 +45,6 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 script = ExtResource( 1 )
-_sections_unfolded = [ "Script" ]
 
 [node name="Background" type="ColorRect" parent="."]
 anchor_left = 0.0
@@ -103,7 +99,6 @@ align = 1
 percent_visible = 1.0
 lines_skipped = 0
 max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="TeamSetupSection" parent="." instance=ExtResource( 4 )]
 margin_top = 170.0
@@ -144,7 +139,6 @@ scroll_horizontal = 0
 scroll_vertical_enabled = true
 scroll_vertical = 0
 scroll_deadzone = 0
-_sections_unfolded = [ "Rect", "Scroll" ]
 
 [node name="TeamsColorsContainer" type="VBoxContainer" parent="ColorRect/ScrollContainer"]
 anchor_left = 0.0
@@ -161,7 +155,6 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 1
 alignment = 0
-_sections_unfolded = [ "Rect" ]
 
 [node name="ContinueSetup" type="Button" parent="."]
 anchor_left = 0.0
@@ -187,7 +180,6 @@ group = null
 text = "Continue Setup >"
 flat = false
 align = 1
-_sections_unfolded = [ "Script", "custom_fonts", "custom_fonts/font" ]
 
 [node name="BackToMenu" type="Button" parent="."]
 anchor_left = 0.0
@@ -214,7 +206,6 @@ text = "< Back To Menu"
 flat = false
 align = 1
 script = ExtResource( 5 )
-_sections_unfolded = [ "Script", "custom_fonts", "custom_fonts/font" ]
 
 [connection signal="on_num_of_teams_changed" from="TeamSetupSection" to="." method="_on_TeamSetupSection_on_num_of_teams_changed" flags=3]
 [connection signal="on_teams_changed" from="TeamSetupSection" to="." method="_on_TeamSetupSection_on_teams_changed" flags=3]

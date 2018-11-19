@@ -52,15 +52,18 @@ remote func change_my_data(new_data):
 
 func _ready():
     add_to_group("networking")
-    get_tree().connect("network_peer_connected", self, "_player_connected")
-    get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
-    get_tree().connect("connected_to_server", self, "_connected_ok")
-    get_tree().connect("connection_failed", self, "_connection_fail")
-    get_tree().connect("server_disconnected", self, "_server_disconnected")
-    connect("my_data_changed", self, "_on_my_data_changed")
+    var unused
+    unused = get_tree().connect("network_peer_connected", self, "_player_connected")
+    unused = get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
+    unused = get_tree().connect("connected_to_server", self, "_connected_ok")
+    unused = get_tree().connect("connection_failed", self, "_connection_fail")
+    unused = get_tree().connect("server_disconnected", self, "_server_disconnected")
+    unused = connect("my_data_changed", self, "_on_my_data_changed")
+    unused = null
     # Below is IP Address Regex.
     validate_ip.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
     net_time.wait_time = 259200  # 3 Days
+    add_child(net_time)
     
 # func _process(): is defined down much lower.
 
@@ -195,6 +198,7 @@ remote func register_player(data):
                 set_scenario_player_options_as_server(get_tree().get_rpc_sender_id())
 
 remote func update_player_data(unique_id, new_data):
+    unique_id = null
     if get_tree().get_rpc_sender_id() == 1:
         players_data[new_data["server_unique_id"]] = new_data
         get_tree().call_group("lobby", "lobby_update_team_grid")
@@ -303,14 +307,17 @@ sync func start_the_game_players_ready():
     get_tree().call_group("in_game", "ig_all_players_ready")
     
 func record_game_event(event_type, parameters):
-    device_unpassed_history.append(net_time.time_left, 
-        my_data["server_unique_id"], event_type, parameters)
+    device_unpassed_history.append([net_time.time_left, 
+        my_data["server_unique_id"], event_type, parameters])
 
 func send_game_events_to_server():
     if device_unpassed_history.size() > 0:
         device_passed_history.append(device_unpassed_history.pop_front())
-        rpc_id(1, "server_rx_game_event", 
-            device_passed_history[device_passed_history.size() - 1])
+        if get_tree().is_network_server():
+            server_rx_game_event(device_passed_history[device_passed_history.size() - 1])
+        else:
+            rpc_id(1, "server_rx_game_event", 
+                device_passed_history[device_passed_history.size() - 1])
         
 remote func server_rx_game_event(event):
     server_unsorted_history.append(event)
@@ -318,23 +325,28 @@ remote func server_rx_game_event(event):
 func server_process_history():
     var largest = 0
     if server_unsorted_history.size() > 0:
-        for hist in server_unsorted_history:
+        for hist in range(server_unsorted_history.size()):
             if server_unsorted_history[hist][0] > largest: # time
                 # largest time is actually the most recent because timers count down.
                 largest = hist
-        if server_unsorted_history[largest][0] < game_history[-1][0]:
+        if game_history.size() == 0:
             game_history.append(server_unsorted_history[largest])
-            server_unpassed_game_history.append(server_unsorted_history[largest], null)
+            server_unpassed_game_history.append([server_unsorted_history[largest], null])
+            server_unsorted_history.remove(largest)
+        elif server_unsorted_history[largest][0] < game_history[-1][0]:
+            game_history.append(server_unsorted_history[largest])
+            server_unpassed_game_history.append([server_unsorted_history[largest], null])
             server_unsorted_history.remove(largest)
         else:
-            var index
+            var index = 0
             for i in range(game_history.size(), 0):  # Work backwards
                 if server_unsorted_history[largest][0] < game_history[i][0]:
                     index = i + 1
                     break
             game_history.insert(index, server_unsorted_history[largest])
-            server_unpassed_game_history.append(server_unsorted_history[largest], index)
+            server_unpassed_game_history.append([server_unsorted_history[largest], index])
             server_unsorted_history.remove(largest)
+        print("game_history = ", game_history)
 
 func server_send_game_history():
     if server_unpassed_game_history.size() > 0:
@@ -349,9 +361,9 @@ remote func client_rx_game_history(piece, at_pos):
         game_history.insert(at_pos, piece)
     
 func _process(delta):  # This is executed during idle time.
+    delta = null
     if state_playing_game:
         if state_connected:
-            
             send_game_events_to_server()
             if get_tree().is_network_server():
                 server_process_history()

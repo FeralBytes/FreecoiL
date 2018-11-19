@@ -11,8 +11,9 @@ func _ready():
     current_scene = root.get_child(root.get_child_count() -1)
     ProgBar = get_node('/root/SceneManager/SceneFader/SM_ProgBar')
     timer.one_shot = true
-    
-        
+    if OS.get_environment("FreecoiL_TEST") == "true":
+        call_deferred("run_tests")
+
 func goto_scene(path): # game requests to switch to this scene
     if loading_state != 'idle':
         return 'Error'
@@ -100,3 +101,12 @@ func set_new_scene_part2(current_scene):
     update_progress([1.0])
     get_node("SceneFader/AnimationPlayer").play("Fade_Out")
     loading_state = 'idle'
+
+func run_tests():
+    
+    call_deferred("exit_tests")
+    
+    
+func exit_tests():
+    print("Exiting Tests are Complete.")
+    get_tree().quit()

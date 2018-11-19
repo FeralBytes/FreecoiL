@@ -1,7 +1,5 @@
 extends ColorRect
 
-var minutes
-
 onready var EndGame = get_node("EndGameWidget")
 onready var Limit = get_node("PlusMinusWidget")
 
