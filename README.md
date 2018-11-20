@@ -28,8 +28,8 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 
 ### The Release Plan So Far: If we are able to speed up the timeline below, we will.
 * ~~Version 0.1.0 on 23OCT2018~~
-* Version 0.2.0 on 17NOV2018
-* Version 0.2.5 on 25NOV2018 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
+* Version 0.2.0 on 20NOV2018
+* Version 0.2.1 on 25NOV2018 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
 * Version 0.3.0 on 06DEC2018
 * Version 0.4.0 on 27DEC2018
 * Version 0.5.0 on 17JAN2019
