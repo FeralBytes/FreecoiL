@@ -15,7 +15,6 @@ func _ready():
 
 
 func _on_GoToLobby_pressed():
-    SettingsConf.save()
     SceneManager.goto_scene("res://scenes/Lobbies/NetworkLobby.tscn")
 
 ##########################################

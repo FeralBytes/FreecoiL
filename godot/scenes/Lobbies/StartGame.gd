@@ -14,8 +14,7 @@ func _ready():
 
 
 func _on_StartGame_pressed():
-    SettingsConf.S.QuickStart.quick_start_complete = true
-    SettingsConf.save()
+    SetConf.Session.quick_start_complete = true
     if not LazerInterface.state_lazer_gun_is_connected:
         get_tree().call_group("connect_weapon", "connect_weapon_guard", "res://scenes/InGame/InGameNoNetwork.tscn")
     else:

@@ -13,7 +13,7 @@ func _ready():
     ViewLR.set_selected_by_index(0)
 
 func calc_players_per_team():
-    LazerInterface.players_per_team = LazerInterface.MAX_PLAYERS / SettingsConf.S.QuickStart.num_of_teams
+    LazerInterface.players_per_team = LazerInterface.MAX_PLAYERS / SetConf.Session.num_of_teams
 
 func _on_ViewLeftRightWidget_LRWidChanged(team_num):
     for i in TheGrid.get_children():

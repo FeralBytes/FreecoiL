@@ -14,5 +14,4 @@ func _ready():
 
 
 func _on_BackToSetup_pressed():
-    SettingsConf.save()
     SceneManager.goto_scene("res://scenes/Setups/NoNetworkSetup.tscn")

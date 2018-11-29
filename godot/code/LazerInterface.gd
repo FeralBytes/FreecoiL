@@ -15,7 +15,6 @@ extends Node
 # li_reload_btn_pushed
 # li_thumb_btn_pushed
 # li_power_btn_pushed
-# li_battery_lvl_changed
 # li_got_shot(shooter_id)
 
 # The LazercoiL Singleton
@@ -24,7 +23,7 @@ var lazercoil = null
 # constants for max and mins
 const MAX_PLAYERS = 63  # 0-63, but 0 is not useable as it is the laser's default for no shot.
 # It could be used if we detected the shooter_id at the same time as the shot_counter. 
-const MAX_TEAMS = 31  # Literally teams not player per team. i.e.: 2 players per team would be 31 teams.
+const MAX_TEAMS = 31  # Literally teams but also players per team. i.e.: 2 players per team would be 31 teams.
 const MIN_TEAMS = 2  # FFA is not a team battle.
 # vars for storing game details
 var players_per_team
@@ -101,7 +100,7 @@ func reload_start():
 
 func reload_finish():
     if lazercoil != null:
-        lazercoil.finishReload(SettingsConf.S.QuickStart.magazine)
+        lazercoil.finishReload(SetConf.Session.magazine)
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
     # SHOT_MODE_FULL_AUTO = 1
@@ -153,7 +152,7 @@ func _on_delay_loading():
     if get_node("/root").has_node("TestContainer"):
         if get_node("/root/TestContainer").has_node("StatusScroll"):
             status_scroll = get_node("/root/TestContainer/StatusScroll")
-    if(Engine.has_singleton("FreecoiL")):
+    if Engine.has_singleton("FreecoiL"):
         lazercoil = Engine.get_singleton("FreecoiL")
         lazercoil.init(get_instance_id())
     
@@ -228,6 +227,7 @@ func _on_lazer_gun_disconnected():
     _new_status("Lazer gun, disconnected.", 1)
     state_lazer_gun_is_connected = false
     get_tree().call_group("lazercoil", "li_lazer_gun_disconnected")
+    SetConf.Session.battery_lvl = 0
     bt_connection_timed_out.stop()
     if state_auto_reconnect_bt_dev:
         connect_to_lazer_gun()
@@ -292,7 +292,8 @@ func _lazer_telem_batteryLvl(batteryLvl):
          battery_sum += battery_lvl_array[i]
     battery_lvl_avg = battery_sum / battery_lvl_array.size()
     if battery_lvl_avg != prev_battery_lvl_avg:
-        get_tree().call_group("lazercoil", "li_battery_lvl_changed")
+        # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
+        SetConf.Session.battery_lvl = LazerInterface.battery_lvl_avg * 6.25
         prev_battery_lvl_avg = battery_lvl_avg
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
     _on_lazer_gun_still_connected()

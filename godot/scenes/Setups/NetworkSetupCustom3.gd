@@ -14,6 +14,5 @@ func _ready():
 
 
 func _on_ContinueSetup_pressed():
-    SettingsConf.save()
     NetworkingCode.set_scenario_as_server(null)
     SceneManager.goto_scene("res://scenes/Setups/NetworkSetupCustom4.tscn")

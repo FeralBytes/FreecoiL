@@ -13,4 +13,4 @@ func set_color(new_color):
 
 
 func _on_ColorPickerButton_color_changed(color):
-    SettingsConf.S.QuickStart.TeamColors[team_num - 1] = color
+    SetConf.Session.team_colors[team_num - 1] = color

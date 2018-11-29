@@ -113,8 +113,8 @@ func _on_Countdown_timeout():
 # connect_weapon group funcs
 ###############################
 func connect_weapon_guard(s):
-    print("SettingsConf.S.testing.test = ", SettingsConf.S.testing.test)
-    if SettingsConf.S.testing.test:
+    print("SetConf.Saved.SetConf.test = ", SetConf.Saved.SetConf.test)
+    if SetConf.Saved.SetConf.test:
         SceneManager.goto_scene(s)
     else:
         scene = s
