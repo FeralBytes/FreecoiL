@@ -1,0 +1,1 @@
+extends "res://tests/The2PlayerIntegrationTester.gd"

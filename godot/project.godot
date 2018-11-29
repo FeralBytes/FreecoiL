@@ -30,11 +30,11 @@ output_latency=1
 
 [autoload]
 
-LazerInterface="*res://code/LazerInterface.gd"
+SetConf="*res://code/SetConf.gd"
 SceneManager="*res://scenes/SceneManager/SceneManager.tscn"
-SettingsConf="*res://code/SettingsConf.gd"
-NetworkingCode="*res://code/NetworkingCode.gd"
+LazerInterface="*res://code/LazerInterface.gd"
 Helpers="*res://code/Helpers.gd"
+NetworkingCode="*res://code/NetworkingCode.gd"
 
 [debug]
 

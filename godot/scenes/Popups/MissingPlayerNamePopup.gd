@@ -14,5 +14,5 @@ func _ready():
 
 
 func _on_LineEdit_text_entered(new_text):
-    SettingsConf.S.QuickStart.player_name = new_text
+    SetConf.Session.player_name = new_text
     get_tree().call_group("lobby", "lobby_hide_popup")

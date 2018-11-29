@@ -1,107 +1,74 @@
 image: openjdk:8-jdk
 
 variables:
-  ANDROID_COMPILE_SDK: "28"
-  ANDROID_BUILD_TOOLS: "28.0.2"
-  ANDROID_SDK_TOOLS:   "4333796"
-  ANDROID_NDK_TOOLS: "r18b"
   GODOT_VERSION: "3.1-alpha2"
 
 before_script:
   - pwd
   - export DOCKER_HOME=$PWD
-  - export ANDROID_HOME=$PWD/android-sdk-linux
-  - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
-  - export ANDROID_NDK_ROOT=$PWD/android-ndk-linux/android-ndk-$ANDROID_NDK_TOOLS
-  # temporarily disable checking for EPIPE error and use yes to accept all licenses
-  - set +o pipefail
-  - sh $DOCKER_HOME/.gitlab/ci_scripts/install_build_dependencies.sh
-  - set -o pipefail
-stages:
-  - build_engine
-  #- build_apk
-  #- test
+  # Locale must be set or else it will cause additional errors for Godot 
+  - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+  - sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+  - dpkg-reconfigure --frontend=noninteractive locales
+  - update-locale LANG=en_US.UTF-8
+  - export LANG=en_US.UTF-8
+  - mkdir -p ~/.config/godot/projects
+  - mkdir -p ~/.godot
+  - mkdir -p ~/.local/share/godot
+  - mkdir -p ~/.config/godot
+  - mkdir -p ~/.cache
+  - cp $DOCKER_HOME/.gitlab/ci_scripts/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
 
-build_engine_and_android_and_templates:
-  stage: build_engine
+stages:
+  - automated_tests
+
+unit_tests:
+  stage: automated_tests
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
-    # Locale issues may be the source of these problems.
-    - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
-    - sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-    - dpkg-reconfigure --frontend=noninteractive locales
-    - update-locale LANG=en_US.UTF-8
-    - export LANG=en_US.UTF-8 
-    # Build Android Export Template Debug APK
-    ######## BELOW WORKS ###########################
-    #- cp -a android_java/app/src/main/java/com/feralbytes/games/FreecoiL/. godot_engine/godot/modules/FreecoiL/android/src/
-    #- cd $DOCKER_HOME/godot_engine/godot
-    #- git checkout master
-    #- scons -Q -j1 platform=android target=debug
-    #- cd $DOCKER_HOME/godot_engine/godot/platform/android/java
-    #- ./gradlew build
-    #- cd $DOCKER_HOME
-    #- echo "##################################"
-    #- ls -a $DOCKER_HOME/godot_engine/godot/bin
-    #- echo "##################################"
-    - mkdir -p $DOCKER_HOME/exports/android
-    #- cp -a $DOCKER_HOME/godot_engine/godot/bin/. $DOCKER_HOME/exports/android/
-    ############ ABOVE WORKS ####################################
-    # Build Android Export Template Release APK
-    #- cd $DOCKER_HOME/godot_engine/godot
-    #- scons -Q -j1 platform=android target=release
-    #- cd $DOCKER_HOME/godot_engine/godot/platform/android/java
-    #- ./gradlew build
-    #- cd $DOCKER_HOME
-    #- echo "##################################"
-    #- ls -a $DOCKER_HOME/godot_engine/godot/bin
-    #Build Linux Editor
-    #- cp -a android_java/app/src/main/java/com/feralbytes/games/FreecoiL/. godot_engine/godot/modules/FreecoiL/android/src/
-    #- cd $DOCKER_HOME/godot_engine/godot
-    #- scons -Q -j1 platform=x11 target=release_debug
-    #- echo "##################################"
-    #- ls -a $DOCKER_HOME/godot_engine/godot/bin
-    #- cd $DOCKER_HOME
-    # Build Headless Linux Editor
-    #- cd $DOCKER_HOME/godot_engine/godot
-    #- scons -Q -j1 platform=server tools=yes target=release_debug
-    #- cd $DOCKER_HOME
-    #- echo " PWD  PWD  PWD"
-    #- pwd
-    #- echo "##################################"
-    #- ls -a $DOCKER_HOME/godot_engine/godot/bin
-    #- echo "Building Headless Server Completed."
-    # Download Headless Editor
-    - wget --quiet --output-document=godot_3.1_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.1/alpha2/Godot_v3.1-alpha2_linux_headless.64.zip
+    # Download Server version of Godot
     - wget --quiet --output-document=godot_3.1_server.zip https://downloads.tuxfamily.org/godotengine/3.1/alpha2/Godot_v3.1-alpha2_linux_server.64.zip
-    - unzip -q -d godot_editor godot_3.1_linux_headless.zip
     - unzip -q -d godot_editor godot_3.1_server.zip
-    # Build the actual APK using the Headless Linux Editor
-    - mkdir -p ~/.config/godot/projects
-    - mkdir -p ~/.godot
-    - mkdir -p ~/.local/share/godot
-    - mkdir -p ~/.config/godot
-    - mkdir -p ~/.cache
-    - cp $DOCKER_HOME/.gitlab/ci_scripts/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64
     - chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_server.64
-    - cd $DOCKER_HOME
-    #- $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --export-debug Android --path $DOCKER_HOME/godot/ --quit -v exports/android/FreecoiL_debug.apk
-    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --export-debug Linux/X11 --path $DOCKER_HOME/godot/ --quit -v FreecoiL_debug.64
-    # Make a test Env var 
-    - export FreecoiL_TEST=true
-    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_server.64 -v --path $DOCKER_HOME/godot
-    - echo "##################################"
-    - ls -a $DOCKER_HOME/exports/android
-    - ls -a $DOCKER_HOME
-    - ls -a $DOCKER_HOME/godot_editor/
-  artifacts: 
-    paths:
-    - exports/android/
-    - godot_engine/godot/bin/
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_server.64 -s $DOCKER_HOME/godot/tests/RunUnitTests.gd --path $DOCKER_HOME/godot/
 
-#debugTests:
-  #stage: test
-  #script:
-    #- ./gradlew -Pci --console=plain :app:testDebug
+integration_tests:
+  stage: automated_tests
+  script:
+    # Download Headless version of Godot
+    - wget --quiet --output-document=godot_3.1_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.1/alpha2/Godot_v3.1-alpha2_linux_headless.64.zip
+    - unzip -q -d godot_editor godot_3.1_linux_headless.zip
+    - chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64
+    - export FreecoiL_TEST=true
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --path $DOCKER_HOME/godot/
+
+2player_integration_tests:
+  stage: automated_tests
+  script:
+    # Download Headless version of Godot. Don't use the server version in these tests.
+    - wget --quiet --output-document=godot_3.1_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.1/alpha2/Godot_v3.1-alpha2_linux_headless.64.zip
+    - unzip -q -d godot_editor godot_3.1_linux_headless.zip
+    - chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64
+    - export FreecoiL_2PLAYER_TEST=true
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --path $DOCKER_HOME/godot/ &
+    # We start the server last. The clients will wait. Server will print all details to stdout.
+    # Since Godot's networking is Server Centric this makes the most sense.
+    - export FreecoiL_SERVER=true
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --path $DOCKER_HOME/godot/ 
+    - export FreecoiL_SERVER=false
+
+multiplayer_integration_tests:
+  stage: automated_tests
+  script:
+    # Download Headless version of Godot. Don't use the server version in these tests.
+    - wget --quiet --output-document=godot_3.1_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.1/alpha2/Godot_v3.1-alpha2_linux_headless.64.zip
+    - unzip -q -d godot_editor godot_3.1_linux_headless.zip
+    - chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64
+    - export FreecoiL_MULTIPLAYER_TEST=true
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --path $DOCKER_HOME/godot/ &
+    # We start the server last. The clients will wait. Server will print all details to stdout.
+    # Since Godot's networking is Server Centric this makes the most sense.
+    - export FreecoiL_SERVER=true
+    - $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_headless.64 --path $DOCKER_HOME/godot/ 
+    - export FreecoiL_SERVER=false

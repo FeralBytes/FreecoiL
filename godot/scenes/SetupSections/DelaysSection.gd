@@ -5,8 +5,8 @@ onready var StartgameDelay = get_node("StartGameDelay")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    RespawnDelay.set_val(SettingsConf.S.QuickStart.respawn_delay)
-    StartgameDelay.set_val(SettingsConf.S.QuickStart.start_delay)
+    RespawnDelay.set_val(SetConf.Session.respawn_delay)
+    StartgameDelay.set_val(SetConf.Session.start_delay)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -14,8 +14,8 @@ func _ready():
 
 
 func _on_RespawnDelay_PMWidChanged(new_val):
-    SettingsConf.S.QuickStart.respawn_delay = new_val
+    SetConf.Session.respawn_delay = new_val
 
 
 func _on_StartGameDelay_PMWidChanged(new_val):
-    SettingsConf.S.QuickStart.start_delay = new_val
+    SetConf.Session.start_delay = new_val
