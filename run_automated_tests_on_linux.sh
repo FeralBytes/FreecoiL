@@ -1,3 +1,4 @@
+#!/bin/bash
 mkdir -p tmp
 export SOURCE_DIR=$PWD
 cd tmp
@@ -26,8 +27,27 @@ wget --quiet --output-document=godot_3.1_server.zip https://downloads.tuxfamily.
 unzip -q -d godot_editor godot_3.1_server.zip
 chmod +x $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_server.64
 $DOCKER_HOME/godot_editor/Godot_v3.1-alpha2_linux_server.64 -s $SOURCE_DIR/godot/tests/RunUnitTests.gd --path $SOURCE_DIR/godot/
+if [ $? -ne 0 ]; then
+    exit $?
+else
+    echo "The Unit Test was Successful, are you ready to continue to the next test?"
+    OPTIONS="Yes No"
+    select opt in $OPTIONS; do
+    if [ "$opt" = "Yes" ]; then
+        echo "Continuing."
+    elif [ "$opt" = "No" ]; then
+        echo "Ending Test Now."
+        exit
+    else
+        clear
+        echo "The Unit Test was Successful, are you ready to continue to the next test?"
+        echo "Your input was invalid. The options are below:"
+        echo "1) Yes"
+        echo "2) No"
+    fi
+    done
+fi
 sleep 2
-
 #integration_tests:
 #  stage: automated_tests
 # Download Headless version of Godot

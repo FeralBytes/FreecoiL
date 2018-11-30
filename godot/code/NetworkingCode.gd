@@ -234,7 +234,6 @@ remote func update_server_player_data(new_data):
 
 func set_lobby_team_or_ffa_as_server(peer_id):
     if SetConf.Session.teams:
-        print("peer_id = ", peer_id)
         if peer_id == null:  # Because this gets called by outside code to push all current players to the right lobby type.
             rpc("set_num_of_teams", SetConf.Session.num_of_teams)
             rpc("set_team_colors", SetConf.Session.team_colors)
@@ -300,7 +299,6 @@ func tell_server_i_am_ready():
     
 remote func server_recieve_i_am_ready():
     if get_tree().is_network_server():
-        print(get_tree().get_rpc_sender_id())
         if get_tree().get_rpc_sender_id() == 0:
             if not 1 in players_ready:
                 players_ready.append(1)
