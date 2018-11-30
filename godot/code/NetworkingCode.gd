@@ -103,7 +103,7 @@ func setup_as_host():
                 get_tree().call_group("networking", "nw_no_inet_facing_addresses")
             if matches.size() == 1:
                 SetConf.Session.server_ip = matches[0]
-                get_tree().call_group("networking", "nw_inet_bound_address", matches[0])
+                get_tree().call_group("networking", "nw_inet_bound_address")
                 call_deferred("finish_host_setup")
             elif matches.size() > 1:
                 possible_server_ips = matches
@@ -111,6 +111,7 @@ func setup_as_host():
         else:
             call_deferred("finish_host_setup")
     else:
+        get_tree().call_group("networking", "nw_inet_bound_address")
         call_deferred("finish_host_setup")
         
 func finish_host_setup():
@@ -233,6 +234,7 @@ remote func update_server_player_data(new_data):
 
 func set_lobby_team_or_ffa_as_server(peer_id):
     if SetConf.Session.teams:
+        print("peer_id = ", peer_id)
         if peer_id == null:  # Because this gets called by outside code to push all current players to the right lobby type.
             rpc("set_num_of_teams", SetConf.Session.num_of_teams)
             rpc("set_team_colors", SetConf.Session.team_colors)
@@ -245,6 +247,7 @@ func set_lobby_team_or_ffa_as_server(peer_id):
 
 remote func change_to_team_lobby():
     SceneManager.goto_scene("res://scenes/Lobbies/NetworkTeamLobby.tscn")
+    print("change_to_team_lobby, going to scene")
     
 remote func change_to_ffa_lobby():
     SceneManager.goto_scene("res://scenes/Lobbies/NetworkFfaLobby.tscn")

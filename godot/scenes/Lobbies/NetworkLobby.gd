@@ -33,5 +33,5 @@ func _on_ReadyGame_pressed():
 ####################################
 func lobby_host_ip(Ip):
     ConnectPopup.hide()
-    NetworkingCode.server_ip = Ip
+    SetConf.Session.server_ip = Ip
     NetworkingCode.setup_as_client()

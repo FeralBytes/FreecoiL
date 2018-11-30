@@ -26,8 +26,7 @@ func nw_too_many_inet_facing_addresses(addresses):
     HostPopup.add_content("res://scenes/Popups/HostTooManyAddressesPopup.tscn")
     HostPopup.popup()
     
-func nw_inet_bound_address(address):
-    address = null
+func nw_inet_bound_address():
     HostPopup.clear_content()
     HostPopup.add_content("res://scenes/Popups/HostBoundAddressPopup.tscn")
     HostPopup.popup()
