@@ -6,7 +6,7 @@ var max_team_id
 var min_team_id 
 var shot_mode = "single"
 var indoor_outdoor_mode
-var remaining_time = SettingsConf.S.QuickStart.end_game_time_limit + 1
+var remaining_time = SetConf.Session.end_game_time_limit + 1
 var game_over = false
 
 onready var reload_sound = get_node("Reload")
@@ -42,10 +42,10 @@ func _ready():
     reset_li_vars()
     add_to_group("lazercoil")
     add_to_group("in_game")
-    LazerInterface.set_lazer_id(SettingsConf.S.QuickStart.player_id)
+    LazerInterface.set_lazer_id(SetConf.Session.player_id)
     init_shot_mode()
     CurrentAmmo.text = "%03d" % LazerInterface.shots_remaining
-    Magazine.text = "%03d" % SettingsConf.S.QuickStart.magazine
+    Magazine.text = "%03d" % SetConf.Session.magazine
     AmmoBar.value = 0
     CurrentHealth.text = "%02d" % LazerInterface.current_health
     FullHealth.text = "%03d" % LazerInterface.full_health
@@ -84,8 +84,8 @@ func reload_start():
     
 func reload_finish():
     LazerInterface.reload_finish()
-    CurrentAmmo.text = "%03d" % SettingsConf.S.QuickStart.magazine
-    AmmoBar.value = SettingsConf.S.QuickStart.magazine
+    CurrentAmmo.text = "%03d" % SetConf.Session.magazine
+    AmmoBar.value = SetConf.Session.magazine
 
 func respawn_start(shooter_id):
     LazerInterface.is_player_alive = false
@@ -98,8 +98,8 @@ func respawn_start(shooter_id):
         LazerInterface.player_deaths += 1
         NetworkingCode.record_game_event("killed", [shooter_id, LazerInterface.player_deaths])
         Deaths.text = "%02d" % LazerInterface.player_deaths
-        if SettingsConf.S.QuickStart.end_game == "deaths":
-            if LazerInterface.player_deaths == SettingsConf.S.QuickStart.end_game_death_limit:
+        if SetConf.Session.end_game == "deaths":
+            if LazerInterface.player_deaths == SetConf.Session.end_game_death_limit:
                 end_game("LIVES!")
                 NetworkingCode.record_game_event("end_game", ["lives"])
             else:
@@ -139,7 +139,7 @@ func li_got_shot(shooter_id):
     StatusMessages.text = "Shot By Player ID # " + str(shooter_id) + "\n" + StatusMessages.text
     call_deferred("delayed_vibrate")  # Because it was slowing down the processing of shots.
     if shooter_id != 0:  # Don't register shots from Player Id 0.
-        if SettingsConf.S.QuickStart.teams:  # Team Match
+        if SetConf.Session.teams:  # Team Match
             # Don't get shot by your own team.
             if shooter_id > max_team_id or shooter_id < min_team_id:
                 if LazerInterface.is_player_alive:
@@ -158,12 +158,12 @@ func li_got_shot(shooter_id):
         HitIndicatorTimer.start()
 
 func li_player_id_changed():
-    PlayerNum.text = "Player # " + str(SettingsConf.S.QuickStart.player_number)
-    StatusMessages.text = "Self Player ID Set as ID # " + str(SettingsConf.S.QuickStart.player_id) + "\n" + StatusMessages.text
+    PlayerNum.text = "Player # " + str(SetConf.Session.player_number)
+    StatusMessages.text = "Self Player ID Set as ID # " + str(SetConf.Session.player_id) + "\n" + StatusMessages.text
     
 func li_shots_remaining_changed():
     if LazerInterface.is_player_alive:
-        if LazerInterface.shots_remaining == SettingsConf.S.QuickStart.magazine:
+        if LazerInterface.shots_remaining == SetConf.Session.magazine:
             pass
         elif LazerInterface.shots_remaining == 0:
             pass
@@ -191,7 +191,7 @@ func li_power_btn_pushed():
 # In Game Functions
 ###############################################################################
 func build_team_filter():
-    max_team_id = SettingsConf.S.QuickStart.player_team * LazerInterface.players_per_team
+    max_team_id = SetConf.Session.player_team * LazerInterface.players_per_team
     min_team_id = max_team_id - LazerInterface.players_per_team + 1
 
 func update_recoil():
@@ -213,32 +213,32 @@ func _on_HitIndicatorTimer_timeout():
     
 func set_shot_mode():
     if shot_mode == "single":
-        if SettingsConf.S.QuickStart.burst_3_allowed:
+        if SetConf.Session.burst_3_allowed:
             shot_mode = "burst"
-        elif SettingsConf.S.QuickStart.full_auto_allowed:
+        elif SetConf.Session.full_auto_allowed:
             shot_mode = "auto"
         # else: pass
     elif shot_mode == "burst":
-        if SettingsConf.S.QuickStart.full_auto_allowed:
+        if SetConf.Session.full_auto_allowed:
             shot_mode = "auto"
-        elif SettingsConf.S.QuickStart.semi_auto_allowed:
+        elif SetConf.Session.semi_auto_allowed:
             shot_mode = "single"
         # else: pass
     elif shot_mode == "auto":
-        if SettingsConf.S.QuickStart.semi_auto_allowed:
+        if SetConf.Session.semi_auto_allowed:
             shot_mode = "single"
-        elif SettingsConf.S.QuickStart.burst_3_allowed:
+        elif SetConf.Session.burst_3_allowed:
             shot_mode = "burst"
     update_shot_mode()
 
 func init_shot_mode():
-    if SettingsConf.S.QuickStart.semi_auto_allowed:
+    if SetConf.Session.semi_auto_allowed:
         shot_mode = "single"
-    elif SettingsConf.S.QuickStart.burst_3_allowed:
+    elif SetConf.Session.burst_3_allowed:
         shot_mode = "burst"
-    elif SettingsConf.S.QuickStart.full_auto_allowed:
+    elif SetConf.Session.full_auto_allowed:
         shot_mode = "auto" 
-    indoor_outdoor_mode = SettingsConf.S.QuickStart.indoor_outdoor_mode
+    indoor_outdoor_mode = SetConf.Session.indoor_outdoor_mode
     update_shot_mode()
 
 func update_shot_mode():
@@ -261,10 +261,10 @@ func ig_respawn_player():
         respawn_finish()
     
 func ig_start_game():
-    if SettingsConf.S.QuickStart.end_game == "time":
+    if SetConf.Session.end_game == "time":
         update_remaining_time()
         end_game_timer.one_shot = true
-        end_game_timer.wait_time = SettingsConf.S.QuickStart.end_game_time_limit
+        end_game_timer.wait_time = SetConf.Session.end_game_time_limit
         TimeRemainingLbl.visible = true
         TimeRemaining.visible = true
         end_game_timer.connect("timeout", self, "end_game", ["TIME!"])

@@ -12,6 +12,7 @@ func _ready():
 # "lobby" group calls
 #################################################
 func add_player_to_lobby(peer_id):
+    peer_id = null
     update_team_grid()
     
 func update_team_grid():

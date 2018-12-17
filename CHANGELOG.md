@@ -1,7 +1,16 @@
 # CHANGELOG for FreeoiL Format based on https://keepachangelog.com/
-
 ## [Unreleased] - 
 ### Added
+### Changed
+### Fixed
+### Removed
+
+## [0.2.0-rc1] - 2018-11-30
+### Added
+- Added 2 Player Integration testing.
+- Improved setters and getters for all shared settings.
+- Added GitLab Continuous Integration (CI)
+- Added Documentation in Markdown via ReadTheDocs.io
 - Added history tracking and event exchange code to networking.
 - Added scenes for Lobbies for Networking.
 - Finished Battery Meter.
@@ -11,6 +20,7 @@
 - Finished end of game support.
 - Finished Indoor or Outdoor mode support and cone.
 ### Changed
+- Changed SettingsConf to SetConf and consolidated shared settings.
 - Increased the size of widgets to make them easier to touch on small screens.
 - Changed "Connect Weapon" button into gun image created by Prestonnovation.
 ### Fixed

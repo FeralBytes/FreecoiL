@@ -15,18 +15,18 @@ func _ready():
 
 
 func _on_GoToLobby_pressed():
-    SettingsConf.save()
     SceneManager.goto_scene("res://scenes/Lobbies/NetworkLobby.tscn")
 
 ##########################################
 # "networking" group calls
 ##########################################
 func nw_too_many_inet_facing_addresses(addresses):
+    addresses = null
     HostPopup.clear_content()
     HostPopup.add_content("res://scenes/Popups/HostTooManyAddressesPopup.tscn")
     HostPopup.popup()
     
-func nw_inet_bound_address(address):
+func nw_inet_bound_address():
     HostPopup.clear_content()
     HostPopup.add_content("res://scenes/Popups/HostBoundAddressPopup.tscn")
     HostPopup.popup()

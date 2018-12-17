@@ -1,7 +1,5 @@
 extends ColorRect
 
-var minutes
-
 onready var EndGame = get_node("EndGameWidget")
 onready var Limit = get_node("PlusMinusWidget")
 
@@ -12,9 +10,9 @@ func _ready():
     set_selected()
     
 func set_selected():
-    if SettingsConf.S.QuickStart.end_game == "deaths":
+    if SetConf.Session.end_game == "deaths":
         EndGame.set_selected_by_index(0)
-    elif SettingsConf.S.QuickStart.end_game == "time":
+    elif SetConf.Session.end_game == "time":
         EndGame.set_selected_by_index(1)
     
 func add_default_end_game():
@@ -24,15 +22,15 @@ func add_default_end_game():
 
 
 func _on_EndGameWidget_LRWidChanged(new_setting):
-    SettingsConf.S.QuickStart.end_game = new_setting
-    if SettingsConf.S.QuickStart.end_game == "deaths":
-        Limit.set_val(SettingsConf.S.QuickStart.end_game_death_limit)
-    elif SettingsConf.S.QuickStart.end_game == "time":
-        Limit.set_val(SettingsConf.S.QuickStart.end_game_time_limit / 60)
+    SetConf.Session.end_game = new_setting
+    if SetConf.Session.end_game == "deaths":
+        Limit.set_val(SetConf.Session.end_game_death_limit)
+    elif SetConf.Session.end_game == "time":
+        Limit.set_val(SetConf.Session.end_game_time_limit / 60)
 
 
 func _on_PlusMinusWidget_PMWidChanged(new_val):
-    if SettingsConf.S.QuickStart.end_game == "deaths":
-        SettingsConf.S.QuickStart.end_game_death_limit = new_val
-    if SettingsConf.S.QuickStart.end_game == "time":
-        SettingsConf.S.QuickStart.end_game_time_limit = new_val * 60
+    if SetConf.Session.end_game == "deaths":
+        SetConf.Session.end_game_death_limit = new_val
+    if SetConf.Session.end_game == "time":
+        SetConf.Session.end_game_time_limit = new_val * 60
