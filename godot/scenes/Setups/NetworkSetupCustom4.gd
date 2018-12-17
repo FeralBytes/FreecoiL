@@ -14,6 +14,5 @@ func _ready():
 
 
 func _on_GoToLobby_pressed():
-    SettingsConf.save()
     NetworkingCode.set_scenario_player_options_as_server(null)
     SceneManager.goto_scene("res://scenes/Lobbies/NetworkTeamLobby.tscn")

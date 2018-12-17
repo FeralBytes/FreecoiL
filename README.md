@@ -1,9 +1,10 @@
-# FreecoiL
-### Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/milestones/1).
-## What is FreecoiL?
+# README for FreecoiL
+## [Download Links - Get the Game](https://gitlab.com/FeralBytes/FreecoiL/snippets/1781429)
+## Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/milestones/2).
+### [Our Documentation](https://freecoil.readthedocs.io/en/latest/) is on ReadTheDocs.
+### What is FreecoiL?   [![pipeline status](https://gitlab.com/FeralBytes/FreecoiL/badges/develop/pipeline.svg)](https://gitlab.com/FeralBytes/FreecoiL/pipelines)  [![Documentation Status](https://readthedocs.org/projects/freecoil/badge/?version=develop)](https://freecoil.readthedocs.io/en/develop/)
 FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability. 
-
-### Features like:
+## Features:
 * No Network: Independent game play. Just like SIMPLECOIL[3].
 * Partial Networking: Ability for players to drop out of the network but still play, then receive updates when back in range. 
   * Play does not stop just because you left the Wi-Fi coverage area. [5]
@@ -12,45 +13,52 @@ FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The
 * Dedicated Host Flexibility: Server OS options: Android, Linux, & Windows.[7]
   * Host pushes settings to other players, but can enable some settings to be set by the players.
 * Multiple Game Modes
-  * Free For All: supporting up to 62 Players. [4]
-  * Team Modes: supporting 2-31 teams up to 62 players. [4]
-  * Weapon Profiles: for handgun, shotgun, rifle, and machine gun. [8]
+  * Free For All: supporting up to 63 Players. [4]
+  * Team Modes: supporting 2 teams or up to 31 teams with a maximum of 62 players and the teams must be equal in size. [4]
+  <del>* Weapon Profiles: for handgun, shotgun, rifle, and machine gun. [8]</del>
   * Ammunition 1-253 rounds per reload.   
 * More Features are planned.
 
-## How to Get FreecoiL:
+### How to Get FreecoiL:
 [Signup for further updates by providing your email here](https://docs.google.com/forms/d/e/1FAIpQLSd-ZglY7iiT7ToqPvR-o6Bv0AsBIz9rJWOAWz83Mygj_GL-Yw/viewform).
 Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! Expected Price $0.00. The project is now open source and we will accept donations to help pay for the PLAY STORE and iTunes submissions.
 
 ### How to Donate:
 * Donate to [FeralBytes the Creators of FreecoiL here](https://www.paypal.me/FeralBytes).
 
-### The Release Plan So Far: If we are able to speed up the timeline below, we will.
-* ~~Version 0.1.0 on 23OCT2018~~
-* Version 0.2.0 on 17NOV2018
-* Version 0.2.5 on 25NOV2018 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
-* Version 0.3.0 on 06DEC2018
-* Version 0.4.0 on 27DEC2018
-* Version 0.5.0 on 17JAN2019
-* Version 0.6.0 on 07FEB2019
-* Version 0.7.0 on 28FEB2019
-* Version 0.8.0 on 21MAR2019
-* Allow Alpha access on GOOGLE PLAY STORE[1] 22MAR2019.
-* Version 0.9.0 on 11APR2019
-* Allow Beta access on GOOGLE PLAY STORE[1] 12APR2019.
-* Version 1.0.0 on 02MAY2019 - Official 1.0.0 release most Beta bugs should be fixed.
+## How to Get Involved
+[Contact the Lead Developer on Discord](https://discord.gg/tn4hThVS).
+```eval_rst
+.. mermaid::
 
-## Why FreecoiL?
+  graph TD;
+      A(You)--First Time Involved-->B[<a href='https://gitlab.com/users/sign_in#register-pane'>Create Account on GitLab</a>];
+      B-->C[<a href='https://gitlab.com/FeralBytes/FreecoiL/'>Clone & Branch FreecoiL<a/>];
+      C-->D[<a href='https://gitlab.com/FeralBytes/FreecoiL/merge_requests/new'>Make Changes & Submit a Merge Request</a>];
+      D-->E{I Review Your MR};
+      E-->F[Looks Good!]
+      E-->I[Needs Changes]
+      F-->G[Your Changes are Merged]
+      G-->H[Play the Game with Your Changes]
+      I--Returns to You-->A
+      A--After Changes-->D
+```
+
+### The Release Plan So Far: More help will mean faster releases.
+```eval_rst
+.. note:: All dates are in ISO Standard Format: YYYY-MM-DD
+```
+* <del>Version 0.1.0 on 2018-10-23</del>
+* <del>Version 0.2.0 on 2018-11-25</del>
+* Version 0.2.0-rc1 on 2018-11-30 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
+* Version 0.3.0 on 2018-01-07
+* Version 0.4.0 on 2019-02-07
+### Why FreecoiL?
 FreecoiL was created because we wanted more features and flexibility than what was offered by the RECOIL[2] app. When we found SIMPLECOIL[3], it inspired us to begin coding our desired features. We wanted more than those offered by either RECOIL[2] or SIMPLECOIL[3].
-
 ## Frequently Asked Questions:
 * Does this really work or are you creating a hoax? 
 * * Actually our app already works, it has worked for months now, but we are improving and adding features. It communicates with the guns and already supports team and individual play.
-
-## Note To SkyRocket LLC
-SkyRocket we would love to help you develop your future products. We would even enjoy becoming an official app for the RECOIL[2] laser tag system.
-
-## Notes:
+### Notes:
 1. GOOGLE PLAY and the Google Play logo are trademarks of Google LLC.
 2. RECOIL are trademarks of SkyRocket LLC.
 3. SIMPLECOIL is copyright of Dees-Troy.

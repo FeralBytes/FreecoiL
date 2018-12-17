@@ -1,4 +1,12 @@
 # -*- coding: utf-8 -*-
+
+# Add hack to convert files outside of source without a symlink. Because this is python after all.
+from shutil import copyfile
+copyfile('../../README.md', 'README.md')
+copyfile('../../CHANGELOG.md', 'CHANGELOG.md')
+copyfile('../../LICENSE.md', 'LICENSE.md')
+copyfile('../../CONTRIBUTING.md', 'CONTRIBUTING.md')
+
 #
 # Configuration file for the Sphinx documentation builder.
 #
@@ -14,7 +22,9 @@
 #
 # import os
 # import sys
+import recommonmark
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 # sys.path.insert(0, os.path.abspath('.'))
 
 
@@ -22,13 +32,17 @@ from recommonmark.parser import CommonMarkParser
 
 project = 'FreecoiL'
 copyright = '2018, Jordan Farrell'
-author = 'Jordan Farrell'
+author = 'FreecoiL Developers'
 
-# The short X.Y version
-version = ''
+import re
+release_ver_regex = re.compile(r'(?:(?:\d+|[a-z])[.-]){2,}(?:\d+|((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)|dev?)\d*)?)')
+short_ver_regex = re.compile(r'(?:(?:\d+|[a-z])[.-]){2,}(?:\d+)')
+with open('../../godot/code/SetConf.gd', 'r') as f:
+    file_contents = f.read()
 # The full version, including alpha/beta/rc tags
-release = '0.2.0'
-
+release = release_ver_regex.search(file_contents).group()
+# The short X.Y version
+version = short_ver_regex.search(file_contents).group()
 
 # -- General configuration ---------------------------------------------------
 
@@ -42,6 +56,9 @@ release = '0.2.0'
 extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.ifconfig',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.mathjax',
+    'sphinxcontrib.mermaid',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -52,7 +69,7 @@ templates_path = ['_templates']
 source_parsers = {
     '.md': CommonMarkParser,
 }
-source_suffix = ['.rst', '.md']
+source_suffix = ['.md']
 # source_suffix = '.rst'
 
 # The master toctree document.
@@ -71,7 +88,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -79,7 +96,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'pyramid'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -134,7 +151,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'FreecoiL.tex', 'FreecoiL Documentation',
-     'Jordan Farrell', 'manual'),
+     'FreecoiL Developers', 'manual'),
 ]
 
 
@@ -155,8 +172,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'FreecoiL', 'FreecoiL Documentation',
-     author, 'FreecoiL', 'One line description of project.',
-     'Miscellaneous'),
+     author, 'FreecoiL Developers', 'Laser Tag where the focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability.'),
 ]
 
 
@@ -184,3 +200,14 @@ epub_exclude_files = ['search.html']
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
+
+# Add recommonmark.AutoStructify
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': lambda url: 'https://gitlab.com/FeralBytes/FreecoiL/tree/develop/docs/source/' + 
+            url,
+            'auto_toc_tree_section': 'Contents',
+            'enable_eval_rst': True,
+            #'enable_auto_doc_ref': True,
+            }, True)
+    app.add_transform(AutoStructify)

@@ -1,18 +1,29 @@
 extends CanvasLayer
 
 var current_scene
+var scene_loaded = false
 var threaded_scene_loader = null
 var loading_state = 'idle'
 var ProgBar
 var timer = Timer.new()
+var integration_testing = false 
+
 onready var root = get_tree().get_root()
 
 func _ready():
     current_scene = root.get_child(root.get_child_count() -1)
     ProgBar = get_node('/root/SceneManager/SceneFader/SM_ProgBar')
     timer.one_shot = true
-    
-        
+    if OS.get_environment("FreecoiL_TEST") == "true":
+        call_deferred("run_integration_tests")
+        SetConf.Session.testing_active = true
+    elif OS.get_environment("FreecoiL_MULTIPLAYER_TEST") == "true":
+        call_deferred("run_multiplayer_tests")
+        SetConf.Session.testing_active = true
+    elif OS.get_environment("FreecoiL_2PLAYER_TEST") == "true":
+        call_deferred("run_2player_tests")
+        SetConf.Session.testing_active = true
+
 func goto_scene(path): # game requests to switch to this scene
     if loading_state != 'idle':
         return 'Error'
@@ -23,7 +34,10 @@ func goto_scene(path): # game requests to switch to this scene
 #    threaded_scene_loader = Thread.new()
 #    threaded_scene_loader.start(self, '_threaded_loading', path)
     call_deferred("non_threaded_loading", path)
-    current_scene.queue_free() # get rid of the old scene
+    if integration_testing:
+        current_scene.free() 
+    else:
+        current_scene.queue_free() # get rid of the old scene
     
 
 func non_threaded_loading(path):
@@ -59,6 +73,7 @@ func _threaded_loading(path):
     var err = OK
     while err == OK:  # ERR_FILE_EOF = loading finished
         err = loader.poll()
+        assert(err == OK)
         #print('Error ', err, '  | Stage ', loader.get_stage(), ' / ', loader.get_stage_count())
         if err == OK:
             progress = float(loader.get_stage()) / loader.get_stage_count()
@@ -100,3 +115,20 @@ func set_new_scene_part2(current_scene):
     update_progress([1.0])
     get_node("SceneFader/AnimationPlayer").play("Fade_Out")
     loading_state = 'idle'
+
+func run_integration_tests():
+    integration_testing = true 
+    var test_runner = load("res://tests/RunIntegrationTests.gd")
+    test_runner = test_runner.new()
+    add_child(test_runner)
+
+func run_multiplayer_tests():
+    var test_runner = load("res://tests/RunMultiplayerTests.gd")
+    test_runner = test_runner.new()
+    add_child(test_runner)
+
+func run_2player_tests():
+    var test_runner = load("res://tests/Run2PlayerTests.gd")
+    test_runner = test_runner.new()
+    add_child(test_runner)
+    

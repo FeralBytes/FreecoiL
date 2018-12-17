@@ -14,11 +14,11 @@ func _ready():
 
 
 func _on_IPChoiceLeftRightWidget_LRWidChanged(ip):
-    NetworkingCode.server_ip = ip
+    SetConf.Session.server_ip = ip
     
 
 
 func _on_Button_pressed():
     get_tree().call_group("lobby", "lobby_hide_popup")
-    get_tree().call_group("networking", "nw_inet_bound_address", NetworkingCode.server_ip)
+    get_tree().call_group("networking", "nw_inet_bound_address", SetConf.Session.server_ip)
     get_tree().call_group("networking", "finish_host_setup")

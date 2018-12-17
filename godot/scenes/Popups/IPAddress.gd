@@ -5,7 +5,8 @@ extends LineEdit
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    pass
+    if SetConf.Session.server_ip != "127.0.0.1":
+        text = SetConf.Session.server_ip
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

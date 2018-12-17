@@ -15,7 +15,7 @@ onready var TimeTick = get_node("Background/TimeTick")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    TimeTick.text = "In: " + "%03d" % SettingsConf.S.QuickStart.start_delay
+    TimeTick.text = "In: " + "%03d" % SetConf.Session.start_delay
     
 func popup():
     emit_signal("about_to_show")
@@ -26,7 +26,7 @@ func popup():
 #    pass   
 
 func _on_StartGamePopup_about_to_show():
-    StartGameTimer.wait_time = SettingsConf.S.QuickStart.start_delay
+    StartGameTimer.wait_time = SetConf.Session.start_delay
     StartGameTimer.start()
     TickTockTimer.start()
 
@@ -36,8 +36,8 @@ func _on_StartGameTimer_timeout():
 
 func _on_TickTockTimer_timeout():
     current_ticks += 1
-    TimeTick.text = "In: " + "%03d" % (SettingsConf.S.QuickStart.start_delay - current_ticks)
-    if current_ticks == SettingsConf.S.QuickStart.start_delay:
+    TimeTick.text = "In: " + "%03d" % (SetConf.Session.start_delay - current_ticks)
+    if current_ticks == SetConf.Session.start_delay:
         TickTockTimer.stop()
         get_tree().call_group("in_game", "ig_start_game")
     else:
