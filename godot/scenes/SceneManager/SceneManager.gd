@@ -14,13 +14,13 @@ func _ready():
     current_scene = root.get_child(root.get_child_count() -1)
     ProgBar = get_node('/root/SceneManager/SceneFader/SM_ProgBar')
     timer.one_shot = true
-    if OS.get_environment("FreecoiL_TEST") == "true":
+    if OS.get_environment("FeralBytes_TEST") == "true":
         call_deferred("run_integration_tests")
         SetConf.Session.testing_active = true
-    elif OS.get_environment("FreecoiL_MULTIPLAYER_TEST") == "true":
+    elif OS.get_environment("FeralBytes_MULTIPLAYER_TEST") == "true":
         call_deferred("run_multiplayer_tests")
         SetConf.Session.testing_active = true
-    elif OS.get_environment("FreecoiL_2PLAYER_TEST") == "true":
+    elif OS.get_environment("FeralBytes_2PLAYER_TEST") == "true":
         call_deferred("run_2player_tests")
         SetConf.Session.testing_active = true
 

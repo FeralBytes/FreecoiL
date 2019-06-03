@@ -6,6 +6,7 @@ signal Network_changed
 
 const user_dir = "user://"
 const res_dir = "res://"
+const img_aset_dir = "res://assets/images/"
 const settings_path = user_dir + "settings.cfg"
 const VERSION = "0.2.0-rc1"
 
@@ -18,10 +19,12 @@ var config = ConfigFile.new()
 var save_thread = null
 var extra_save = false
 var Session
+var Constants
 
 func _ready():
     #Check if settingSaved.ini exist if not create a new one with the default Settings
     Session = SessData.new()
+    Constants = ConstData.new()
     if _load_Settings() == LOAD_ERROR_COULDNT_OPEN :
         save()
     #_apply_Settings()
@@ -148,6 +151,7 @@ var Saved = {
         "num_of_teams": 2,
         "player_team": 1,
         "player_number": 1,
+        "players_per_team": 0,
         "player_name": "",
         "player_id": 1,
         "recoil_enabled": true,
@@ -224,6 +228,7 @@ class SessData:
     signal Session_server_ip_changed
     signal Session_server_port_changed
     signal Session_testing_active_changed
+    signal Session_players_per_team
     
     var game_type = "NoNetwork" setget set_game_type, get_game_type
     var teams = true setget set_teams, get_teams
@@ -231,6 +236,7 @@ class SessData:
     var num_of_teams = 2 setget set_num_of_teams, get_num_of_teams
     var player_team = 0 setget set_player_team, get_player_team
     var player_number = 0 setget set_player_number, get_player_number
+    var players_per_team = 0 setget set_players_per_team, get_players_per_team
     var player_name = "" setget set_player_name, get_player_name
     var player_id = 0 setget set_player_id, get_player_id
     var recoil_enabled = false setget set_recoil_enabled, get_recoil_enabled
@@ -293,7 +299,15 @@ class SessData:
         player_team = new_val
         emit_signal("Session_player_team_changed")
         SetConf.Saved.QuickStart.player_team = new_val
+        
+    func get_players_per_team():
+        return players_per_team
 
+    func set_players_per_team(new_val):
+        players_per_team = players_per_team
+        emit_signal("Session_players_per_team")
+        SetConf.Saved.QuickStart.players_per_team = new_val
+        
     func get_player_number():
         return player_number
 
@@ -466,3 +480,9 @@ class SessData:
     func set_testing_active(new_val):
         testing_active = new_val
         emit_signal("Session_testing_active_changed")
+        
+####################################################
+# SetConf.Constants
+class ConstData:
+    # warning-ignore:unused_class_variable
+    var MAX_PLAYERS = 4 
