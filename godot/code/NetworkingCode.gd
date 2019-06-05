@@ -1,4 +1,6 @@
 extends Node
+
+signal my_data_changed
 var my_data = {} setget set_my_data, get_my_data
 
 var my_peer_id
@@ -24,7 +26,6 @@ var net_time = Timer.new()
 var players_at_end_game = 0
 var game_history_act_count = -1
 
-# warning-ignore:unused_argument
 func set_my_data(new_val):
     pass
     
@@ -57,7 +58,6 @@ remote func change_my_player_team(new_team):
 
 func _ready():
     add_to_group("networking")
-    # warning-ignore:unused_variable
     var unused
     unused = get_tree().connect("network_peer_connected", self, "_player_connected")
     unused = get_tree().connect("network_peer_disconnected", self, "_player_disconnected")
@@ -118,7 +118,7 @@ func finish_host_setup():
     Network = NetworkedMultiplayerENet.new()
     Network.set_bind_ip(SetConf.Session.server_ip)
     # Below Max Players + Dedicated Server
-    Network.create_server(SetConf.Session.server_port, SetConf.Constants.MAX_PLAYERS)
+    Network.create_server(SetConf.Session.server_port, LazerInterface.MAX_PLAYERS + 1)
     get_tree().set_network_peer(Network)
     my_peer_id = 1
     players_data[800] = get_my_data()
@@ -130,12 +130,10 @@ func setup_as_client():
     Network.create_client(SetConf.Session.server_ip, SetConf.Session.server_port)
     get_tree().set_network_peer(Network)
 
-# warning-ignore:unused_argument
 func _player_connected(peer_id):
     pass
     #print("Player Connected: " + str(peer_id))
 
-# warning-ignore:unused_argument
 func _player_disconnected(peer_id):
     pass
     #print("Player Disconnected: " + str(peer_id))
@@ -169,7 +167,7 @@ func assign_player_number(unique_id):
                 players_on_team += 1
     players_on_team += 1
     players_data[unique_id]["player_number"] = players_on_team
-    players_data[unique_id]["player_id"] = ((players_data[unique_id]["player_team"] - 1) * SetConf.Session.players_per_team) + players_data[unique_id]["player_number"]
+    players_data[unique_id]["player_id"] = ((players_data[unique_id]["player_team"] - 1) * LazerInterface.players_per_team) + players_data[unique_id]["player_number"]
     if players_data[unique_id]["player_id"] < 0:
         players_data[unique_id]["player_id"] = 0
     if players_data[unique_id]["my_peer_id"] != 1:
