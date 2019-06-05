@@ -44,15 +44,23 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
       A--After Changes-->D
 ```
 
-### The Release Plan So Far: More help will mean faster releases.
+### The Release Plan So Far: If we are able to speed up the timeline below, we will.
 ```eval_rst
 .. note:: All dates are in ISO Standard Format: YYYY-MM-DD
 ```
 * <del>Version 0.1.0 on 2018-10-23</del>
 * <del>Version 0.2.0 on 2018-11-25</del>
 * Version 0.2.0-rc1 on 2018-11-30 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
-* Version 0.3.0 on 2018-01-07
-* Version 0.4.0 on 2019-02-07
+* Version 0.3.0 on 2018-12-16
+* Version 0.4.0 on 2019-01-07
+* Version 0.5.0 on 2019-01-27
+* Version 0.6.0 on 2019-02-17
+* Version 0.7.0 on 2019-03-10
+* Version 0.8.0 on 2019-03-31
+* Allow Alpha access on GOOGLE PLAY STORE[1] 2019-04-02.
+* Version 0.9.0 on 2019-04-23
+* Allow Beta access on GOOGLE PLAY STORE[1] 2019-04-25.
+* Version 1.0.0 on 2019-05-16 - Official 1.0.0 release most Beta bugs should be fixed.
 ### Why FreecoiL?
 FreecoiL was created because we wanted more features and flexibility than what was offered by the RECOIL[2] app. When we found SIMPLECOIL[3], it inspired us to begin coding our desired features. We wanted more than those offered by either RECOIL[2] or SIMPLECOIL[3].
 ## Frequently Asked Questions:
