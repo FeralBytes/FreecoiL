@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/prog_outline.png-d917a5a55708a2f12d62bfc51aeee612.stex"
+path="res://.import/FeralBytesLogo.png-f6234dc38c06e5e4265405cceac509ba.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/prog_outline.png"
-dest_files=[ "res://.import/prog_outline.png-d917a5a55708a2f12d62bfc51aeee612.stex" ]
+source_file="res://assets/images/FeralBytesLogo.png"
+dest_files=[ "res://.import/FeralBytesLogo.png-f6234dc38c06e5e4265405cceac509ba.stex" ]
 
 [params]
 
