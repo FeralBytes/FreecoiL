@@ -1,10 +1,18 @@
 # README for FreecoiL
+
 ## [Download Links - Get the Game](https://gitlab.com/FeralBytes/FreecoiL/snippets/1781429)
+
 ## Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/milestones/2).
+
 ### [Our Documentation](https://freecoil.readthedocs.io/en/latest/) is on ReadTheDocs.
-### What is FreecoiL?   [![pipeline status](https://gitlab.com/FeralBytes/FreecoiL/badges/develop/pipeline.svg)](https://gitlab.com/FeralBytes/FreecoiL/pipelines)  [![Documentation Status](https://readthedocs.org/projects/freecoil/badge/?version=develop)](https://freecoil.readthedocs.io/en/develop/)
+
+### What is FreecoiL?   [![pipeline status]
+
+(https://gitlab.com/FeralBytes/FreecoiL/badges/develop/pipeline.svg)](https://gitlab.com/FeralBytes/FreecoiL/pipelines)  [![Documentation Status](https://readthedocs.org/projects/freecoil/badge/?version=develop)](https://freecoil.readthedocs.io/en/develop/)
 FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability. 
+
 ## Features:
+
 * No Network: Independent game play. Just like SIMPLECOIL[3].
 * Partial Networking: Ability for players to drop out of the network but still play, then receive updates when back in range. 
   * Play does not stop just because you left the Wi-Fi coverage area. [5]
@@ -20,14 +28,17 @@ FreecoiL is a laser tag application for the RECOIL[2] system for Android[6]. The
 * More Features are planned.
 
 ### How to Get FreecoiL:
+
 [Signup for further updates by providing your email here](https://docs.google.com/forms/d/e/1FAIpQLSd-ZglY7iiT7ToqPvR-o6Bv0AsBIz9rJWOAWz83Mygj_GL-Yw/viewform).
 Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! Expected Price $0.00. The project is now open source and we will accept donations to help pay for the PLAY STORE and iTunes submissions.
 
 ### How to Donate:
+
 * Donate to [FeralBytes the Creators of FreecoiL here](https://www.paypal.me/FeralBytes).
 
 ## How to Get Involved
-[Contact the Lead Developer on Discord](https://discord.gg/tn4hThVS).
+
+[Contact the Lead Developer on Discord (I Fixed the Broken Link, Sorry.)](https://discordapp.com/invite/tn4hThV).
 ```eval_rst
 .. mermaid::
 
@@ -45,6 +56,7 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 ```
 
 ### The Release Plan So Far: If we are able to speed up the timeline below, we will.
+
 ```eval_rst
 .. note:: All dates are in ISO Standard Format: YYYY-MM-DD
 ```
@@ -61,12 +73,18 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 * Version 0.9.0 on 2019-04-23
 * Allow Beta access on GOOGLE PLAY STORE[1] 2019-04-25.
 * Version 1.0.0 on 2019-05-16 - Official 1.0.0 release most Beta bugs should be fixed.
+
 ### Why FreecoiL?
+
 FreecoiL was created because we wanted more features and flexibility than what was offered by the RECOIL[2] app. When we found SIMPLECOIL[3], it inspired us to begin coding our desired features. We wanted more than those offered by either RECOIL[2] or SIMPLECOIL[3].
+
 ## Frequently Asked Questions:
+
 * Does this really work or are you creating a hoax? 
 * * Actually our app already works, it has worked for months now, but we are improving and adding features. It communicates with the guns and already supports team and individual play.
+
 ### Notes:
+
 1. GOOGLE PLAY and the Google Play logo are trademarks of Google LLC.
 2. RECOIL are trademarks of SkyRocket LLC.
 3. SIMPLECOIL is copyright of Dees-Troy.
