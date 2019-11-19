@@ -35,7 +35,7 @@ func delayed_goto_scene():
     yield(get_tree().create_timer(0.5), "timeout" )
     var s = scene
     scene = null
-    SceneManager.goto_scene(s)
+    get_tree().call_group("Container", "goto_scene", s)
 
 #func li_trigger_btn_pushed():
 #    empty_gun_shot.play()
@@ -118,9 +118,10 @@ func _on_Countdown_timeout():
 # connect_weapon group funcs
 ###############################
 func connect_weapon_guard(s):
-    print("SetConf.Saved.SetConf.test = ", SetConf.Saved.SetConf.test)
-    if SetConf.Saved.SetConf.test:
-        SceneManager.goto_scene(s)
+    pass
+    print("SetConf.Saved.SetConf.test = ", Settings.Testing.get_data("SetConf.test"))
+    if Settings.Testing.get_data("SetConf.test") == null:
+        get_tree().call_group("Container", "goto_scene", s)
     else:
         scene = s
         ConnectPopup.popup_centered()

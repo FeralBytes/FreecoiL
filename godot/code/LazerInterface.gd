@@ -100,7 +100,7 @@ func reload_start():
 
 func reload_finish():
     if lazercoil != null:
-        lazercoil.finishReload(SetConf.Session.magazine)
+        lazercoil.finishReload(Settings.Session.get_data("magazine"))
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
     # SHOT_MODE_FULL_AUTO = 1
@@ -227,7 +227,7 @@ func _on_lazer_gun_disconnected():
     _new_status("Lazer gun, disconnected.", 1)
     state_lazer_gun_is_connected = false
     get_tree().call_group("lazercoil", "li_lazer_gun_disconnected")
-    SetConf.Session.battery_lvl = 0
+    Settings.Session.set_data("battery_lvl", 0)
     bt_connection_timed_out.stop()
     if state_auto_reconnect_bt_dev:
         connect_to_lazer_gun()
@@ -251,6 +251,7 @@ func _changed_lazer_telem_commandId(commandId):
     command_id = commandId
     get_tree().call_group("lazercoil", "li_command_accepted")
 
+# warning-ignore:unused_argument
 func _changed_lazer_telem_playerId(playerId):
     get_tree().call_group("lazercoil", "li_player_id_changed")
     # TODO: Set or update player id.
@@ -293,7 +294,7 @@ func _lazer_telem_batteryLvl(batteryLvl):
     battery_lvl_avg = battery_sum / battery_lvl_array.size()
     if battery_lvl_avg != prev_battery_lvl_avg:
         # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
-        SetConf.Session.battery_lvl = LazerInterface.battery_lvl_avg * 6.25
+        Settings.Session.set_data("battery_lvl", LazerInterface.battery_lvl_avg * 6.25)
         prev_battery_lvl_avg = battery_lvl_avg
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
     _on_lazer_gun_still_connected()
@@ -310,6 +311,7 @@ func _changed_lazer_telem_shot_data(shotById1, shotCounter1, shotById2, shotCoun
         shot_by_id_2 = shotById2
         get_tree().call_group("lazercoil", "li_got_shot", shotById2)
 
+# warning-ignore:unused_argument
 func _changed_telem_button_pressed(buttonsPressed):
     # buttonsPressed Values:
     #default = 0

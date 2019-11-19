@@ -20,7 +20,7 @@ modules="org/godotengine/godot/FreecoiL"
 [application]
 
 config/name="FreecoiL"
-run/main_scene="res://scenes/MainMenu/MainMenu2.tscn"
+run/main_scene="res://scenes/Container/Container.tscn"
 boot_splash/fullsize=false
 config/icon="res://icon.png"
 
@@ -30,11 +30,9 @@ output_latency=1
 
 [autoload]
 
-SetConf="*res://code/SetConf.gd"
-SceneManager="*res://scenes/SceneManager/SceneManager.tscn"
-LazerInterface="*res://code/LazerInterface.gd"
 Helpers="*res://code/Helpers.gd"
-NetworkingCode="*res://code/NetworkingCode.gd"
+Settings="*res://code/Settings.gd"
+LazerInterface="*res://code/LazerInterface.gd"
 
 [debug]
 
@@ -47,7 +45,8 @@ window/size/height=960
 window/size/resizable=false
 window/energy_saving/keep_screen_on=false
 window/handheld/orientation="portrait"
-window/stretch/mode="2d"
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
 
 [input]
 
@@ -128,4 +127,6 @@ ui_end={
 
 [rendering]
 
+quality/driver/driver_name="GLES2"
 environment/default_environment="res://default_env.tres"
+quality/dynamic_fonts/use_oversampling=false
