@@ -3,6 +3,9 @@
 importer="texture"
 type="StreamTexture"
 path="res://.import/pistol_blur.png-c210207686aaca89b88b0653e59cdd35.stex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 

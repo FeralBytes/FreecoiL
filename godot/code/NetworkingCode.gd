@@ -69,7 +69,7 @@ func _ready():
     SetConf.Session.player_number = 0
     unused = SetConf.Session.connect("Session_player_team_changed", self, "_on_my_data_changed")
     unused = null
-    # Below is IP Address Regex.
+    # Below is IPv4 Address Regex.
     validate_ip.compile("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
     net_time.wait_time = 259200  # 3 Days
     add_child(net_time)

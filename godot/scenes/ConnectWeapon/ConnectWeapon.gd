@@ -79,6 +79,7 @@ func _on_ConnectWeapon2_pressed():
     self.state = "connecting"
     self.texture_normal = pistol_clear
     ConnectWeapon2.text = "Connecting..." + "%02d" % countdown
+    set_modulate(Color(1,1,1))
     LazerInterface.connect_to_lazer_gun()
     
 func _on_adjust_blink():
@@ -87,15 +88,19 @@ func _on_adjust_blink():
     if green >= 1:
         increasing = false
     if increasing:
-        green += 0.02
-        blue += 0.02
         if self.state == "connecting":
             self.texture_normal = pistol_blur
+            green += 0.02
+        else:
+            green += 0.02
+            blue += 0.02
     else:
-        green -= 0.02
-        blue -= 0.02
         if self.state == "connecting":
             self.texture_normal = pistol_clear
+            green -= 0.02
+        else:
+            green -= 0.02
+            blue -= 0.02
     set_modulate(Color(1, green, blue))
 
 

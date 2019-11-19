@@ -3,6 +3,9 @@
 importer="texture"
 type="StreamTexture"
 path="res://.import/power_ring.png-12083e8febdcc7bd5b1cd4793692c95d.stex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 

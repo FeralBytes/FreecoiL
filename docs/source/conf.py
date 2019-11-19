@@ -2,10 +2,10 @@
 
 # Add hack to convert files outside of source without a symlink. Because this is python after all.
 from shutil import copyfile
-copyfile('../../README.md', 'README.md')
-copyfile('../../CHANGELOG.md', 'CHANGELOG.md')
-copyfile('../../LICENSE.md', 'LICENSE.md')
-copyfile('../../CONTRIBUTING.md', 'CONTRIBUTING.md')
+#copyfile('../../README.md', 'README.md')
+#copyfile('../../CHANGELOG.md', 'CHANGELOG.md')
+#copyfile('../../LICENSE.md', 'LICENSE.md')
+#copyfile('../../CONTRIBUTING.md', 'CONTRIBUTING.md')
 
 #
 # Configuration file for the Sphinx documentation builder.
@@ -30,9 +30,9 @@ from recommonmark.transform import AutoStructify
 
 # -- Project information -----------------------------------------------------
 
-project = 'FreecoiL'
-copyright = '2018, Jordan Farrell'
-author = 'FreecoiL Developers'
+project = 'Alaska Leadership Academy Catalog'
+copyright = '2019, Alaska Leadership Academy'
+author = 'Alaska Leadership Academy Catalog Developers'
 
 import re
 release_ver_regex = re.compile(r'(?:(?:\d+|[a-z])[.-]){2,}(?:\d+|((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)|dev?)\d*)?)')
@@ -123,7 +123,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'FreecoiLdoc'
+htmlhelp_basename = 'Alaska Leadership Academy Catalogdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -150,8 +150,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'FreecoiL.tex', 'FreecoiL Documentation',
-     'FreecoiL Developers', 'manual'),
+    (master_doc, 'Alaska Leadership Academy Catalog.tex', 'Alaska Leadership Academy Catalog Documentation',
+     'Alaska Leadership Academy Catalog Developers', 'manual'),
 ]
 
 
@@ -160,7 +160,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'freecoil', 'FreecoiL Documentation',
+    (master_doc, 'akleadershipacademycatalog', 'Alaska Leadership Academy Catalog Documentation',
      [author], 1)
 ]
 
@@ -171,8 +171,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'FreecoiL', 'FreecoiL Documentation',
-     author, 'FreecoiL Developers', 'Laser Tag where the focus is to add more features to the game environment, offer more flexibility and customization to players, and increase replay-ability.'),
+    (master_doc, 'Alaska Leadership Academy Catalog', 'Alaska Leadership Academy Catalog Documentation',
+     author, 'Alaska Leadership Academy Catalog Developers', 'To develop future leaders of the Alaska National Guard.'),
 ]
 
 
@@ -204,7 +204,7 @@ todo_include_todos = True
 # Add recommonmark.AutoStructify
 def setup(app):
     app.add_config_value('recommonmark_config', {
-            'url_resolver': lambda url: 'https://gitlab.com/FeralBytes/FreecoiL/tree/develop/docs/source/' + 
+            'url_resolver': lambda url: 'https://gitlab.com/AKLeadershipAcademy/catalog/tree/master/source/' + 
             url,
             'auto_toc_tree_section': 'Contents',
             'enable_eval_rst': True,
