@@ -5,6 +5,7 @@ signal finished_loading
 var current_scene
 var previous_scene
 var active_scene_container = 0
+var is_halftime = false
 #warning-ignore:unused_class_variable
 var scene_loaded = false
 var threaded_scene_loader1 = null
@@ -14,7 +15,6 @@ var loading_state2 = "idle"
 var integration_testing = false
 var splash_timer = Timer.new()
 var SplashScene = preload("res://scenes/Splash/Splash.tscn").instance()
-onready var SceneFader = $Camera/TopLayer/SceneFader
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -44,7 +44,7 @@ func _ready():
         $Scene0.add_child(current_scene)
         self.add_child(splash_timer)
         splash_timer.one_shot = true
-        splash_timer.wait_time = 0.001  # TODO: 4
+        splash_timer.wait_time = 2  # TODO: 4
         splash_timer.connect("timeout",self,"_on_splash_timer_timeout") 
         splash_timer.start()
         SplashScene = null
@@ -68,8 +68,7 @@ func goto_scene(scene_path):
     if loading_state != "idle":
         yield(self, "finished_loading")
     Settings.Log("Going to scene: " + str(scene_path))
-    if SceneFader != null:
-        get_tree().call_group("SceneFader", "fade_in")
+    get_tree().call_group("Transitioner", "trans_in")
     #   SceneFader.fade_in()
     background_load_scene(scene_path)
     
@@ -149,7 +148,8 @@ func set_new_scene(scene_resource=null):
     call_deferred("set_new_scene_part2")
     
 func set_new_scene_part2():
-    while not SceneFader.dark:
+    get_tree().call_group("Transitioner", "is_halftime", self)
+    while not is_halftime:
         yield(get_tree().create_timer(0.01), "timeout")
     if active_scene_container == 0:
         $Scene1.add_child(current_scene)
@@ -158,9 +158,8 @@ func set_new_scene_part2():
         $Scene0.add_child(current_scene)
         active_scene_container = 0
     update_progress([1.0])
-    # start to End your loading animation.
-    #get_node("SceneFader/AnimationPlayer").play("Fade_Out")
-    get_tree().call_group("SceneFader", "fade_out")
+    # start the End loading animation.
+    get_tree().call_group("Transitioner", "trans_out")
     if active_scene_container == 0:
         $Scene1.remove_child(previous_scene)
     else:
@@ -179,7 +178,7 @@ func finished_loading_thread2():
     loading_state2 = "idle"
     
 func _on_splash_timer_timeout():
-    goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
+    goto_scene("res://scenes/Menu/Main.tscn")
     
 func run_unit_tests():
     var test_runner = load("res://tests/RunUnitTests.gd")
