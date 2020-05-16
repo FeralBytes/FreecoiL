@@ -1,0 +1,518 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://default.theme" type="Theme" id=1]
+[ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=3]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_LineEdit_text_entered(new_text):
+    Settings.InGame.set_data(\"player_name\", new_text)
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+
+
+func _on_Button_pressed():
+    var new_text = text
+    Settings.InGame.set_data(\"player_name\", new_text)
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+"
+
+[sub_resource type="DynamicFont" id=2]
+size = 60
+font_data = ExtResource( 2 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button2_pressed():
+    Settings.InGame.set_data(\"game_networked\", true)
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,1\")
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button2_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
+"
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    Settings.InGame.set_data(\"game_scenario\", \"custom\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"2,1\")
+"
+
+[sub_resource type="GDScript" id=6]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    Settings.InGame.set_data(\"game_teams\", true)
+    get_tree().call_group(\"Container\", \"next_menu\", \"3,1\")
+"
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button2_pressed():
+    Settings.InGame.set_data(\"game_networked\", false)
+    get_tree().call_group(\"Container\", \"next_menu\", \"4,1\")
+"
+
+[node name="MainMenu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="1,-1-Quick Menu" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = -960.0
+margin_right = 1080.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="0,-1-Get Player Name" type="ReferenceRect" parent="."]
+margin_top = -960.0
+margin_right = 540.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,-1-Get Player Name"]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Get Player Name/CenterContainer"]
+margin_top = 292.0
+margin_right = 540.0
+margin_bottom = 668.0
+custom_constants/separation = 8
+
+[node name="Label" type="Label" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 137.0
+rect_min_size = Vector2( 540, 0 )
+text = "Welcome to FreecoiL!
+
+Before we can get started we need your player name?"
+align = 1
+autowrap = true
+
+[node name="LineEdit" type="LineEdit" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
+margin_top = 145.0
+margin_right = 540.0
+margin_bottom = 184.0
+align = 1
+placeholder_text = "Lazer?"
+placeholder_alpha = 0.15
+caret_blink = true
+script = SubResource( 1 )
+
+[node name="Label2" type="Label" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
+margin_top = 192.0
+margin_right = 540.0
+margin_bottom = 329.0
+text = "On Mobile press \"Go\".
+On desktop press \"Enter\".
+Alternatively press the \"submit\" button below."
+align = 1
+autowrap = true
+
+[node name="Button" type="Button" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
+margin_top = 337.0
+margin_right = 540.0
+margin_bottom = 376.0
+text = "Submit"
+
+[node name="HeaderSection" parent="0,-1-Get Player Name" instance=ExtResource( 3 )]
+
+[node name="0,0-Game Options" type="ReferenceRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Game Options"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer"]
+margin_top = 348.0
+margin_right = 540.0
+margin_bottom = 612.0
+custom_constants/separation = 8
+
+[node name="Label" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 540, 0 )
+custom_fonts/font = SubResource( 2 )
+text = "FREECOIL"
+align = 1
+autowrap = true
+
+[node name="Label2" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 123.0
+text = "BRINGING THE GAME TO THE WORLD"
+align = 1
+
+[node name="Button" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_top = 131.0
+margin_right = 540.0
+margin_bottom = 170.0
+disabled = true
+text = "Quick Start Game"
+
+[node name="Button2" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_top = 178.0
+margin_right = 540.0
+margin_bottom = 217.0
+text = "Start A Networked Game"
+script = SubResource( 3 )
+
+[node name="Button3" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_top = 225.0
+margin_right = 540.0
+margin_bottom = 264.0
+disabled = true
+text = "Start A No Network Game"
+
+[node name="HeaderSection" parent="0,0-Game Options" instance=ExtResource( 3 )]
+
+[node name="0,1-Networked Game 1" type="ReferenceRect" parent="."]
+margin_top = 960.0
+margin_right = 540.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,1-Networked Game 1"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-Networked Game 1/CenterContainer"]
+margin_top = 381.0
+margin_right = 540.0
+margin_bottom = 578.0
+
+[node name="Label" type="Label" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 35.0
+rect_min_size = Vector2( 540, 0 )
+text = "Network Game Setup Part 1"
+align = 1
+
+[node name="Label2" type="Label" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 148.0
+text = "Will you be the host of a client?
+Host sets up the game and it's rules.
+Clients simply join in."
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
+margin_top = 158.0
+margin_right = 540.0
+margin_bottom = 197.0
+custom_constants/separation = 32
+alignment = 1
+
+[node name="Button" type="Button" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 173.0
+margin_right = 262.0
+margin_bottom = 39.0
+disabled = true
+text = "Client"
+
+[node name="Button2" type="Button" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 294.0
+margin_right = 366.0
+margin_bottom = 39.0
+text = "Host"
+script = SubResource( 4 )
+
+[node name="HeaderSection" parent="0,1-Networked Game 1" instance=ExtResource( 3 )]
+
+[node name="1,1-Networked Game 2" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = 960.0
+margin_right = 1080.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="1,1-Networked Game 2" instance=ExtResource( 3 )]
+
+[node name="CenterContainer" type="CenterContainer" parent="1,1-Networked Game 2"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,1-Networked Game 2/CenterContainer"]
+margin_top = 391.0
+margin_right = 540.0
+margin_bottom = 569.0
+
+[node name="Label2" type="Label" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 35.0
+text = "Network Game Setup Part 2"
+
+[node name="Label" type="Label" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 540, 0 )
+text = "What type of match?"
+align = 1
+
+[node name="Button" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 129.0
+text = "Custom Match Setup"
+script = SubResource( 5 )
+
+[node name="Button2" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 178.0
+disabled = true
+text = "Scenario Match Selection"
+
+[node name="2,1-Networked Game 3" type="ReferenceRect" parent="."]
+margin_left = 1080.0
+margin_top = 960.0
+margin_right = 1620.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="2,1-Networked Game 3"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="2,1-Networked Game 3/CenterContainer"]
+margin_top = 415.0
+margin_right = 540.0
+margin_bottom = 544.0
+
+[node name="Label" type="Label" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 35.0
+rect_min_size = Vector2( 540, 0 )
+text = "Network Game Setup Part 3"
+align = 1
+
+[node name="Label2" type="Label" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Do you want Teams?"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 129.0
+custom_constants/separation = 32
+alignment = 1
+
+[node name="Button" type="Button" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 202.0
+margin_right = 260.0
+margin_bottom = 39.0
+text = "Yes"
+script = SubResource( 6 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button2" type="Button" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 292.0
+margin_right = 338.0
+margin_bottom = 39.0
+text = "No"
+script = SubResource( 7 )
+
+[node name="HeaderSection" parent="2,1-Networked Game 3" instance=ExtResource( 3 )]
+
+[node name="3,1-Networked Game 4" type="ReferenceRect" parent="."]
+margin_left = 1620.0
+margin_top = 960.0
+margin_right = 2160.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="3,1-Networked Game 4" instance=ExtResource( 3 )]
+
+[node name="4,1-Networked Game 5" type="ReferenceRect" parent="."]
+margin_left = 2160.0
+margin_top = 960.0
+margin_right = 2700.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="4,1-Networked Game 5" instance=ExtResource( 3 )]
+
+[node name="0,2-No Network Game 1" type="ReferenceRect" parent="."]
+margin_top = 1920.0
+margin_right = 540.0
+margin_bottom = 2880.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="1,0-Quick Start" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_right = 1080.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]
+[connection signal="pressed" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/Button" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/Button2" to="0,0-Game Options/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="pressed" from="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="pressed" from="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" to="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer/Button" to="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]

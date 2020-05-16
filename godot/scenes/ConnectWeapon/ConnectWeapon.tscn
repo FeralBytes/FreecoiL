@@ -7,115 +7,46 @@
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=5]
 
 [sub_resource type="DynamicFont" id=1]
-
 size = 30
-outline_size = 0
-outline_color = Color( 1, 1, 1, 1 )
-use_mipmaps = false
-use_filter = false
 font_data = ExtResource( 5 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [sub_resource type="DynamicFont" id=2]
-
 size = 28
-outline_size = 0
-outline_color = Color( 1, 1, 1, 1 )
-use_mipmaps = false
-use_filter = false
 font_data = ExtResource( 5 )
-_sections_unfolded = [ "Font", "Settings" ]
 
 [node name="ConnectWeapon" type="TextureButton"]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 margin_left = 110.0
 margin_right = 270.0
 margin_bottom = 110.0
-rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-focus_mode = 2
-mouse_filter = 0
-mouse_default_cursor_shape = 0
-size_flags_horizontal = 1
-size_flags_vertical = 1
-toggle_mode = false
-enabled_focus_mode = 2
-shortcut = null
-group = null
 texture_normal = ExtResource( 1 )
 texture_hover = ExtResource( 2 )
 expand = true
 stretch_mode = 4
 script = ExtResource( 3 )
-_sections_unfolded = [ "Script", "Textures", "Visibility", "custom_fonts", "custom_fonts/font" ]
 
 [node name="ConnectionCompleteSnd" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 4 )
-volume_db = 0.0
-pitch_scale = 1.0
-autoplay = false
-stream_paused = false
-mix_target = 0
-bus = "Master"
 
 [node name="Countdown" type="Timer" parent="."]
-process_mode = 1
-wait_time = 1.0
 one_shot = true
-autostart = false
 
 [node name="ConnectPopup" type="Popup" parent="."]
-visible = false
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 margin_left = -102.0
 margin_top = 8.0
 margin_right = 418.0
 margin_bottom = 954.0
-rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-mouse_filter = 0
-mouse_default_cursor_shape = 0
-size_flags_horizontal = 1
-size_flags_vertical = 1
 popup_exclusive = true
-_sections_unfolded = [ "Popup", "Visibility" ]
 
 [node name="ColorRect" type="ColorRect" parent="ConnectPopup"]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 margin_right = 522.0
 margin_bottom = 942.0
-rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-mouse_filter = 0
-mouse_default_cursor_shape = 0
-size_flags_horizontal = 1
-size_flags_vertical = 1
 color = Color( 0.584314, 0.0745098, 0.0352941, 1 )
 
 [node name="Label" type="Label" parent="ConnectPopup"]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 margin_left = 2.0
 margin_top = 42.0
 margin_right = 519.0
 margin_bottom = 319.0
-rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-mouse_filter = 2
-mouse_default_cursor_shape = 0
-size_flags_horizontal = 1
-size_flags_vertical = 4
 custom_fonts/font = SubResource( 1 )
 text = "Before proceeding, your 
 weapon must be connected 
@@ -125,37 +56,14 @@ Please turn the weapon on,
 then press the connect button
 below."
 align = 1
-percent_visible = 1.0
-lines_skipped = 0
-max_lines_visible = -1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
 
 [node name="ConnectWeapon2" type="Button" parent="ConnectPopup"]
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
 margin_left = 102.0
 margin_top = 322.0
 margin_right = 408.0
 margin_bottom = 363.0
-rect_pivot_offset = Vector2( 0, 0 )
-rect_clip_content = false
-focus_mode = 2
-mouse_filter = 0
-mouse_default_cursor_shape = 0
-size_flags_horizontal = 1
-size_flags_vertical = 1
 custom_fonts/font = SubResource( 2 )
-toggle_mode = false
-enabled_focus_mode = 2
-shortcut = null
-group = null
 text = "Connect To Weapon"
-flat = false
-align = 1
-_sections_unfolded = [ "custom_fonts", "custom_fonts/font" ]
-
 [connection signal="pressed" from="." to="." method="_on_ConnectWeapon_pressed"]
 [connection signal="timeout" from="Countdown" to="." method="_on_Countdown_timeout" flags=3]
 [connection signal="pressed" from="ConnectPopup/ConnectWeapon2" to="." method="_on_ConnectWeapon2_pressed" flags=3]

@@ -14,10 +14,12 @@ var loading_state2 = "idle"
 var integration_testing = false
 var splash_timer = Timer.new()
 var SplashScene = preload("res://scenes/Splash/Splash.tscn").instance()
+var current_menu_num = "0,0"
 onready var SceneFader = $Camera/TopLayer/SceneFader
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    add_to_group("Container")
     var test_file = File.new()
     if OS.get_environment("FeralBytes_UNIT_TEST") == "true":
         call_deferred("run_unit_tests")
@@ -178,8 +180,14 @@ func set_new_background():
 func finished_loading_thread2():
     loading_state2 = "idle"
     
+func next_menu(menu):
+    var xy = menu.split_floats(",")
+    get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
+    Settings.MainMenu.set_data("current_menu", menu)
+    
+    
 func _on_splash_timer_timeout():
-    goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
+    goto_scene("res://scenes/MainMenu/MainMenu.tscn")
     
 func run_unit_tests():
     var test_runner = load("res://tests/RunUnitTests.gd")

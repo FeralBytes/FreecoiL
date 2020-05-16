@@ -8,11 +8,12 @@ func _ready():
 
 func _on_SettingsBtn_pressed():
     SettingsMenu.popup()
+    SettingsMenu.rect_position = rect_global_position + Vector2(30, 70)
 
 
 func _on_MainMenuBtn_pressed():
     SettingsMenu.hide()
-    #SceneManager.goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
+    get_tree().call_group("Container", "next_menu", "0,0")
 
 
 func _on_ToggleRecoil_pressed():

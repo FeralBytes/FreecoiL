@@ -1,4 +1,4 @@
-extends ColorRect
+extends Control
 
 onready var Version = get_node("Version")
 

@@ -30,12 +30,6 @@ func _ready():
     else:
         li_lazer_gun_disconnected()
         
-func delayed_goto_scene():
-    #Trying to fix crash when going to game scene too soon after gun is connected.
-    yield(get_tree().create_timer(0.5), "timeout" )
-    var s = scene
-    scene = null
-    get_tree().call_group("Container", "goto_scene", s)
 
 #func li_trigger_btn_pushed():
 #    empty_gun_shot.play()
@@ -46,10 +40,7 @@ func li_lazer_gun_connected():
     Countdown.stop()
     blink_timer.stop()
     set_modulate(Color(1,1,1))
-    if scene != null:
-        call_deferred("delayed_goto_scene")
-    else:
-        ConnectionCompleteSnd.play()
+    ConnectionCompleteSnd.play()
     
 func li_lazer_gun_disconnected():
     Countdown.stop()

@@ -18,6 +18,7 @@ _global_script_class_icons={
 config/name="FreecoiL"
 run/main_scene="res://scenes/Container/Container.tscn"
 boot_splash/fullsize=false
+boot_splash/bg_color=Color( 0, 0, 0, 1 )
 config/icon="res://icon.png"
 
 [audio]
@@ -125,5 +126,6 @@ ui_end={
 
 quality/driver/driver_name="GLES2"
 vram_compression/import_etc=true
+environment/default_clear_color=Color( 0, 0, 0, 1 )
 environment/default_environment="res://default_env.tres"
 quality/dynamic_fonts/use_oversampling=false
