@@ -86,6 +86,7 @@ func stop_bt_scan():
     if lazercoil != null:
         lazercoil.stopBluetoothScan()
 
+#TODO: Godot now has a vibrate feature no need to do it through Java.
 func vibrate(duration_millis):
     if lazercoil != null:
         lazercoil.vibrate(duration_millis)
@@ -154,7 +155,9 @@ func _on_delay_loading():
             status_scroll = get_node("/root/TestContainer/StatusScroll")
     if Engine.has_singleton("FreecoiL"):
         lazercoil = Engine.get_singleton("FreecoiL")
+        print(lazercoil.hello())
         lazercoil.init(get_instance_id())
+        print("here 0")
     
 func init_vars():
     # We initialize the vars here to allow loading from saved defaults but also to 
@@ -194,14 +197,16 @@ func _bt_on():
         print('Bluetooth is NOT supported on this device.')
     
 func _fine_access_location_status():
-    state_fine_access_location = lazercoil.fineAccessPermissionStatus()
+    print(OS.get_granted_permissions())
+    #state_fine_access_location = lazercoil.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
     if state_fine_access_location == 1:
         print('Fine Access Enabled!')
     else:
         if lazercoil != null:
-            lazercoil.enableFineAccess()
+            OS.request_permissions()
+            #lazercoil.enableFineAccess()
         
 func _on_bt_connect_timeout():
     if lazercoil != null:
@@ -341,16 +346,16 @@ func _new_status(status, level):
     #     3 = error
     #     4 = critical
     #     5 = exception
-    print('LazercoiL Java: DEBUG: ', status) # debug level always print
+    print('FreecoiL Java: DEBUG: ', status) # debug level always print
     if status_scroll != null:
         if level == 1:
-            status_scroll.text = 'LazercoiL Java: INFO: ' + status + '\n' + status_scroll.text
+            status_scroll.text = 'FreecoiL Java: INFO: ' + status + '\n' + status_scroll.text
         elif level == 2:
-            status_scroll.text = 'LazercoiL Java: WARNING: ' + status + '\n' + status_scroll.text
+            status_scroll.text = 'FreecoiL Java: WARNING: ' + status + '\n' + status_scroll.text
         elif level == 3:
-            status_scroll.text = 'LazercoiL Java: ERROR: ' + status + '\n' + status_scroll.text
+            status_scroll.text = 'FreecoiL Java: ERROR: ' + status + '\n' + status_scroll.text
         elif level == 4:
-            status_scroll.text = 'LazercoiL Java: CRITICAL: ' + status + '\n' + status_scroll.text
+            status_scroll.text = 'FreecoiL Java: CRITICAL: ' + status + '\n' + status_scroll.text
         elif level == 5:
-            status_scroll.text = 'LazercoiL Java: EXCEPTION: ' + status + '\n' + status_scroll.text
+            status_scroll.text = 'FreecoiL Java: EXCEPTION: ' + status + '\n' + status_scroll.text
     

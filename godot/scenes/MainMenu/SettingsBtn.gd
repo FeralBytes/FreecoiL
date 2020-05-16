@@ -12,7 +12,7 @@ func _on_SettingsBtn_pressed():
 
 func _on_MainMenuBtn_pressed():
     SettingsMenu.hide()
-    SceneManager.goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
+    #SceneManager.goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
 
 
 func _on_ToggleRecoil_pressed():

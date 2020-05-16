@@ -9,3 +9,5 @@
 .idea
 # Sphinx documentation build Artifacts
 docs/build/
+# Godot Android Build Templates
+godot/android/
