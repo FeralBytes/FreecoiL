@@ -17,6 +17,7 @@ func _on_MainMenuBtn_pressed():
 
 func _on_ToggleRecoil_pressed():
     SettingsMenu.hide()
+    LazerInterface.enable_recoil(!LazerInterface.recoil_enabled)
 
 
 func _on_ExitApp_pressed():
