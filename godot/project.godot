@@ -13,10 +13,6 @@ _global_script_class_icons={
 
 }
 
-[android]
-
-modules="org/godotengine/godot/FreecoiL"
-
 [application]
 
 config/name="FreecoiL"
@@ -128,4 +124,6 @@ ui_end={
 
 [rendering]
 
+quality/driver/driver_name="GLES2"
+vram_compression/import_etc=true
 environment/default_environment="res://default_env.tres"

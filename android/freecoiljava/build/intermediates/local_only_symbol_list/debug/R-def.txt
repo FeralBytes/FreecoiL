@@ -1,0 +1,5 @@
+R_DEF: Internal format may change without notice
+local
+id freecoil_container
+layout freecoil_view
+string hello_world

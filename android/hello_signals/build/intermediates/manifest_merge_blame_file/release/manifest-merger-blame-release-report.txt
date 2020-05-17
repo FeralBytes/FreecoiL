@@ -1,0 +1,35 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="fhuyakou.godot.plugin.android.hellosignals"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="18"
+8-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="29" />
+9-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml
+10
+11    <application>
+11-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml:4:3-19:17
+12
+13        <!--
+14    Plugin metadata:
+15
+16    - In the `android:name` attribute, the `org.godotengine.plugin.v1` prefix
+17    is required so Godot can recognize the project as a valid Godot
+18    Android plugin. The plugin name following the prefix should match the value
+19    of the plugin name returned by the plugin initializer.
+20
+21    - The `android:value` attribute should be the classpath to the plugin
+22    initializer.
+23        -->
+24        <meta-data
+24-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml:16:5-18:89
+25            android:name="org.godotengine.plugin.v1.HelloSignals"
+25-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml:17:9-62
+26            android:value="fhuyakou.godot.plugin.android.hellosignals.HelloSignalsPlugin" />
+26-->/home/wolfrage/0.Projects/5.FreecoiL/src/android_kotlin/hello_signals/src/main/AndroidManifest.xml:18:9-86
+27    </application>
+28
+29</manifest>

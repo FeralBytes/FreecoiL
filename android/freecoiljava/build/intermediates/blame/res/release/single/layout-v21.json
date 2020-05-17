@@ -1,0 +1,18 @@
+[
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-v21/notification_action.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/f39ac19812751864b617296733ab60a9/support-compat-28.0.0/res/layout-v21/notification_action.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-v21/notification_template_custom_big.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/f39ac19812751864b617296733ab60a9/support-compat-28.0.0/res/layout-v21/notification_template_custom_big.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-v21/notification_template_icon_group.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/f39ac19812751864b617296733ab60a9/support-compat-28.0.0/res/layout-v21/notification_template_icon_group.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-v21/notification_action_tombstone.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/f39ac19812751864b617296733ab60a9/support-compat-28.0.0/res/layout-v21/notification_action_tombstone.xml"
+    }
+]

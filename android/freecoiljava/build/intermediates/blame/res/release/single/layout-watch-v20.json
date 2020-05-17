@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-watch-v20/abc_alert_dialog_title_material.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/layout-watch-v20/abc_alert_dialog_title_material.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/layout-watch-v20/abc_alert_dialog_button_bar_material.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/layout-watch-v20/abc_alert_dialog_button_bar_material.xml"
+    }
+]

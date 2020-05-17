@@ -1,0 +1,50 @@
+[
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_slide_in_bottom.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_slide_in_bottom.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_slide_in_top.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_slide_in_top.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_slide_out_bottom.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_slide_out_bottom.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_slide_out_top.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_slide_out_top.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_popup_enter.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_popup_enter.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_tooltip_exit.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_tooltip_exit.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_tooltip_enter.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_tooltip_enter.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_fade_in.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_fade_in.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_shrink_fade_out_from_bottom.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_shrink_fade_out_from_bottom.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_grow_fade_in_from_bottom.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_grow_fade_in_from_bottom.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_fade_out.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_fade_out.xml"
+    },
+    {
+        "merged": "/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build/intermediates/res/merged/release/anim/abc_popup_exit.xml",
+        "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/c126655c4c472ba6c2075b660162002e/appcompat-v7-28.0.0/res/anim/abc_popup_exit.xml"
+    }
+]

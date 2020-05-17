@@ -1,0 +1,45 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+	package
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:2:5-55
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:1-20:12
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:1:11-69
+application
+ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:4:3-19:17
+meta-data#org.godotengine.plugin.v1.HelloWorld
+ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:16:5-18:85
+	android:value
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:18:9-82
+	android:name
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml:17:9-60
+uses-sdk
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml
+		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/android/hello_world/src/main/AndroidManifest.xml

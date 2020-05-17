@@ -194,14 +194,18 @@ func _bt_on():
         print('Bluetooth is NOT supported on this device.')
     
 func _fine_access_location_status():
-    state_fine_access_location = lazercoil.fineAccessPermissionStatus()
+    print(OS.get_granted_permissions())
+    #state_fine_access_location = lazercoil.fineAccessPermissionStatus()
+
         
 func _fine_access_location_enabled():
     if state_fine_access_location == 1:
         print('Fine Access Enabled!')
     else:
         if lazercoil != null:
-            lazercoil.enableFineAccess()
+            OS.request_permissions()
+            #lazercoil.enableFineAccess()
+
         
 func _on_bt_connect_timeout():
     if lazercoil != null:

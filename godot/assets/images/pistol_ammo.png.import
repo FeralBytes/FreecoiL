@@ -3,6 +3,9 @@
 importer="texture"
 type="StreamTexture"
 path="res://.import/pistol_ammo.png-fdd6117c0c457b3f9d8789c547c2b770.stex"
+metadata={
+"vram_texture": false
+}
 
 [deps]
 
