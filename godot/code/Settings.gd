@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.1-dev2"
+const VERSION = "0.3.1-dev3"
 const DEBUG_GUI = false
 const DEBUG_LEVEL = 2
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
