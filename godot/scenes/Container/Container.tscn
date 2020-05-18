@@ -23,13 +23,15 @@ func _ready():
 
 func put(line_txt):
     lines.append(line_txt)
-    if len(lines) > 10:
+    if len(lines) > 6:
         lines.pop_front()
     var display_lines = \"\"
     for line in lines:
         display_lines += line + \"\\n\"
     self.text = display_lines
-        
+
+func toggle_visibility():
+    self.visible = Settings.DEBUG_GUI
 "
 
 [sub_resource type="Environment" id=2]
@@ -84,9 +86,9 @@ script = ExtResource( 3 )
 ]]
 modulate = Color( 1, 1, 1, 0.654902 )
 margin_right = 540.0
-margin_bottom = 200.0
+margin_bottom = 250.0
 autowrap = true
-max_lines_visible = 10
+max_lines_visible = 12
 script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false

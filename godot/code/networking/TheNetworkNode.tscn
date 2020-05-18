@@ -75,13 +75,14 @@ func _ready():
     Settings.Network.register_data(\"peers_minimum\", Settings.MIN_PLAYERS)
     # peer_status can be one of [\"connected\", \"disconnected\", \"connecting\", \"reconnecting\", \"reconnected\", \"identifying\"]
     Settings.Network.register_data(\"mups_status\", {\"1\": \"connected\"})
-    Settings.Session.connect(Settings.Session.monitor_data(\"server_possible_ips\"), self, \"setup_server_part2\")
+    #Settings.Session.connect(Settings.Session.monitor_data(\"server_possible_ips\"), self, \"setup_server_part2\")
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_to_peers\"), self, \"invert_mups_to_peers\")
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"check_if_all_mups_ready\")
     Settings.Network.set_data(\"websockets_init_comp\", false)
     Settings.Network.set_data(\"websockets_client_connected\", false)
     rng.randomize()
     host_udp_broadcast_uid = rng.randi()
+    Settings.Log(\"Network: UDP: UDP broadcast uid = \" + str(host_udp_broadcast_uid))
     set_process(false)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -175,11 +176,11 @@ remote func identify(pup_id, godot_peer_id):
                     Server.disconnect_peer(real_rpc_id, true)
                     return
             Settings.Network.sync_peer(godot_peer_id)
+            print(\"Player Name = \" + Settings.InGame.get_data(\"player_name\"))
             Settings.InGame.sync_peer(godot_peer_id)
             Settings.Network.set_data(\"mups_status\", mups_status)
 
 func setup_server_part1():
-    network_loops.append(\"_hosting_so_toss_udp_broadcast\")
     reset_networking()
     Settings.Session.set_data(\"mup_id\", \"1\")  # mup_id != peer id.
     if Settings.Session.get_data(\"server_ip\") == \"\":
@@ -194,31 +195,35 @@ func setup_server_part1():
         if valid_ipv4_matches.size() == 0:
             Settings.Log(\"Error: Not Implemented Yet!\", \"error\")
             Settings.Log(\"    No valid IPv4 addresses.\", \"error\")
+            get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
         elif valid_ipv4_matches.size() == 1:
             Settings.Session.set_data(\"server_ip\", valid_ipv4_matches[0])
+            Settings.Log(\"Network: Server: Valid IP Address found of \" + str(valid_ipv4_matches[0]) + \".\")
             call_deferred(\"setup_server_part2\")
-        else:  # > 1
-            get_tree().call_group(\"Transitioner\", \"next_menu\", \"2,-2\")
+        else:  # > 1 AKA multiple valid external IP Address to choose from.
+            Settings.Log(\"Error: Not Implemented Yet!\", \"error\")
+            Settings.Log(\"    Too many valid IPv4 addresses.\", \"error\")
+            get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
             
     else:
-        Settings.Session.set_data(\"server_ip\", Settings.Session.get_data(\"server_ip\"))
+        Settings.Log(\"Network: Server: Valid IP Address found of \" + str(Settings.Session.get_data(\"server_ip\")) + \".\")
         call_deferred(\"setup_server_part2\")
         
-func setup_server_part2(possible_ips=null):
-    if possible_ips != null:
-        if Settings.Session.get_data(\"server_possible_ips\").size() == 1:
-            Settings.Session.set_data(\"server_ip\", Settings.Session.get_data(\"server_possible_ips\")[0])
-        else:
-            return
-        Settings.Session.set_data(\"server_port\", Settings.NETWORK_LAN_PORT)
-        Server = NetworkedMultiplayerENet.new()
-        Server.set_bind_ip(Settings.Session.get_data(\"server_ip\"))
-        Server.create_server(Settings.Session.get_data(\"server_port\"), Settings.MAX_PLAYERS + Settings.MAX_OBSERVERS)
-        get_tree().set_network_peer(Server)
-        Settings.Session.set_data(\"connection_status\", \"connected\")
-        host_udp_broadcast = true
-        network_loops.append(\"_hosting_send_udp_broadcast\")
-        get_tree().call_group(\"Transitioner\", \"next_menu\", \"3,-1\")
+func setup_server_part2():
+    Settings.Log(\"Network: Server: Setting up the Server now.\")
+    Settings.Session.set_data(\"server_port\", Settings.NETWORK_LAN_PORT)
+    Server = NetworkedMultiplayerENet.new()
+    Server.set_bind_ip(Settings.Session.get_data(\"server_ip\"))
+    Server.create_server(Settings.Session.get_data(\"server_port\"), Settings.MAX_PLAYERS + Settings.MAX_OBSERVERS)
+    get_tree().set_network_peer(Server)
+    Settings.Session.set_data(\"connection_status\", \"connected\")
+    host_udp_broadcast = true
+    search_for_peers()
+    Settings.Log(\"Network: Server: Removing UDP Peer Search from network loops.\")
+    network_loops.append(\"_hosting_so_toss_udp_broadcast\")
+    network_loops.append(\"_hosting_send_udp_broadcast\")
+    set_process(true)
+    Settings.Log(\"Network: Server: Server created and sending out UDP invites with a UID of \" + str(host_udp_broadcast_uid) + \".\")
 
 func check_if_all_mups_ready(mups_ready):
     if testing:
@@ -280,6 +285,7 @@ remote func set_mup_id(new_id):
 
 #### UDP BroadCast For LAN
 func search_for_peers():
+    Settings.Log(\"Network: UDP: Search for Peers: Setting up new PacketPeerUDP.\")
     pp_udp = PacketPeerUDP.new()
     pp_udp.set_broadcast_enabled(true)  # New with 3.2 must have this option enabled.
     pp_udp.set_dest_address(\"255.255.255.255\", Settings.NETWORK_BROADCAST_LAN_PORT)
@@ -289,6 +295,7 @@ func search_for_peers():
     network_loops.append(\"_udp_broadcast_rxd\")
     network_loops.append(\"_udp_broadcast_tx\")
     set_process(true)
+    Settings.Log(\"Network: UDP: Search for Peers: Setup completed.\")
     
 func _udp_broadcast_tx():
     if search_udp_broadcast:
@@ -316,23 +323,26 @@ func _udp_broadcast_rxd():
             udp_test_broadcast_rx_count += 1
         if typeof(udp_var) == TYPE_ARRAY:
             if udp_var[3] == host_udp_broadcast_uid:
+                #Settings.Log(\"Network: UDP: Got broadcast from self.\")
                 pass  # Throw it away.
             elif udp_var[0] == Settings.UDP_BROADCAST_GREETING:
-                Settings.Log(\"Networking: UDP: Got UDP broadcast from: \" + udp_peer_ip +  \" of \" + str(udp_var))
+                Settings.Log(\"Networking: UDP: Got UDP Peer Greeting broadcast from: \" + udp_peer_ip +  \" of \" + str(udp_var))
                 udp_peer_dict[udp_peer_ip] = OS.get_system_time_secs()
                 if testing:
                     udp_test_from_peer = udp_var[3]
             elif udp_var[0] == Settings.UDP_BROADCAST_HOST:
-                Settings.Log(\"Networking: UDP: Got UDP broadcast from: \" + udp_peer_ip +  \" of \" + str(udp_var))
+                Settings.Log(\"Networking: UDP: Got UDP Server Greeting broadcast from: \" + udp_peer_ip +  \" of \" + str(udp_var))
                 if not Settings.Session.get_data(\"server_invite\"):
                     if udp_var[1] in Settings.Session.get_data(\"server_ignore_list\"):
                         pass
                     else:
                         Settings.Session.set_data(\"server_invite\", true)
-                        get_tree().call_group(\"Transitioner\", \"next_menu\", \"3,0\")
-                        Settings.Log(\"Networking: UDP: Server's address = \" + udp_var[1] + \":\" + str(udp_var[2]))
+                        Settings.Log(\"Networking: UDP: Client found server's address = \" + udp_var[1] + \":\" + str(udp_var[2]))
                         Settings.Session.set_data(\"server_ip\", udp_var[1])
                         Settings.Session.set_data(\"server_port\", udp_var[2])
+                        get_tree().call_group(\"Network\", \"stop_udp_peer_search\")
+                        get_tree().call_group(\"Network\", \"setup_as_client\")
+                        get_tree().call_group(\"Container\", \"load_lobby\")              
         # Remove peers that have not broadcast lately. > 3 seconds.
         for udp_peer in udp_peer_dict:
             if OS.get_system_time_secs() - udp_peer_dict[udp_peer] > 3:
@@ -342,16 +352,17 @@ func _udp_broadcast_rxd():
 func _hosting_so_toss_udp_broadcast():
     search_udp_broadcast = false
     network_loops.remove(\"_udp_broadcast_tx\")
-    while pp_udp.get_available_packet_count() > 0:
-        var udp_var = pp_udp.get_var()
-        var udp_peer_ip = pp_udp.get_packet_ip()
-        if udp_peer_ip in IP.get_local_addresses():
-            pass  # Throw it away.
-        else:
-            if typeof(udp_var) == TYPE_ARRAY:
-                if udp_var[0] == Settings.UDP_BROADCAST_HOST:
-                    Settings.Log(\"Networking: UDP: Warning: Another server is hosting at \" + udp_var[1] + \":\" + str(udp_var[2]))
-                    Settings.Log(\"        Verified IP Address is: \" + udp_peer_ip)
+    if pp_udp != null:
+        while pp_udp.get_available_packet_count() > 0:
+            var udp_var = pp_udp.get_var()
+            var udp_peer_ip = pp_udp.get_packet_ip()
+            if udp_peer_ip in IP.get_local_addresses():
+                pass  # Throw it away.
+            else:
+                if typeof(udp_var) == TYPE_ARRAY:
+                    if udp_var[0] == Settings.UDP_BROADCAST_HOST:
+                        Settings.Log(\"Network: UDP: Warning: Another server is hosting at \" + udp_var[1] + \":\" + str(udp_var[2]))
+                        Settings.Log(\"        Verified IP Address is: \" + udp_peer_ip)
 
 func _hosting_send_udp_broadcast():
     if __udp_broadcast_hosting_tx_time_since == null:
@@ -364,15 +375,16 @@ func _hosting_send_udp_broadcast():
 func __hosting_send_udp_broadcast():
     pp_udp.put_var([Settings.UDP_BROADCAST_HOST, Settings.Session.get_data(\"server_ip\"), Settings.Session.get_data(\"server_port\"), host_udp_broadcast_uid])
     __udp_broadcast_hosting_tx_time_since = OS.get_ticks_msec()
+    #Settings.Log(\"Network: UDP: Sent UDP Host Broadcast.\")
  
 func udp_peer_selected(peer_ip):
-    Settings.Log(\"Networking: UDP: UDP Peer Selected: \" + str(peer_ip))
+    Settings.Log(\"Network: UDP: UDP Peer Selected: \" + str(peer_ip))
     stop_udp_peer_search()   
     Settings.Session.set_data(\"players_ip\", peer_ip)
     setup_server_part1()  
     
 func stop_udp_peer_search():
-    Settings.Log(\"Networking: UDP: Stopping UPD Peer Search.\")
+    Settings.Log(\"Network: UDP: Stopping UPD Peer Search.\")
     search_udp_broadcast = false
     network_loops.remove(\"_udp_broadcast_rxd\")
     network_loops.remove(\"_udp_broadcast_tx\")
@@ -396,17 +408,17 @@ func init_websocket_server():
     network_loops.append(\"websocket_server_poll\")
     
 func websocket_server_connected(id, _proto):
-    Settings.Log(\"Networking: Websockets: Websocket server new connection with \" + str(id))
+    Settings.Log(\"Network: Websockets: Websocket server new connection with \" + str(id))
     if testing:
         websockets_test_server_connected = true
     
 func websocket_server_disconnected(id, _was_clean=false):
-    Settings.Log(\"Networking: Websockets: Websocket server disconnected from id \" + str(id))
+    Settings.Log(\"Network: Websockets: Websocket server disconnected from id \" + str(id))
     if testing:
         websockets_test_server_disconnected = true
     
 func websocket_server_client_close_request(id, code, reason):
-    Settings.Log(\"Networking: Websockets: Websocket server, client close request from \" + str(id)
+    Settings.Log(\"Network: Websockets: Websocket server, client close request from \" + str(id)
         + \" with code of \" + str(code) + \" reason of \" + str(reason))
     if testing:
         websockets_test_client_requested_closed = true
@@ -431,28 +443,28 @@ func init_websocket_client():
     websocket_client.connect(\"data_received\", self, \"websocket_client_on_data\")
     network_loops.append(\"websocket_client_poll\")
     set_process(true)
-    Settings.Log(\"Networking: Websockets: Websockets Initialization Completed.\")
+    Settings.Log(\"Network: Websockets: Websockets Initialization Completed.\")
     Settings.Network.set_data(\"websockets_client_init_comp\", true)
 
 func websocket_client_established(_proto=\"\"):
-    Settings.Log(\"Networking: Websockets: Websocket client connected.\")
+    Settings.Log(\"Network: Websockets: Websocket client connected.\")
     Settings.Network.set_data(\"websockets_client_connected\", true)
     if testing:
         websockets_test_client_connected = true
 
 func websocket_client_error(_was_clean=false):
-    Settings.Log(\"Networking: Websockets: Encountered an error while attempting websocket client communication.\")
+    Settings.Log(\"Network: Websockets: Encountered an error while attempting websocket client communication.\")
     pass
 
 func websocket_client_closed(was_clean=false):
-    Settings.Log(\"Networking: Websockets: Websocket client disconnected was clean = \" + str(was_clean))
+    Settings.Log(\"Network: Websockets: Websocket client disconnected was clean = \" + str(was_clean))
     if testing:
         websockets_test_client_disconnected = true
     
 func websocket_client_on_data():
     var temp = websocket_client.get_peer(1).get_packet()
     Settings.Network.set_data(\"websocket_client_data\", temp)
-    Settings.Log(\"Networking: Websockets: Data recieved = \" + str(temp.get_string_from_utf8()))
+    Settings.Log(\"Network: Websockets: Data recieved = \" + str(temp.get_string_from_utf8()))
     if testing:
         websockets_test_client_rx_data = websocket_client.get_peer(1).get_packet()
 
@@ -466,9 +478,9 @@ func websocket_client_connect_to_url(url, additional_headers):
     else:
         err = websocket_client.connect_to_url(url, [], false, additional_headers)
     if err != OK:
-        Settings.Log(\"Networking: Websockets: Unable to connect; error = \" + str(err), \"error\")
+        Settings.Log(\"Network: Websockets: Unable to connect; error = \" + str(err), \"error\")
     else:
-        Settings.Log(\"Networking: Websockets: Connection made.\")
+        Settings.Log(\"Network: Websockets: Connection made.\")
 
 func websocket_client_send_data(data):
     websocket_client.get_peer(1).put_packet(data)

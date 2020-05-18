@@ -10,7 +10,7 @@ var screen_height = 960
 # Called when the node enters the scene tree for the first time.
 func _ready():
     add_to_group("Camera")
-    Settings.MainMenu.set_data("last_xy", [last_x, last_y])
+    Settings.Session.set_data("last_xy", [last_x, last_y])
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -72,7 +72,7 @@ func pan_camera(steps_x, steps_y):
     if not panning:
         last_x = steps_x
         last_y = steps_y
-        Settings.MainMenu.set_data("last_xy", [last_x, last_y])
+        Settings.Session.set_data("last_xy", [last_x, last_y])
         #get_tree().call_group("Particle", "emit_on", false)
         get_tree().call_group("MenuButtons", "enabled", true)
 
@@ -87,6 +87,6 @@ func instant_pan_camera(steps_x, steps_y):
     position.y = total_to_pan_y
     last_x = steps_x
     last_y = steps_y
-    Settings.MainMenu.set_data("last_xy", [last_x, last_y])
+    Settings.Session.set_data("last_xy", [last_x, last_y])
     get_tree().call_group("MenuButtons", "enabled", true)
     

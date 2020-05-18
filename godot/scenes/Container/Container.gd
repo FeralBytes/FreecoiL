@@ -1,7 +1,8 @@
 extends Node
 
 signal finished_loading
-# Declare member variables here. Examples:
+export(String) var lobby_xy = "3,1"
+# Declare member variables here.
 var current_scene
 var previous_scene
 var active_scene_container = 0
@@ -14,7 +15,6 @@ var loading_state2 = "idle"
 var integration_testing = false
 var splash_timer = Timer.new()
 var SplashScene = preload("res://scenes/Splash/Splash.tscn").instance()
-var current_menu_num = "0,0"
 onready var SceneFader = $Camera/TopLayer/SceneFader
 
 # Called when the node enters the scene tree for the first time.
@@ -183,7 +183,12 @@ func finished_loading_thread2():
 func next_menu(menu):
     var xy = menu.split_floats(",")
     get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
-    Settings.MainMenu.set_data("current_menu", menu)
+    Settings.Session.set_data("current_menu", menu)
+    
+func load_lobby():
+    var xy = lobby_xy.split_floats(",")
+    get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
+    Settings.Session.set_data("current_menu", lobby_xy)
     
     
 func _on_splash_timer_timeout():

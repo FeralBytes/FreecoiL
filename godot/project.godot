@@ -31,15 +31,12 @@ Helpers="*res://code/Helpers.gd"
 Settings="*res://code/Settings.gd"
 LazerInterface="*res://code/LazerInterface.gd"
 
-[debug]
-
-settings/fps/force_fps=30
-
 [display]
 
 window/size/width=540
 window/size/height=960
 window/size/resizable=false
+window/vsync/use_vsync=false
 window/energy_saving/keep_screen_on=false
 window/handheld/orientation="portrait"
 window/stretch/mode="viewport"

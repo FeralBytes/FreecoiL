@@ -1,8 +1,6 @@
 extends Node
 
-const VERSION = "0.3.1-dev3"
-const DEBUG_GUI = false
-const DEBUG_LEVEL = 2
+const VERSION = "0.3.0-dev3"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -16,12 +14,14 @@ const MIN_PLAYERS = 2
 const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signal.
 
+var DEBUG_GUI = false
+var DEBUG_LEVEL = 0
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
 var Testing = Data.new("Testing")
 # warning-ignore:unused_class_variable
-var MainMenu = Data.new("MainMenu", USER_DIR + "MainMenu.json", false, true)
+var Preferences = Data.new("Preferences", USER_DIR + "Preferences.json", true, true)
 # warning-ignore:unused_class_variable
 var InGame = Data.new("InGame", USER_DIR + "InGame.json", false, true, true)
 # warning-ignore:unused_class_variable
@@ -39,6 +39,7 @@ var Network = Data.new("Network", null, false, false, true)
 func Log(to_print, level="debug"):
     if DEBUG_LEVELS.find(level) >= DEBUG_LEVEL:
         print(to_print)
+    if DEBUG_GUI:
         get_tree().call_group("DebugOutput", "put", to_print)
 
 class Data:
@@ -140,7 +141,8 @@ class Data:
         var config = ConfigFile.new()
         var error = config.load(settings_path)
         if error != OK:
-            printerr("Error loading the settings. Error code: " + str(error) + " " + Helpers.error_lookup(error))
+            printerr("Error loading the settings file " + str(settings_path) + 
+                ". Error code: " + str(error) + " " + Helpers.error_lookup(error))
             return error
         else:
             var file = File.new()
