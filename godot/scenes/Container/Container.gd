@@ -46,7 +46,7 @@ func _ready():
         $Scene0.add_child(current_scene)
         self.add_child(splash_timer)
         splash_timer.one_shot = true
-        splash_timer.wait_time = 0.001  # TODO: 4
+        splash_timer.wait_time = 5  # TODO: 4
         splash_timer.connect("timeout",self,"_on_splash_timer_timeout") 
         splash_timer.start()
         SplashScene = null
