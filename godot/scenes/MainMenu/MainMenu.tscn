@@ -588,9 +588,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer"]
-margin_top = 264.0
+margin_top = 311.0
 margin_right = 540.0
-margin_bottom = 575.0
+margin_bottom = 528.0
 custom_constants/separation = 8
 
 [node name="Label" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
@@ -610,6 +610,7 @@ text = "BRINGING THE GAME TO THE WORLD"
 align = 1
 
 [node name="Button" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+visible = false
 margin_top = 131.0
 margin_right = 540.0
 margin_bottom = 170.0
@@ -617,23 +618,24 @@ disabled = true
 text = "Quick Start Game"
 
 [node name="Button2" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 178.0
+margin_top = 131.0
 margin_right = 540.0
-margin_bottom = 217.0
+margin_bottom = 170.0
 text = "Start A Networked Game"
 script = SubResource( 7 )
 
 [node name="Button3" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 225.0
+visible = false
+margin_top = 178.0
 margin_right = 540.0
-margin_bottom = 264.0
+margin_bottom = 217.0
 disabled = true
 text = "Start A No Network Game"
 
 [node name="Button4" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 272.0
+margin_top = 178.0
 margin_right = 540.0
-margin_bottom = 311.0
+margin_bottom = 217.0
 text = "Test Mode"
 script = SubResource( 8 )
 
@@ -723,9 +725,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,1-Networked Game 2/CenterContainer"]
-margin_top = 331.0
+margin_top = 355.0
 margin_right = 540.0
-margin_bottom = 509.0
+margin_bottom = 484.0
 
 [node name="Label2" type="Label" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
 margin_right = 540.0
@@ -749,6 +751,7 @@ text = "Custom Match Setup"
 script = SubResource( 11 )
 
 [node name="Button2" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
+visible = false
 margin_top = 139.0
 margin_right = 540.0
 margin_bottom = 178.0
@@ -850,9 +853,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="4,1-Lobby/CenterContainer"]
-margin_left = 12.0
 margin_top = 7.0
-margin_right = 552.0
+margin_right = 540.0
 margin_bottom = 832.0
 rect_min_size = Vector2( 540, 0 )
 

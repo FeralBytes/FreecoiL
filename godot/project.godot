@@ -17,7 +17,7 @@ _global_script_class_icons={
 
 config/name="FreecoiL"
 run/main_scene="res://scenes/Container/Container.tscn"
-boot_splash/fullsize=false
+boot_splash/image="res://assets/images/boot_splash.png"
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
 config/icon="res://icon.png"
 
