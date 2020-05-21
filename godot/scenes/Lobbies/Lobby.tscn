@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
@@ -23,9 +23,44 @@ func _ready():
 #    pass
 "
 
-[sub_resource type="DynamicFont" id=2]
-size = 60
-font_data = ExtResource( 1 )
+[sub_resource type="GDScript" id=10]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_respawn_delay\"), self, \"update_host_status\")
+
+
+func update_host_status(__):
+    text = \"The Host has joined the lobby.\"
+"
+
+[sub_resource type="GDScript" id=9]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+
+
+func update_teams(teams):
+    if teams:
+        text = 'Teams are turned \"ON\".'
+    else:
+        text = 'Teams are turned \"OFF\".'
+"
 
 [sub_resource type="GDScript" id=3]
 script/source = "extends Button
@@ -77,19 +112,41 @@ font_data = ExtResource( 1 )
 script/source = "extends VBoxContainer
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
+onready var LeftBtn = get_parent().get_parent().get_parent().get_node(\"LeftBtn\")
+onready var RightBtn = get_parent().get_parent().get_parent().get_node(\"RightBtn\")
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"update_team_list\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
+    Settings.Session.set_data(\"ui_team_being_viewed\", 0)  #TODO: Team 0 as unassigned players.
+    Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    if Settings.InGame.get_data(\"game_teams\"):
+        LeftBtn.disabled = false
+        RightBtn.disabled = false
+    else:
+        LeftBtn.disabled = true
+        RightBtn.disabled = true
+
+
+func update_team_list(__):
+    pass
+    
+
+
+func _on_LeftBtn_pressed():
+    var game_num_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+    if game_num_of_teams == null:
+        return
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
+    if new_team == 0:
+        pass
+
+
+func _on_RightBtn_pressed():
     pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
 "
 
 [sub_resource type="StyleBoxFlat" id=6]
@@ -128,24 +185,38 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_left = 2.0
-margin_right = 542.0
-margin_bottom = 874.0
+margin_right = 540.0
+margin_bottom = 829.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label3" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 35.0
 rect_min_size = Vector2( 540, 0 )
-custom_fonts/font = SubResource( 2 )
-text = "FREECOIL"
+text = "Game Lobby"
 align = 1
 autowrap = true
 
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "The host is still setting up the game."
+align = 1
+script = SubResource( 10 )
+
+[node name="Teams" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_top = 90.0
 margin_right = 540.0
-margin_bottom = 129.0
+margin_bottom = 125.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 9 )
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 135.0
+margin_right = 540.0
+margin_bottom = 174.0
 script = SubResource( 3 )
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
@@ -157,16 +228,16 @@ text = "Network Match Lobby"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-margin_top = 139.0
+margin_top = 184.0
 margin_right = 540.0
-margin_bottom = 874.0
+margin_bottom = 829.0
 custom_constants/separation = 12
 alignment = 1
 
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="LeftBtn" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 43.0
-margin_bottom = 735.0
+margin_bottom = 645.0
 custom_styles/normal = SubResource( 4 )
 custom_fonts/font = SubResource( 5 )
 text = "<"
@@ -174,21 +245,21 @@ text = "<"
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 55.0
 margin_right = 485.0
-margin_bottom = 735.0
+margin_bottom = 645.0
 rect_min_size = Vector2( 430, 0 )
 alignment = 1
 
 [node name="Team" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 430.0
 margin_bottom = 35.0
-text = "Team 1"
+text = "Rogue Players (No Team)"
 align = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 45.0
 margin_right = 430.0
-margin_bottom = 735.0
-rect_min_size = Vector2( 430, 690 )
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 600 )
 scroll_horizontal_enabled = false
 
 [node name="TeamContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
@@ -202,11 +273,13 @@ margin_right = 430.0
 margin_bottom = 39.0
 text = "Joe"
 
-[node name="Button2" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="RightBtn" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 497.0
 margin_right = 536.0
-margin_bottom = 735.0
+margin_bottom = 645.0
 custom_styles/normal = SubResource( 6 )
 custom_fonts/font = SubResource( 7 )
 text = ">"
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
