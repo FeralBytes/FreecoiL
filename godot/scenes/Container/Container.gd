@@ -189,6 +189,7 @@ func load_lobby():
     var xy = lobby_xy.split_floats(",")
     get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
     Settings.Session.set_data("current_menu", lobby_xy)
+    goto_scene("res://scenes/Lobbies/Lobby.tscn")
     
     
 func _on_splash_timer_timeout():

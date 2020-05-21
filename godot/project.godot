@@ -19,7 +19,7 @@ config/name="FreecoiL"
 run/main_scene="res://scenes/Container/Container.tscn"
 boot_splash/image="res://assets/images/boot_splash.png"
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
-config/icon="res://icon.png"
+config/icon="res://assets/images/logos/Freecoil_app_icon.png"
 
 [audio]
 
@@ -118,6 +118,11 @@ ui_end={
 "events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":16777230,"unicode":0,"echo":false,"script":null)
  ]
 }
+
+[network]
+
+limits/debugger_stdout/max_chars_per_second=4096
+limits/debugger_stdout/max_messages_per_frame=30
 
 [rendering]
 

@@ -1,9 +1,10 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=25 format=2]
 
-[ext_resource path="res://default.theme" type="Theme" id=1]
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
 [ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=3]
 [ext_resource path="res://scenes/Widgets/PlusMinusWidget.tscn" type="PackedScene" id=4]
+[ext_resource path="res://assets/themes/default/LineEdit_theme.tres" type="StyleBox" id=5]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Button
@@ -98,10 +99,13 @@ script/source = "extends ReferenceRect
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"force_player_name\")
-    force_player_name()
+    if Settings.Preferences.get_data(\"player_name\") == null:
+        force_player_name()
+    else: 
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 
 func force_player_name():
-    if Settings.InGame.get_data(\"player_name\") == null:
+    if Settings.Preferences.get_data(\"player_name\") == null:
         get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
 "
 
@@ -537,9 +541,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Get Player Name/CenterContainer"]
-margin_top = 321.0
+margin_top = 325.0
 margin_right = 540.0
-margin_bottom = 518.0
+margin_bottom = 514.0
 custom_constants/separation = 8
 
 [node name="Label" type="Label" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
@@ -555,15 +559,16 @@ autowrap = true
 [node name="LineEdit" type="LineEdit" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
 margin_top = 111.0
 margin_right = 540.0
-margin_bottom = 150.0
+margin_bottom = 142.0
+custom_styles/normal = ExtResource( 5 )
 align = 1
 placeholder_alpha = 0.15
 script = SubResource( 5 )
 
 [node name="Button" type="Button" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
-margin_top = 158.0
+margin_top = 150.0
 margin_right = 540.0
-margin_bottom = 197.0
+margin_bottom = 189.0
 text = "Login"
 
 [node name="HeaderSection" parent="0,-1-Get Player Name" instance=ExtResource( 3 )]
@@ -828,92 +833,6 @@ margin_right = 540.0
 margin_bottom = 35.0
 text = "Loading the Lobby."
 align = 1
-
-[node name="4,1-Lobby" type="ReferenceRect" parent="."]
-margin_left = 2160.0
-margin_top = 960.0
-margin_right = 2700.0
-margin_bottom = 1920.0
-rect_min_size = Vector2( 540, 960 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="HeaderSection" parent="4,1-Lobby" instance=ExtResource( 3 )]
-
-[node name="CenterContainer" type="CenterContainer" parent="4,1-Lobby"]
-margin_top = 120.0
-margin_right = 540.0
-margin_bottom = 960.0
-rect_min_size = Vector2( 540, 840 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VBoxContainer" type="VBoxContainer" parent="4,1-Lobby/CenterContainer"]
-margin_left = 12.0
-margin_top = 7.0
-margin_right = 552.0
-margin_bottom = 832.0
-rect_min_size = Vector2( 540, 0 )
-
-[node name="Label3" type="Label" parent="4,1-Lobby/CenterContainer/VBoxContainer"]
-margin_right = 540.0
-margin_bottom = 80.0
-rect_min_size = Vector2( 540, 0 )
-custom_fonts/font = SubResource( 6 )
-text = "FREECOIL"
-align = 1
-autowrap = true
-
-[node name="Label" type="Label" parent="4,1-Lobby/CenterContainer/VBoxContainer"]
-margin_top = 90.0
-margin_right = 540.0
-margin_bottom = 125.0
-text = "Network Match Lobby"
-align = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="4,1-Lobby/CenterContainer/VBoxContainer"]
-margin_top = 135.0
-margin_right = 540.0
-margin_bottom = 825.0
-custom_constants/separation = 32
-alignment = 1
-
-[node name="ScrollContainer" type="ScrollContainer" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_right = 254.0
-margin_bottom = 690.0
-rect_min_size = Vector2( 254, 690 )
-scroll_horizontal_enabled = false
-
-[node name="VBoxContainer" type="VBoxContainer" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
-margin_right = 254.0
-margin_bottom = 39.0
-rect_min_size = Vector2( 254, 0 )
-alignment = 1
-
-[node name="Button" type="Button" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer"]
-margin_right = 254.0
-margin_bottom = 39.0
-text = "Player 1"
-
-[node name="ScrollContainer2" type="ScrollContainer" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 286.0
-margin_right = 540.0
-margin_bottom = 690.0
-rect_min_size = Vector2( 254, 690 )
-scroll_horizontal_enabled = false
-
-[node name="VBoxContainer" type="VBoxContainer" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer2"]
-margin_right = 254.0
-margin_bottom = 39.0
-rect_min_size = Vector2( 254, 0 )
-alignment = 1
-
-[node name="Button" type="Button" parent="4,1-Lobby/CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer2/VBoxContainer"]
-margin_right = 254.0
-margin_bottom = 39.0
-text = "Player 2"
 
 [node name="0,3-Custom Setup 1" type="ReferenceRect" parent="."]
 margin_top = 2880.0

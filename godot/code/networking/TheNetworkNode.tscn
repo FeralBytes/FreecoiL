@@ -80,6 +80,7 @@ func _ready():
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"check_if_all_mups_ready\")
     Settings.Network.set_data(\"websockets_init_comp\", false)
     Settings.Network.set_data(\"websockets_client_connected\", false)
+    Settings.InGame.set_data(\"player_name_by_id\", {})
     rng.randomize()
     host_udp_broadcast_uid = rng.randi()
     Settings.Log(\"Network: UDP: UDP broadcast uid = \" + str(host_udp_broadcast_uid))
@@ -176,7 +177,7 @@ remote func identify(pup_id, godot_peer_id):
                     Server.disconnect_peer(real_rpc_id, true)
                     return
             Settings.Network.sync_peer(godot_peer_id)
-            print(\"Player Name = \" + Settings.InGame.get_data(\"player_name\"))
+            print(\"Player Name = \" + str(Settings.InGame.get_data(\"player_name_by_id\")))
             Settings.InGame.sync_peer(godot_peer_id)
             Settings.Network.set_data(\"mups_status\", mups_status)
 
@@ -219,6 +220,7 @@ func setup_server_part2():
     Settings.Session.set_data(\"connection_status\", \"connected\")
     host_udp_broadcast = true
     search_for_peers()
+    Settings.InGame.set_data(\"player_name_by_id\", {\"1\": Settings.Preferences.get_data(\"player_name\")})
     Settings.Log(\"Network: Server: Removing UDP Peer Search from network loops.\")
     network_loops.append(\"_hosting_so_toss_udp_broadcast\")
     network_loops.append(\"_hosting_send_udp_broadcast\")
@@ -253,13 +255,11 @@ func synchronize_start_game_data():
         Settings.InGame.set_data(\"names_by_id\", {\"1\":\"Blue\", \"2\":\"Red\"})
         Settings.InGame.set_data(\"scores_by_id\", {\"1\":2, \"2\":2})
         Settings.InGame.set_data(\"current_players_turn\", \"1\")
-        get_tree().call_group(\"Transitioner\", \"go_invisible\", true)
         get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/BattleScenes/HotSeat_1v1.tscn\")
 
 #### SCENETREE CLIENT NETWORKING FUNCTIONS
 func _connected_ok():
     Settings.Log(\"Network: Client: Connection Established, my peer id is: \" + str(get_tree().get_network_unique_id()))
-    get_tree().call_group(\"Transitioner\", \"next_menu\", \"5,0\")
     rpc_id(1, \"identify\", Settings.Session.get_data(\"mup_id\"), get_tree().get_network_unique_id())
     
 func _connection_failed():
@@ -282,6 +282,14 @@ remote func set_mup_id(new_id):
         Settings.Log(\"RPC: 'set_my_unique_persistant_id' to \" + str(new_id) + \". sender_id = \" + str(get_tree().get_rpc_sender_id()), \"info\")
         if get_tree().get_rpc_sender_id() == 1:
             Settings.Session.set_data(\"mup_id\", new_id)
+            
+remote func set_player_name(new_name):
+    if get_tree().is_network_server():
+        Settings.Log(\"RPC: 'set_player_name()' to \" + str(new_name) + \" from sender_id = \" + str(get_tree().get_rpc_sender_id()))
+        var player_name_by_id = Settings.InGame.get_data(\"player_name_by_id\")
+        var mups = Settings.Network.get_data(\"peers_to_mups\")[get_tree().get_rpc_sender_id()]
+        player_name_by_id[mups] = new_name
+        Settings.InGame.set_data(\"player_name_by_id\", player_name_by_id)
 
 #### UDP BroadCast For LAN
 func search_for_peers():
