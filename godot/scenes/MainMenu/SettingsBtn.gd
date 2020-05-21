@@ -27,3 +27,7 @@ func _on_ExitApp_pressed():
     
 func exit_the_app():
     get_tree().quit()
+
+
+func _on_ChangePlayerName_pressed():
+    get_tree().call_group("Container", "next_menu", "0,-1")

@@ -1,10 +1,10 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
 [ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=3]
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=1]
 script/source = "extends ReferenceRect
 
 
@@ -23,11 +23,43 @@ func _ready():
 #    pass
 "
 
-[sub_resource type="DynamicFont" id=1]
+[sub_resource type="DynamicFont" id=2]
 size = 60
 font_data = ExtResource( 1 )
 
-[sub_resource type="StyleBoxFlat" id=3]
+[sub_resource type="GDScript" id=3]
+script/source = "extends Button
+
+
+onready var Team = get_parent().get_node(\"HBoxContainer/VBoxContainer/Team\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"check_if_team_assigned\")
+    check_if_team_assigned()
+    
+func check_if_team_assigned():
+    if Settings.Session.get_data(\"player_team\") == null:
+        text = \"Join This Team\"
+        disabled = false
+    elif Team.text == str(Settings.Session.get_data(\"player_team\")):
+        text = \"You Are On This Team\"
+        disabled = true
+    else:
+        text = \"Switch To This Team\"
+        disabled = false
+
+
+
+func _on_Button_pressed():
+    var new_team = int(Team.text)
+    Settings.Session.set_data(\"player_team\", new_team)
+    get_tree().call_group(\"Network\", \"set_player_team\")
+    
+"
+
+[sub_resource type="StyleBoxFlat" id=4]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -37,11 +69,30 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_left = 50
 corner_radius_bottom_left = 50
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=5]
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="StyleBoxFlat" id=5]
+[sub_resource type="GDScript" id=8]
+script/source = "extends VBoxContainer
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+"
+
+[sub_resource type="StyleBoxFlat" id=6]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -51,7 +102,7 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_right = 50
 corner_radius_bottom_right = 50
 
-[sub_resource type="DynamicFont" id=6]
+[sub_resource type="DynamicFont" id=7]
 size = 50
 font_data = ExtResource( 1 )
 
@@ -60,7 +111,7 @@ margin_right = 540.0
 margin_bottom = 960.0
 rect_min_size = Vector2( 540, 960 )
 theme = ExtResource( 2 )
-script = SubResource( 2 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -77,21 +128,28 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_top = 7.0
-margin_right = 540.0
-margin_bottom = 832.0
+margin_left = 2.0
+margin_right = 542.0
+margin_bottom = 874.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label3" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 80.0
 rect_min_size = Vector2( 540, 0 )
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
 text = "FREECOIL"
 align = 1
 autowrap = true
 
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 129.0
+script = SubResource( 3 )
+
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+visible = false
 margin_top = 90.0
 margin_right = 540.0
 margin_bottom = 125.0
@@ -99,49 +157,56 @@ text = "Network Match Lobby"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-margin_top = 135.0
+margin_top = 139.0
 margin_right = 540.0
-margin_bottom = 825.0
+margin_bottom = 874.0
 custom_constants/separation = 12
 alignment = 1
 
 [node name="Button" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 43.0
-margin_bottom = 690.0
-custom_styles/normal = SubResource( 3 )
-custom_fonts/font = SubResource( 4 )
+margin_bottom = 735.0
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
 text = "<"
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 55.0
 margin_right = 485.0
-margin_bottom = 690.0
-rect_min_size = Vector2( 430, 690 )
-scroll_horizontal_enabled = false
-
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
-margin_right = 430.0
-margin_bottom = 84.0
+margin_bottom = 735.0
 rect_min_size = Vector2( 430, 0 )
 alignment = 1
 
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer"]
+[node name="Team" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 430.0
 margin_bottom = 35.0
 text = "Team 1"
 align = 1
 
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 45.0
 margin_right = 430.0
-margin_bottom = 84.0
+margin_bottom = 735.0
+rect_min_size = Vector2( 430, 690 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 430, 0 )
+script = SubResource( 8 )
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
 text = "Joe"
 
 [node name="Button2" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 497.0
 margin_right = 536.0
-margin_bottom = 690.0
-custom_styles/normal = SubResource( 5 )
-custom_fonts/font = SubResource( 6 )
+margin_bottom = 735.0
+custom_styles/normal = SubResource( 6 )
+custom_fonts/font = SubResource( 7 )
 text = ">"
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]

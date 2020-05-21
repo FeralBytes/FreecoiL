@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=17 format=2]
 
 [ext_resource path="res://scenes/MainMenu/HeaderSection.gd" type="Script" id=1]
 [ext_resource path="res://assets/images/gear_gray.png" type="Texture" id=2]
@@ -23,11 +23,15 @@ font_data = ExtResource( 5 )
 size = 28
 font_data = ExtResource( 5 )
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=7]
 size = 28
 font_data = ExtResource( 5 )
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="DynamicFont" id=8]
+size = 28
+font_data = ExtResource( 5 )
+
+[sub_resource type="DynamicFont" id=6]
 font_data = ExtResource( 5 )
 
 [node name="HeaderSection" type="Control"]
@@ -52,7 +56,7 @@ __meta__ = {
 margin_left = 30.0
 margin_top = 70.0
 margin_right = 398.0
-margin_bottom = 271.0
+margin_bottom = 333.0
 custom_fonts/font = SubResource( 1 )
 
 [node name="MainMenuBtn" type="Button" parent="SettingsBtn/SettingsMenu"]
@@ -71,12 +75,23 @@ margin_bottom = 121.0
 custom_fonts/font = SubResource( 3 )
 text = "Toggle Recoil"
 
+[node name="ChangePlayerName" type="Button" parent="SettingsBtn/SettingsMenu"]
+margin_left = 3.87708
+margin_top = 149.913
+margin_right = 363.877
+margin_bottom = 191.913
+custom_fonts/font = SubResource( 7 )
+text = "Change Callsign"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="ExitApp" type="Button" parent="SettingsBtn/SettingsMenu"]
 margin_left = 5.0
-margin_top = 160.0
+margin_top = 222.0
 margin_right = 365.0
-margin_bottom = 201.0
-custom_fonts/font = SubResource( 4 )
+margin_bottom = 264.0
+custom_fonts/font = SubResource( 8 )
 text = "Exit App"
 
 [node name="ConnectWeapon" parent="." instance=ExtResource( 6 )]
@@ -111,12 +126,13 @@ margin_left = 95.0
 margin_top = 40.0
 margin_right = 136.0
 margin_bottom = 60.0
-custom_fonts/font = SubResource( 5 )
-text = " Ver: "
+custom_fonts/font = SubResource( 6 )
+text = " Ver: 0.3.0-dev8 "
 __meta__ = {
 "_edit_use_anchors_": false
 }
 [connection signal="pressed" from="SettingsBtn" to="SettingsBtn" method="_on_SettingsBtn_pressed" flags=3]
 [connection signal="pressed" from="SettingsBtn/SettingsMenu/MainMenuBtn" to="SettingsBtn" method="_on_MainMenuBtn_pressed" flags=3]
 [connection signal="pressed" from="SettingsBtn/SettingsMenu/ToggleRecoil" to="SettingsBtn" method="_on_ToggleRecoil_pressed" flags=3]
+[connection signal="pressed" from="SettingsBtn/SettingsMenu/ChangePlayerName" to="SettingsBtn" method="_on_ChangePlayerName_pressed" flags=3]
 [connection signal="pressed" from="SettingsBtn/SettingsMenu/ExitApp" to="SettingsBtn" method="_on_ExitApp_pressed" flags=3]

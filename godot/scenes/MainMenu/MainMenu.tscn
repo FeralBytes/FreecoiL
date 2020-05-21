@@ -100,11 +100,11 @@ script/source = "extends ReferenceRect
 func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"force_player_name\")
     if Settings.Preferences.get_data(\"player_name\") == null:
-        force_player_name()
+        force_player_name(null)
     else: 
         get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 
-func force_player_name():
+func force_player_name(__):
     if Settings.Preferences.get_data(\"player_name\") == null:
         get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
 "
@@ -534,16 +534,16 @@ __meta__ = {
 [node name="CenterContainer" type="CenterContainer" parent="0,-1-Get Player Name"]
 margin_top = 120.0
 margin_right = 540.0
-margin_bottom = 960.0
-rect_min_size = Vector2( 540, 840 )
+margin_bottom = 920.0
+rect_min_size = Vector2( 540, 800 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Get Player Name/CenterContainer"]
-margin_top = 325.0
+margin_top = 305.0
 margin_right = 540.0
-margin_bottom = 514.0
+margin_bottom = 494.0
 custom_constants/separation = 8
 
 [node name="Label" type="Label" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]

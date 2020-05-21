@@ -81,6 +81,7 @@ func _ready():
     Settings.Network.set_data(\"websockets_init_comp\", false)
     Settings.Network.set_data(\"websockets_client_connected\", false)
     Settings.InGame.set_data(\"player_name_by_id\", {})
+    Settings.InGame.set_data(\"player_team_by_id\", {})
     rng.randomize()
     host_udp_broadcast_uid = rng.randi()
     Settings.Log(\"Network: UDP: UDP broadcast uid = \" + str(host_udp_broadcast_uid))
@@ -261,6 +262,7 @@ func synchronize_start_game_data():
 func _connected_ok():
     Settings.Log(\"Network: Client: Connection Established, my peer id is: \" + str(get_tree().get_network_unique_id()))
     rpc_id(1, \"identify\", Settings.Session.get_data(\"mup_id\"), get_tree().get_network_unique_id())
+    set_player_name()
     
 func _connection_failed():
     Settings.Log(\"Network: Client: Connection failed.\")
@@ -282,14 +284,28 @@ remote func set_mup_id(new_id):
         Settings.Log(\"RPC: 'set_my_unique_persistant_id' to \" + str(new_id) + \". sender_id = \" + str(get_tree().get_rpc_sender_id()), \"info\")
         if get_tree().get_rpc_sender_id() == 1:
             Settings.Session.set_data(\"mup_id\", new_id)
+
+func set_player_name():
+    rpc_id(1, \"set_player_name_remote\", Settings.Preferences.get_data(\"player_name\"))
             
-remote func set_player_name(new_name):
+remote func set_player_name_remote(new_name):
     if get_tree().is_network_server():
         Settings.Log(\"RPC: 'set_player_name()' to \" + str(new_name) + \" from sender_id = \" + str(get_tree().get_rpc_sender_id()))
         var player_name_by_id = Settings.InGame.get_data(\"player_name_by_id\")
         var mups = Settings.Network.get_data(\"peers_to_mups\")[get_tree().get_rpc_sender_id()]
         player_name_by_id[mups] = new_name
         Settings.InGame.set_data(\"player_name_by_id\", player_name_by_id)
+
+func set_player_team():
+    rpc_id(1, \"set_player_team_remote\", Settings.Session.get_data(\"player_team\"))
+
+remote func set_player_team_remote(new_team):
+    if get_tree().is_network_server():
+        Settings.Log(\"RPC: 'set_player_team()' to \" + str(new_team) + \"from sender_id = \" + str(get_tree().get_rpc_sender_id()))
+        var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
+        var mups = Settings.Network.get_data(\"peers_to_mups\")[get_tree().get_rpc_sender_id()]
+        player_team_by_id[mups] = new_team
+        Settings.InGame.set_data(\"player_team_by_id\", player_team_by_id)
 
 #### UDP BroadCast For LAN
 func search_for_peers():
