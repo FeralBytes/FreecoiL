@@ -224,7 +224,7 @@ func setup_server_part2():
     search_for_peers()
     Settings.InGame.set_data(\"player_name_by_id\", {\"1\": Settings.Preferences.get_data(\"player_name\")})
     Settings.InGame.set_data(\"player_team_by_id\", {\"1\": 0})
-    Settings.InGame.set_data(\"game_teams_by_team_num\", [Settings.Preferences.get_data(\"player_name\")])
+    Settings.InGame.set_data(\"game_teams_by_team_num\", [[Settings.Preferences.get_data(\"player_name\")]])
     Settings.Log(\"Network: Server: Removing UDP Peer Search from network loops.\")
     network_loops.append(\"_hosting_so_toss_udp_broadcast\")
     network_loops.append(\"_hosting_send_udp_broadcast\")
@@ -310,13 +310,16 @@ remote func set_player_team_remote(new_team):
         Settings.Log(\"RPC: 'set_player_team()' to \" + str(new_team) + \"from sender_id = \" + str(get_tree().get_rpc_sender_id()))
         var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
         var mups = Settings.Network.get_data(\"peers_to_mups\")[get_tree().get_rpc_sender_id()]
-        var previous_team = player_team_by_id[mups]
+        var previous_team = -1
+        if player_team_by_id.has(mups):
+            previous_team = player_team_by_id[mups]
         player_team_by_id[mups] = new_team
         Settings.InGame.set_data(\"player_team_by_id\", player_team_by_id)
         var game_teams_by_team_num = Settings.InGame.get_data(\"game_teams_by_team_num\")
         # First remove them from the previous team.
         var player_name = Settings.InGame.get_data(\"player_name_by_id\")[mups]
-        game_teams_by_team_num[previous_team].remove(player_name)
+        if previous_team != -1:
+            game_teams_by_team_num[previous_team].remove(player_name)
         # Now add them to the new team.
         game_teams_by_team_num[new_team].append(player_name)
         Settings.InGame.set_data(\"game_teams_by_team_num\", game_teams_by_team_num)
