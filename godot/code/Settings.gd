@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.0-dev9"
+const VERSION = "0.3.0-dev10"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -63,12 +63,13 @@ class Data:
         else:
             register_data("SETTINGS_VERSION", SETTINGS_VERSION, false)
         
-    func set_data(data_name, new_val, called_by_sync=false):
+    func set_data(data_name, new_val, called_by_sync=false, emit_a_signal=true):
         if not __settings.has(data_name):
             register_data(data_name, new_val)
         else:
             __settings[data_name][0] = new_val
-        emit_signal(__settings[data_name][1], __settings[data_name][0])
+        if emit_a_signal:
+            emit_signal(__settings[data_name][1], __settings[data_name][0])
         if auto_save:
             save_settings()
         if network_sync:

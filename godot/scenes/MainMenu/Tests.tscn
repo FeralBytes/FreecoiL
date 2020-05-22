@@ -1,0 +1,182 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
+[ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    if LazerInterface.state_lazer_gun_is_connected:
+        text = \"Connected to \" + str(LazerInterface.state_lazer_gun_id)
+    else:
+        text = \"Connect Gun\"
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    if LazerInterface.state_lazer_gun_is_connected:
+        pass
+    else:
+        LazerInterface.connect_to_lazer_gun()
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    add_to_group(\"lazercoil\")
+    if LazerInterface.recoil_enabled:
+        text = \"Recoil Enabled: Press to Disable Recoil.\"
+    else:
+        text = \"Recoil Disabled: Press to Enable Recoil.\"
+
+func li_recoil_enabled_changed():
+    if LazerInterface.recoil_enabled:
+        text = \"Recoil Enabled: Press to Disable Recoil.\"
+    else:
+        text = \"Recoil Disabled: Press to Enable Recoil.\"
+
+
+func _on_Button2_pressed():
+    LazerInterface.enable_recoil(!LazerInterface.recoil_enabled)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button3_pressed():
+    Settings.DEBUG_GUI = !Settings.DEBUG_GUI
+    get_tree().call_group(\"DebugOutput\", \"toggle_visibility\")
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends OptionButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    add_item(\"Do Not Load A Scene For Testing\")
+    set_item_metadata(0, null)
+    add_item(\"Load 'Lobby' For Testing\")
+    set_item_metadata(1, \"res://scenes/Lobbies/Lobby.tscn\")
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_OptionButton_item_selected(index):
+    var resource_path = get_item_metadata(index)
+    if resource_path != null:
+        get_tree().call_group(\"Container\", \"goto_scene\", resource_path)
+
+
+func _on_OptionButton_pressed():
+    get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
+"
+
+[node name="Tests" type="Control"]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 840 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_top = 304.0
+margin_right = 540.0
+margin_bottom = 535.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 35.0
+text = "Tests"
+align = 1
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 84.0
+text = "Connect to Gun"
+script = SubResource( 1 )
+
+[node name="Button2" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 133.0
+text = "Enable Recoil"
+script = SubResource( 2 )
+
+[node name="Button3" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 143.0
+margin_right = 540.0
+margin_bottom = 182.0
+text = "Enable/Disable Debug Visual Output"
+script = SubResource( 3 )
+
+[node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
+margin_top = 192.0
+margin_right = 540.0
+margin_bottom = 231.0
+align = 1
+script = SubResource( 4 )
+
+[node name="HeaderSection" parent="." instance=ExtResource( 2 )]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button2" to="CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button3" to="CenterContainer/VBoxContainer/Button3" method="_on_Button3_pressed" flags=3]
+[connection signal="item_selected" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]

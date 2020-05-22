@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
@@ -24,6 +24,46 @@ func _ready():
 "
 
 [sub_resource type="GDScript" id=10]
+script/source = "extends OptionButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"change_index\")
+    add_item(\"Teams Lobby\")
+    set_item_metadata(0, \"0,0\")
+    add_item(\"Player Details\")
+    set_item_metadata(1, \"0,1\")
+    add_item(\"Game Settings\")
+    set_item_metadata(2, \"0,-1\")
+
+func change_index(menu):
+    if menu == \"0,0\":
+        selected = 0
+    elif menu == \"0,1\":
+        selected = 1
+    elif menu == \"0,-1\":
+        selected = 2
+    else:
+        selected = 0
+
+
+func _on_LobbyDropDown_item_selected(index):
+    var resource_path = get_item_metadata(index)
+    if resource_path != null:
+        get_tree().call_group(\"Container\", \"next_menu\", resource_path)
+
+
+func _on_LobbyDropDown_pressed():
+    get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
+"
+
+[sub_resource type="GDScript" id=2]
 script/source = "extends Label
 
 
@@ -41,7 +81,7 @@ func update_host_status(__):
     text = \"The Host has joined the lobby.\"
 "
 
-[sub_resource type="GDScript" id=9]
+[sub_resource type="GDScript" id=3]
 script/source = "extends Label
 
 
@@ -62,7 +102,7 @@ func update_teams(teams):
         text = 'Teams are turned \"OFF\".'
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Button
 
 
@@ -94,7 +134,7 @@ func _on_Button_pressed():
     
 "
 
-[sub_resource type="StyleBoxFlat" id=4]
+[sub_resource type="StyleBoxFlat" id=5]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -104,11 +144,11 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_left = 50
 corner_radius_bottom_left = 50
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="DynamicFont" id=6]
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=7]
 script/source = "extends VBoxContainer
 
 
@@ -123,22 +163,45 @@ func _ready():
     Settings.Session.set_data(\"ui_team_being_viewed\", 0)  #TODO: Team 0 as unassigned players.
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    update_team_list(null)
+
+
+func update_team_list(__):
     if Settings.InGame.get_data(\"game_teams\"):
         LeftBtn.disabled = false
         RightBtn.disabled = false
     else:
         LeftBtn.disabled = true
         RightBtn.disabled = true
+        Settings.Session.set_data(\"ui_team_being_viewed\", 0, false, false)
+    for child in get_children():
+        child.queue_free()
+    if len(Settings.InGame.get_data(\"game_teams_by_team_num\")) > 0:
+        for entry in Settings.InGame.get_data(\"game_teams_by_team_num\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
+            var new_player_btn = Button.new()
+            new_player_btn.text = entry
+            new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [new_player_btn.text])
+            var ready_btn = Button.new()
+            ready_btn.text = \"Ready\"
+            ready_btn.modulate = Color(\"000000\")
+            ready_btn.connect(\"pressed\", self, \"on_player_ready\")
+            var hbox_container = HBoxContainer.new()
+            hbox_container.seperation = 8
+            hbox_container.add_child(new_player_btn)
+            hbox_container.add_child(ready_btn)
+            add_child(hbox_container)
 
+func on_player_ready():
+    print(\"Player clicked ready.\")
 
-func update_team_list(__):
-    pass
-    
-
+func on_player_entry_clicked(name):
+    print(\"on_player_entry_clicked() \" + str(name))
 
 func _on_LeftBtn_pressed():
     var game_num_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
     if game_num_of_teams == null:
+        return
+    elif Settings.InGame.get_data(\"game_teams\") == false:
         return
     var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
     if new_team == 0:
@@ -149,7 +212,7 @@ func _on_RightBtn_pressed():
     pass # Replace with function body.
 "
 
-[sub_resource type="StyleBoxFlat" id=6]
+[sub_resource type="StyleBoxFlat" id=8]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -159,11 +222,15 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_right = 50
 corner_radius_bottom_right = 50
 
-[sub_resource type="DynamicFont" id=7]
+[sub_resource type="DynamicFont" id=9]
 size = 50
 font_data = ExtResource( 1 )
 
-[node name="0,0-Network Teams Lobby" type="ReferenceRect"]
+[node name="Lobbies" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="0,0-Game Lobby" type="ReferenceRect" parent="."]
 margin_right = 540.0
 margin_bottom = 960.0
 rect_min_size = Vector2( 540, 960 )
@@ -173,9 +240,9 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="." instance=ExtResource( 3 )]
+[node name="HeaderSection" parent="0,0-Game Lobby" instance=ExtResource( 3 )]
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Game Lobby"]
 margin_top = 120.0
 margin_right = 540.0
 margin_bottom = 960.0
@@ -184,42 +251,43 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
+margin_top = 3.0
 margin_right = 540.0
-margin_bottom = 829.0
+margin_bottom = 836.0
 rect_min_size = Vector2( 540, 0 )
 
-[node name="Label3" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="LobbyDropDown" type="OptionButton" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 39.0
 rect_min_size = Vector2( 540, 0 )
 text = "Game Lobby"
 align = 1
-autowrap = true
-
-[node name="Label2" type="Label" parent="CenterContainer/VBoxContainer"]
-margin_top = 45.0
-margin_right = 540.0
-margin_bottom = 80.0
-text = "The host is still setting up the game."
-align = 1
 script = SubResource( 10 )
 
-[node name="Teams" type="Label" parent="CenterContainer/VBoxContainer"]
-margin_top = 90.0
+[node name="Label2" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 49.0
 margin_right = 540.0
-margin_bottom = 125.0
+margin_bottom = 84.0
+text = "The host is still setting up the game."
+align = 1
+script = SubResource( 2 )
+
+[node name="Teams" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 129.0
 text = "Teams are turned \"OFF\"."
 align = 1
-script = SubResource( 9 )
-
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
-margin_top = 135.0
-margin_right = 540.0
-margin_bottom = 174.0
 script = SubResource( 3 )
 
-[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+[node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 178.0
+script = SubResource( 4 )
+
+[node name="Label" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 visible = false
 margin_top = 90.0
 margin_right = 540.0
@@ -227,59 +295,434 @@ margin_bottom = 125.0
 text = "Network Match Lobby"
 align = 1
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
-margin_top = 184.0
+[node name="HBoxContainer" type="HBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 188.0
 margin_right = 540.0
-margin_bottom = 829.0
+margin_bottom = 833.0
 custom_constants/separation = 12
 alignment = 1
 
-[node name="LeftBtn" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="LeftBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 43.0
 margin_bottom = 645.0
-custom_styles/normal = SubResource( 4 )
-custom_fonts/font = SubResource( 5 )
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
 text = "<"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 55.0
 margin_right = 485.0
 margin_bottom = 645.0
 rect_min_size = Vector2( 430, 0 )
 alignment = 1
 
-[node name="Team" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="Team" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 430.0
 margin_bottom = 35.0
 text = "Rogue Players (No Team)"
 align = 1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_top = 45.0
 margin_right = 430.0
 margin_bottom = 645.0
 rect_min_size = Vector2( 430, 600 )
 scroll_horizontal_enabled = false
 
-[node name="TeamContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+[node name="TeamContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
 margin_right = 430.0
 margin_bottom = 39.0
 rect_min_size = Vector2( 430, 0 )
-script = SubResource( 8 )
+script = SubResource( 7 )
 
-[node name="Button" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+[node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
 margin_right = 430.0
 margin_bottom = 39.0
 text = "Joe"
 
-[node name="RightBtn" type="Button" parent="CenterContainer/VBoxContainer/HBoxContainer"]
+[node name="RightBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 497.0
 margin_right = 536.0
 margin_bottom = 645.0
-custom_styles/normal = SubResource( 6 )
-custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 8 )
+custom_fonts/font = SubResource( 9 )
 text = ">"
-[connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
-[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
-[connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+
+[node name="0,1-Player Details" type="ReferenceRect" parent="."]
+margin_top = 960.0
+margin_right = 540.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="0,1-Player Details" instance=ExtResource( 3 )]
+
+[node name="CenterContainer" type="CenterContainer" parent="0,1-Player Details"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 840 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
+margin_top = 3.0
+margin_right = 540.0
+margin_bottom = 836.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 540, 0 )
+align = 1
+script = SubResource( 10 )
+
+[node name="Label2" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 49.0
+margin_right = 540.0
+margin_bottom = 84.0
+text = "The host is still setting up the game."
+align = 1
+script = SubResource( 2 )
+
+[node name="Teams" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 129.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 3 )
+
+[node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 178.0
+script = SubResource( 4 )
+
+[node name="Label" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 125.0
+text = "Network Match Lobby"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 188.0
+margin_right = 540.0
+margin_bottom = 833.0
+custom_constants/separation = 12
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 43.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 55.0
+margin_right = 485.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 0 )
+alignment = 1
+
+[node name="Team" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 430.0
+margin_bottom = 35.0
+text = "Rogue Players (No Team)!"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 430.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 600 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 430, 0 )
+script = SubResource( 7 )
+
+[node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+text = "Joe"
+
+[node name="RightBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 497.0
+margin_right = 536.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 8 )
+custom_fonts/font = SubResource( 9 )
+text = ">"
+
+[node name="0,-1-Game Settings" type="ReferenceRect" parent="."]
+margin_top = -960.0
+margin_right = 540.0
+margin_bottom = -6.10352e-05
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="0,-1-Game Settings" instance=ExtResource( 3 )]
+
+[node name="CenterContainer" type="CenterContainer" parent="0,-1-Game Settings"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 840 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer"]
+margin_top = 3.0
+margin_right = 540.0
+margin_bottom = 836.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 540, 0 )
+align = 1
+script = SubResource( 10 )
+
+[node name="Label2" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 49.0
+margin_right = 540.0
+margin_bottom = 84.0
+text = "The host is still setting up the game."
+align = 1
+script = SubResource( 2 )
+
+[node name="Teams" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 129.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 3 )
+
+[node name="Button" type="Button" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 178.0
+script = SubResource( 4 )
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 125.0
+text = "Network Match Lobby"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 188.0
+margin_right = 540.0
+margin_bottom = 833.0
+custom_constants/separation = 12
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 43.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 55.0
+margin_right = 485.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 0 )
+alignment = 1
+
+[node name="Team" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 430.0
+margin_bottom = 35.0
+text = "Rogue Players (No Team)!"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 430.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 600 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 430, 0 )
+script = SubResource( 7 )
+
+[node name="Button" type="Button" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+text = "Joe"
+
+[node name="RightBtn" type="Button" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 497.0
+margin_right = 536.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 8 )
+custom_fonts/font = SubResource( 9 )
+text = ">"
+
+[node name="1,-1-Name Conflict" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = -960.0
+margin_right = 1080.0
+margin_bottom = -6.10352e-05
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HeaderSection" parent="1,-1-Name Conflict" instance=ExtResource( 3 )]
+
+[node name="CenterContainer" type="CenterContainer" parent="1,-1-Name Conflict"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 840 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,-1-Name Conflict/CenterContainer"]
+margin_top = 3.0
+margin_right = 540.0
+margin_bottom = 836.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 540, 0 )
+align = 1
+script = SubResource( 10 )
+
+[node name="Label2" type="Label" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 49.0
+margin_right = 540.0
+margin_bottom = 84.0
+text = "The host is still setting up the game."
+align = 1
+script = SubResource( 2 )
+
+[node name="Teams" type="Label" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 129.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 3 )
+
+[node name="Button" type="Button" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 178.0
+script = SubResource( 4 )
+
+[node name="Label" type="Label" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 125.0
+text = "Network Match Lobby"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 188.0
+margin_right = 540.0
+margin_bottom = 833.0
+custom_constants/separation = 12
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 43.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 55.0
+margin_right = 485.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 0 )
+alignment = 1
+
+[node name="Team" type="Label" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 430.0
+margin_bottom = 35.0
+text = "Rogue Players (No Team)!"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 45.0
+margin_right = 430.0
+margin_bottom = 645.0
+rect_min_size = Vector2( 430, 600 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+rect_min_size = Vector2( 430, 0 )
+script = SubResource( 7 )
+
+[node name="Button" type="Button" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 39.0
+text = "Joe"
+
+[node name="RightBtn" type="Button" parent="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 497.0
+margin_right = 536.0
+margin_bottom = 645.0
+custom_styles/normal = SubResource( 8 )
+custom_fonts/font = SubResource( 9 )
+text = ">"
+[connection signal="item_selected" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/Button" to="0,0-Game Lobby/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+[connection signal="item_selected" from="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" to="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" to="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/Button" to="0,1-Player Details/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+[connection signal="item_selected" from="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" to="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" to="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="0,-1-Game Settings/CenterContainer/VBoxContainer/Button" to="0,-1-Game Settings/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,-1-Game Settings/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+[connection signal="item_selected" from="1,-1-Name Conflict/CenterContainer/VBoxContainer/LobbyDropDown" to="1,-1-Name Conflict/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="1,-1-Name Conflict/CenterContainer/VBoxContainer/LobbyDropDown" to="1,-1-Name Conflict/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="1,-1-Name Conflict/CenterContainer/VBoxContainer/Button" to="1,-1-Name Conflict/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="1,-1-Name Conflict/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
