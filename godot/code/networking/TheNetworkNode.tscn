@@ -82,7 +82,7 @@ func _ready():
     Settings.Network.set_data(\"websockets_client_connected\", false)
     Settings.InGame.set_data(\"player_name_by_id\", {})
     Settings.InGame.set_data(\"player_team_by_id\", {})
-    Settings.InGame.set_data(\"game_teams_by_team_num\", [])
+    Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [])
     rng.randomize()
     host_udp_broadcast_uid = rng.randi()
     Settings.Log(\"Network: UDP: UDP broadcast uid = \" + str(host_udp_broadcast_uid))
@@ -224,7 +224,7 @@ func setup_server_part2():
     search_for_peers()
     Settings.InGame.set_data(\"player_name_by_id\", {\"1\": Settings.Preferences.get_data(\"player_name\")})
     Settings.InGame.set_data(\"player_team_by_id\", {\"1\": 0})
-    Settings.InGame.set_data(\"game_teams_by_team_num\", [[Settings.Preferences.get_data(\"player_name\")]])
+    Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [[Settings.Preferences.get_data(\"player_name\")]])
     Settings.Log(\"Network: Server: Removing UDP Peer Search from network loops.\")
     network_loops.append(\"_hosting_so_toss_udp_broadcast\")
     network_loops.append(\"_hosting_send_udp_broadcast\")
@@ -315,14 +315,14 @@ remote func set_player_team_remote(new_team):
             previous_team = player_team_by_id[mups]
         player_team_by_id[mups] = new_team
         Settings.InGame.set_data(\"player_team_by_id\", player_team_by_id)
-        var game_teams_by_team_num = Settings.InGame.get_data(\"game_teams_by_team_num\")
+        var game_teams_by_team_num_by_id = Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")
         # First remove them from the previous team.
         var player_name = Settings.InGame.get_data(\"player_name_by_id\")[mups]
         if previous_team != -1:
-            game_teams_by_team_num[previous_team].remove(player_name)
+            game_teams_by_team_num_by_id[previous_team].remove(mups)
         # Now add them to the new team.
-        game_teams_by_team_num[new_team].append(player_name)
-        Settings.InGame.set_data(\"game_teams_by_team_num\", game_teams_by_team_num)
+        game_teams_by_team_num_by_id[new_team].append(mups)
+        Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", game_teams_by_team_num_by_id)
 
 #### UDP BroadCast For LAN
 func search_for_peers():

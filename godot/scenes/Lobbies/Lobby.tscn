@@ -176,18 +176,21 @@ func update_team_list(__):
         Settings.Session.set_data(\"ui_team_being_viewed\", 0, false, false)
     for child in get_children():
         child.queue_free()
-    if len(Settings.InGame.get_data(\"game_teams_by_team_num\")) > 0:
-        for entry in Settings.InGame.get_data(\"game_teams_by_team_num\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
+    if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) > 0:
+        for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
+            var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
             var new_player_btn = Button.new()
-            new_player_btn.text = entry
+            new_player_btn.text = player_name
             new_player_btn.rect_min_size.x = 275
             new_player_btn.clip_text = true
-            new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [new_player_btn.text])
+            new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
             var ready_btn = Button.new()
+            if Settings.Session.get_data(\"mup_id\") != entry:
+                ready_btn.disabled = true
             ready_btn.text = \"Not Ready\"
             ready_btn.modulate = Color(\"ff0505\")
             ready_btn.rect_min_size.x = 145
-            ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn])
+            ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
             var hbox_container = HBoxContainer.new()
             hbox_container.add_constant_override(\"separation\", 10)
             hbox_container.alignment = BoxContainer.ALIGN_CENTER
@@ -196,14 +199,15 @@ func update_team_list(__):
             hbox_container.add_child(ready_btn)
             add_child(hbox_container)
 
-func on_player_ready(btn):
-    print(\"Player clicked ready.\")
-    if btn.modulate == Color(\"ff0505\"):
-        btn.modulate = Color(\"03ff13\")
-        btn.text = \"Ready\"
-    else:
-        btn.modulate = Color(\"ff0505\")
-        btn.text = \"Not Ready\"
+func on_player_ready(btn, entry):
+    print(\"Player clicked ready. \" + str(entry))
+    if Settings.Session.get_data(\"mup_id\") == entry:
+        if btn.modulate == Color(\"ff0505\"):
+            btn.modulate = Color(\"03ff13\")
+            btn.text = \"Ready\"
+        else:
+            btn.modulate = Color(\"ff0505\")
+            btn.text = \"Not Ready\"
 
 func on_player_entry_clicked(name):
     print(\"on_player_entry_clicked() \" + str(name))
@@ -339,6 +343,9 @@ func update_respawn_delay(delay):
 [node name="Lobbies" type="Control"]
 margin_right = 40.0
 margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="0,0-Game Lobby" type="ReferenceRect" parent="."]
 margin_right = 540.0
@@ -566,7 +573,6 @@ rect_min_size = Vector2( 430, 0 )
 script = SubResource( 8 )
 
 [node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
-modulate = Color( 0.0117647, 1, 0.0745098, 1 )
 margin_right = 430.0
 margin_bottom = 39.0
 text = "Joe"

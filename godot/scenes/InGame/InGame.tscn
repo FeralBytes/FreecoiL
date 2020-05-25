@@ -1,0 +1,187 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
+[ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=2]
+
+[node name="InGame" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="-1,0-Waiting For Other Players" type="ReferenceRect" parent="."]
+margin_top = -960.0
+margin_right = 540.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="CenterContainer" type="CenterContainer" parent="-1,0-Waiting For Other Players"]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="-1,0-Waiting For Other Players/CenterContainer"]
+margin_top = 428.0
+margin_right = 540.0
+margin_bottom = 531.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="-1,0-Waiting For Other Players/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 103.0
+text = "Waiting for the other players to finish loading the game.
+Please be patient..."
+align = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="-1,1-Start Game Delay" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = -960.0
+margin_right = 1080.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="-1,1-Start Game Delay"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Start Game Delay/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="-1,0-Map" type="ReferenceRect" parent="."]
+margin_left = -540.0
+margin_right = -500.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="-1,0-Map"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="-1,0-Map/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="0,0-Playing" type="ReferenceRect" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Playing"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 900.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
+margin_top = 430.0
+margin_right = 540.0
+margin_bottom = 430.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="HeaderSection" parent="0,0-Playing" instance=ExtResource( 2 )]
+
+[node name="0,1-End of Game" type="ReferenceRect" parent="."]
+margin_top = 960.0
+margin_right = 540.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,1-End of Game"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-End of Game/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="-1,1-Scoreboard" type="ReferenceRect" parent="."]
+margin_left = -540.0
+margin_top = 960.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="CenterContainer" type="CenterContainer" parent="-1,1-Scoreboard"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="1,0-Respawn" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_right = 580.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="CenterContainer" type="CenterContainer" parent="1,0-Respawn"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,0-Respawn/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
+
+[node name="2,0-InGame Settings" type="ReferenceRect" parent="."]
+margin_left = 1080.0
+margin_right = 1120.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="CenterContainer" type="CenterContainer" parent="2,0-InGame Settings"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="2,0-InGame Settings/CenterContainer"]
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 20.0
+margin_bottom = 20.0
