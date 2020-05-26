@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.0-dev12"
+const VERSION = "0.3.0-dev13"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
