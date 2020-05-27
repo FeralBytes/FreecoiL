@@ -224,7 +224,7 @@ func setup_server_part2():
     search_for_peers()
     Settings.InGame.set_data(\"player_name_by_id\", {\"1\": Settings.Preferences.get_data(\"player_name\")})
     Settings.InGame.set_data(\"player_team_by_id\", {\"1\": 0})
-    Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [[Settings.Preferences.get_data(\"player_name\")]])
+    Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [[\"1\"]])
     Settings.Log(\"Network: Server: Removing UDP Peer Search from network loops.\")
     network_loops.append(\"_hosting_so_toss_udp_broadcast\")
     network_loops.append(\"_hosting_send_udp_broadcast\")
@@ -259,7 +259,7 @@ func synchronize_start_game_data():
         Settings.InGame.set_data(\"names_by_id\", {\"1\":\"Blue\", \"2\":\"Red\"})
         Settings.InGame.set_data(\"scores_by_id\", {\"1\":2, \"2\":2})
         Settings.InGame.set_data(\"current_players_turn\", \"1\")
-        get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/BattleScenes/HotSeat_1v1.tscn\")
+        get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/InGame/InGame.tscn\")
 
 #### SCENETREE CLIENT NETWORKING FUNCTIONS
 func _connected_ok():
@@ -307,7 +307,7 @@ func set_player_team():
 
 remote func set_player_team_remote(new_team):
     if get_tree().is_network_server():
-        Settings.Log(\"RPC: 'set_player_team()' to \" + str(new_team) + \"from sender_id = \" + str(get_tree().get_rpc_sender_id()))
+        Settings.Log(\"RPC: 'set_player_team()' to \" + str(new_team) + \" from sender_id = \" + str(get_tree().get_rpc_sender_id()))
         var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
         var mups = Settings.Network.get_data(\"peers_to_mups\")[get_tree().get_rpc_sender_id()]
         var previous_team = -1

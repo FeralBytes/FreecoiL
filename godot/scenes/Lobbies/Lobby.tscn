@@ -158,11 +158,12 @@ onready var RightBtn = get_parent().get_parent().get_parent().get_node(\"RightBt
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"update_team_list\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"player_team_by_id\"), self, \"update_team_list\")
     Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
     Settings.Session.set_data(\"ui_team_being_viewed\", 0)  #TODO: Team 0 as unassigned players.
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"update_team_list\")
     update_team_list(null)
 
 
@@ -177,6 +178,7 @@ func update_team_list(__):
     for child in get_children():
         child.queue_free()
     if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) > 0:
+        var mups_ready = Settings.Network.get_data(\"mups_ready\")
         for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
             var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
             var new_player_btn = Button.new()
@@ -187,8 +189,16 @@ func update_team_list(__):
             var ready_btn = Button.new()
             if Settings.Session.get_data(\"mup_id\") != entry:
                 ready_btn.disabled = true
-            ready_btn.text = \"Not Ready\"
-            ready_btn.modulate = Color(\"ff0505\")
+            if mups_ready.has(entry):
+                if mups_ready[entry] == true:
+                    ready_btn.text = \"Ready\"
+                    ready_btn.modulate = Color(\"03ff13\")
+                else:
+                    ready_btn.text = \"Not Ready\"
+                    ready_btn.modulate = Color(\"ff0505\")
+            else:
+                ready_btn.text = \"Not Ready\"
+                ready_btn.modulate = Color(\"ff0505\")
             ready_btn.rect_min_size.x = 145
             ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
             var hbox_container = HBoxContainer.new()
@@ -199,15 +209,42 @@ func update_team_list(__):
             hbox_container.add_child(ready_btn)
             add_child(hbox_container)
 
+func mups_not_ready(btn, mups_ready):
+    btn.modulate = Color(\"ff0505\")
+    btn.text = \"Not Ready\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = false
+    return mups_ready
+    
+func mups_pick_team(btn, mups_ready):
+    btn.modulate = Color(\"ff0505\")
+    btn.text = \"Pick a Team\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = false
+    return mups_ready
+
+func mups_ready(btn, mups_ready):
+    btn.modulate = Color(\"03ff13\")
+    btn.text = \"Ready\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = true
+    return mups_ready 
+
 func on_player_ready(btn, entry):
-    print(\"Player clicked ready. \" + str(entry))
+    var mups_ready = Settings.Network.get_data(\"mups_ready\")
     if Settings.Session.get_data(\"mup_id\") == entry:
-        if btn.modulate == Color(\"ff0505\"):
-            btn.modulate = Color(\"03ff13\")
-            btn.text = \"Ready\"
+        if btn.modulate == Color(\"ff0505\"):  # Red
+            if Settings.InGame.get_data(\"game_teams\"):
+                if Settings.InGame.get_data(\"player_team_by_id\").has(Settings.Session.get_data(\"mup_id\")):
+                    if Settings.InGame.get_data(\"player_team_by_id\")[Settings.Session.get_data(\"mup_id\")] == 0:
+                        mups_ready = mups_pick_team(btn, mups_ready)
+                    else:
+                        mups_ready = mups_ready(btn, mups_ready)
+                else:
+                    mups_ready = mups_pick_team(btn, mups_ready)
+            else:
+                mups_ready = mups_ready(btn, mups_ready)
         else:
-            btn.modulate = Color(\"ff0505\")
-            btn.text = \"Not Ready\"
+            mups_ready = mups_not_ready(btn, mups_ready)
+        if mups_ready != Settings.Network.get_data(\"mups_ready\"):
+            Settings.Network.set_data(\"mups_ready\", mups_ready)
 
 func on_player_entry_clicked(name):
     print(\"on_player_entry_clicked() \" + str(name))
@@ -271,12 +308,15 @@ script/source = "extends Label
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_numbers_of_teams\"), self, \"update_num_teams\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_number_of_teams\"), self, \"update_num_teams\")
+    update_num_teams(Settings.InGame.get_data(\"game_number_of_teams\"))
 
 
 func update_num_teams(num_of_teams):
     text = \"Number of teams = \" + str(num_of_teams)
-    if num_of_teams == 0:
+    if num_of_teams == null:
+        text = \"Number of teams = 0 (No Teams)\"
+    elif num_of_teams == 0:
         text += \" (No Teams)\"
 "
 

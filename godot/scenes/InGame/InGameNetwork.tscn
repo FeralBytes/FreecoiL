@@ -263,6 +263,9 @@ margin_right = 519.0
 margin_bottom = 78.0
 custom_fonts/normal_font = SubResource( 14 )
 text = "Initialized."
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="HitIndicatorTimer" type="Timer" parent="."]
 wait_time = 0.5
@@ -282,7 +285,6 @@ visible = false
 [node name="Reload" parent="." instance=ExtResource( 12 )]
 
 [node name="EndGamePopup" parent="." instance=ExtResource( 13 )]
-visible = false
 
 [node name="WaitForPlayersPopup" parent="." instance=ExtResource( 14 )]
 visible = false
