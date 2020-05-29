@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=2]
+[gd_scene load_steps=24 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -376,6 +376,37 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
+[sub_resource type="GDScript" id=17]
+script/source = "extends OptionButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"server_possible_ips\"), self, \"set_possible_ip_opts\")
+
+
+func set_possible_ip_opts(possible_ips):
+    add_item(\"\")
+    for ip in possible_ips:
+        add_item(ip)
+
+
+func _on_OptionButton_pressed():
+    get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
+
+
+func _on_OptionButton_item_selected(index):
+    var selected_ip = get_item_text(index)
+    Settings.Session.set_data(\"server_ip\", selected_ip)
+    get_tree().call_group(\"Network\", \"setup_server_part1\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
+"
+
 [node name="MainMenu" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -395,7 +426,6 @@ __meta__ = {
 
 [node name="Tests" parent="-1,0-Tests" instance=ExtResource( 6 )]
 margin_bottom = 460.0
-rect_min_size = Vector2( 540, 960 )
 
 [node name="1,-1-Quick Menu" type="ReferenceRect" parent="."]
 margin_left = 540.0
@@ -1053,9 +1083,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Networked IP Conflict/CenterContainer"]
-margin_top = 115.0
+margin_top = 91.0
 margin_right = 540.0
-margin_bottom = 444.0
+margin_bottom = 469.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
@@ -1072,10 +1102,17 @@ text = "An IP Address Conflict has been detected. "
 align = 1
 autowrap = true
 
-[node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
+[node name="OptionButton" type="OptionButton" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_top = 124.0
 margin_right = 540.0
-margin_bottom = 329.0
+margin_bottom = 163.0
+align = 1
+script = SubResource( 17 )
+
+[node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
+margin_top = 173.0
+margin_right = 540.0
+margin_bottom = 378.0
 text = "NOTE: The program has the ability to work around this, but the functionality, is currently not implemented. Please Contact FeralBytes on discord and let him know of the issue.
 https://discordapp.com/invite/tn4hThV"
 align = 1
@@ -1097,3 +1134,5 @@ autowrap = true
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/Button" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
+[connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]

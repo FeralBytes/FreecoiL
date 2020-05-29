@@ -75,6 +75,8 @@ script/source = "extends Label
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_respawn_delay\"), self, \"update_host_status\")
+    if Settings.InGame.get_data(\"game_respawn_delay\") != null:
+        update_host_status(null)
 
 
 func update_host_status(__):
@@ -93,6 +95,7 @@ script/source = "extends Label
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    update_teams(Settings.InGame.get_data(\"game_teams\"))
 
 
 func update_teams(teams):
@@ -154,7 +157,7 @@ script/source = "extends VBoxContainer
 
 onready var LeftBtn = get_parent().get_parent().get_parent().get_node(\"LeftBtn\")
 onready var RightBtn = get_parent().get_parent().get_parent().get_node(\"RightBtn\")
-
+onready var TeamNumLbl = get_parent().get_parent().get_node(\"Team\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -171,43 +174,46 @@ func update_team_list(__):
     if Settings.InGame.get_data(\"game_teams\"):
         LeftBtn.disabled = false
         RightBtn.disabled = false
+        TeamNumLbl.text = \"Team \" + str(Settings.Session.get_data(\"ui_team_being_viewed\"))
     else:
         LeftBtn.disabled = true
         RightBtn.disabled = true
+        TeamNumLbl.text = \"Rogue Players (No Team)\"
         Settings.Session.set_data(\"ui_team_being_viewed\", 0, false, false)
     for child in get_children():
         child.queue_free()
     if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) > 0:
         var mups_ready = Settings.Network.get_data(\"mups_ready\")
-        for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
-            var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
-            var new_player_btn = Button.new()
-            new_player_btn.text = player_name
-            new_player_btn.rect_min_size.x = 275
-            new_player_btn.clip_text = true
-            new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
-            var ready_btn = Button.new()
-            if Settings.Session.get_data(\"mup_id\") != entry:
-                ready_btn.disabled = true
-            if mups_ready.has(entry):
-                if mups_ready[entry] == true:
-                    ready_btn.text = \"Ready\"
-                    ready_btn.modulate = Color(\"03ff13\")
+        if Settings.Session.get_data(\"ui_team_being_viewed\") in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\"):
+            for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
+                var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
+                var new_player_btn = Button.new()
+                new_player_btn.text = player_name
+                new_player_btn.rect_min_size.x = 275
+                new_player_btn.clip_text = true
+                new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
+                var ready_btn = Button.new()
+                if Settings.Session.get_data(\"mup_id\") != entry:
+                    ready_btn.disabled = true
+                if mups_ready.has(entry):
+                    if mups_ready[entry] == true:
+                        ready_btn.text = \"Ready\"
+                        ready_btn.modulate = Color(\"03ff13\")
+                    else:
+                        ready_btn.text = \"Not Ready\"
+                        ready_btn.modulate = Color(\"ff0505\")
                 else:
                     ready_btn.text = \"Not Ready\"
                     ready_btn.modulate = Color(\"ff0505\")
-            else:
-                ready_btn.text = \"Not Ready\"
-                ready_btn.modulate = Color(\"ff0505\")
-            ready_btn.rect_min_size.x = 145
-            ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
-            var hbox_container = HBoxContainer.new()
-            hbox_container.add_constant_override(\"separation\", 10)
-            hbox_container.alignment = BoxContainer.ALIGN_CENTER
-            hbox_container.rect_min_size.x = 430
-            hbox_container.add_child(new_player_btn)
-            hbox_container.add_child(ready_btn)
-            add_child(hbox_container)
+                ready_btn.rect_min_size.x = 145
+                ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
+                var hbox_container = HBoxContainer.new()
+                hbox_container.add_constant_override(\"separation\", 10)
+                hbox_container.alignment = BoxContainer.ALIGN_CENTER
+                hbox_container.rect_min_size.x = 430
+                hbox_container.add_child(new_player_btn)
+                hbox_container.add_child(ready_btn)
+                add_child(hbox_container)
 
 func mups_not_ready(btn, mups_ready):
     btn.modulate = Color(\"ff0505\")
@@ -257,11 +263,24 @@ func _on_LeftBtn_pressed():
         return
     var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
     if new_team == 0:
-        pass
+        new_team = game_num_of_teams
+    else:
+        new_team = new_team - 1
+    Settings.Session.set_data(\"ui_team_being_viewed\", new_team)
 
 
 func _on_RightBtn_pressed():
-    pass # Replace with function body.
+    var game_num_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+    if game_num_of_teams == null:
+        return
+    elif Settings.InGame.get_data(\"game_teams\") == false:
+        return
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
+    if new_team == game_num_of_teams:
+        new_team = 0
+    else:
+        new_team = new_team + 1
+    Settings.Session.set_data(\"ui_team_being_viewed\", new_team)
 "
 
 [sub_resource type="StyleBoxFlat" id=9]
@@ -409,8 +428,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
+margin_left = 2.0
 margin_top = 3.0
-margin_right = 540.0
+margin_right = 542.0
 margin_bottom = 836.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -529,8 +549,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
+margin_left = 2.0
 margin_top = 3.0
-margin_right = 540.0
+margin_right = 542.0
 margin_bottom = 836.0
 rect_min_size = Vector2( 540, 0 )
 
