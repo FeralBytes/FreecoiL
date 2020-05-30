@@ -118,7 +118,7 @@ func finish_host_setup():
     Network = NetworkedMultiplayerENet.new()
     Network.set_bind_ip(SetConf.Session.server_ip)
     # Below Max Players + Dedicated Server
-    Network.create_server(SetConf.Session.server_port, LazerInterface.MAX_PLAYERS + 1)
+    Network.create_server(SetConf.Session.server_port, FreecoiLInterface.MAX_PLAYERS + 1)
     get_tree().set_network_peer(Network)
     my_peer_id = 1
     players_data[800] = get_my_data()
@@ -167,7 +167,7 @@ func assign_player_number(unique_id):
                 players_on_team += 1
     players_on_team += 1
     players_data[unique_id]["player_number"] = players_on_team
-    players_data[unique_id]["player_id"] = ((players_data[unique_id]["player_team"] - 1) * LazerInterface.players_per_team) + players_data[unique_id]["player_number"]
+    players_data[unique_id]["player_id"] = ((players_data[unique_id]["player_team"] - 1) * FreecoiLInterface.players_per_team) + players_data[unique_id]["player_number"]
     if players_data[unique_id]["player_id"] < 0:
         players_data[unique_id]["player_id"] = 0
     if players_data[unique_id]["my_peer_id"] != 1:

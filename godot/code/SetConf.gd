@@ -131,12 +131,12 @@ var Saved = {
         "WarningAlert" : "e0992e",
         "CriticalAlert" : "f44336"
     },
-    "LazercoilDefaults":
+    "FreecoiLDefaults":
     {
         "Speech": 100,
         "SoundEffects": 100
     },
-    "LazercoilPreferences":
+    "FreecoiLPreferences":
     {
         "PlayerName": ""
     },

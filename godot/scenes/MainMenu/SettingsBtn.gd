@@ -17,7 +17,7 @@ func _on_MainMenuBtn_pressed():
 
 
 func _on_ToggleRecoil_pressed():
-    LazerInterface.enable_recoil(!LazerInterface.recoil_enabled)
+    FreecoiLInterface.enable_recoil(!FreecoiLInterface.recoil_enabled)
     SettingsMenu.hide()
 
 

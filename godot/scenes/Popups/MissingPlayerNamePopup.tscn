@@ -93,7 +93,7 @@ mouse_default_cursor_shape = 0
 size_flags_horizontal = 1
 size_flags_vertical = 4
 custom_fonts/font = SubResource( 1 )
-text = "Welcome to LazercoiL
+text = "Welcome to FreecoiL
 What is your player
 name?"
 align = 1
@@ -167,7 +167,7 @@ secret_character = "*"
 focus_mode = 2
 context_menu_enabled = true
 clear_button_enabled = false
-placeholder_text = "Lazer?"
+placeholder_text = "laser?"
 placeholder_alpha = 0.2
 caret_blink = false
 caret_blink_speed = 0.65

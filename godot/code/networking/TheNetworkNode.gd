@@ -289,7 +289,10 @@ remote func set_mup_id(new_id):
             Settings.Session.set_data("mup_id", new_id)
 
 func set_player_name():
-    rpc_id(1, "set_player_name_remote", Settings.Preferences.get_data("player_name"))
+    if get_tree().is_network_server():
+        set_player_name_remote(Settings.Preferences.get_data("player_name"))
+    else:
+        rpc_id(1, "set_player_name_remote", Settings.Preferences.get_data("player_name"))
             
 remote func set_player_name_remote(new_name):
     if get_tree().is_network_server():
@@ -300,24 +303,39 @@ remote func set_player_name_remote(new_name):
         Settings.InGame.set_data("player_name_by_id", player_name_by_id)
 
 func set_player_team():
-    rpc_id(1, "set_player_team_remote", Settings.Session.get_data("player_team"))
+    if get_tree().is_network_server():
+        set_player_team_remote(Settings.Session.get_data("player_team"))
+    else:
+        rpc_id(1, "set_player_team_remote", Settings.Session.get_data("player_team"))
 
 remote func set_player_team_remote(new_team):
+    var rpc_sender_id = -1
     if get_tree().is_network_server():
-        Settings.Log("RPC: 'set_player_team()' to " + str(new_team) + " from sender_id = " + str(get_tree().get_rpc_sender_id()))
+        if get_tree().get_rpc_sender_id() == 0:
+            rpc_sender_id = 1
+        else:
+            rpc_sender_id = get_tree().get_rpc_sender_id()
+        Settings.Log("RPC: 'set_player_team()' to " + str(new_team) + " from sender_id = " + str(rpc_sender_id))
         var player_team_by_id = Settings.InGame.get_data("player_team_by_id")
-        var mups = Settings.Network.get_data("peers_to_mups")[get_tree().get_rpc_sender_id()]
+        var mups = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
         var previous_team = -1
         if player_team_by_id.has(mups):
             previous_team = player_team_by_id[mups]
         player_team_by_id[mups] = new_team
         Settings.InGame.set_data("player_team_by_id", player_team_by_id)
         var game_teams_by_team_num_by_id = Settings.InGame.get_data("game_teams_by_team_num_by_id")
-        # First remove them from the previous team.
-        var player_name = Settings.InGame.get_data("player_name_by_id")[mups]
+        # First make sure there is an Array for each possible team.
+        if Settings.InGame.get_data("game_number_of_teams") != null:
+            if len(game_teams_by_team_num_by_id) - 1 != Settings.InGame.get_data("game_number_of_teams"):
+                for index in range(0, Settings.InGame.get_data("game_number_of_teams") + 1):
+                    if len(game_teams_by_team_num_by_id) - 1 < index:
+                        game_teams_by_team_num_by_id.append([])
+        # Second remove them from the previous team.
         if previous_team != -1:
-            game_teams_by_team_num_by_id[previous_team].remove(mups)
-        # Now add them to the new team.
+            if mups in game_teams_by_team_num_by_id[previous_team]:
+                game_teams_by_team_num_by_id[previous_team].erase(mups)
+        # Third add them to the new team.
+        print("game_teams_by_team_num_by_id = " + str(game_teams_by_team_num_by_id))
         game_teams_by_team_num_by_id[new_team].append(mups)
         Settings.InGame.set_data("game_teams_by_team_num_by_id", game_teams_by_team_num_by_id)
 

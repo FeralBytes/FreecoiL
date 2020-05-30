@@ -65,7 +65,7 @@ func test_4_test():
     assert_equal(SetConf.Session.player_number, 2, "Assertion #1. Client did not get it's player_number assigned by the server.")
     assert_equal(SetConf.Session.player_id, 33, "Assertion #2.Client did not get it's player_id assigned by the server.")
     # 2 is the team number. Subtract 1 is required.
-    var corr_id = (2 - 1) * LazerInterface.MAX_TEAMS + SetConf.Session.player_number
+    var corr_id = (2 - 1) * FreecoiLInterface.MAX_TEAMS + SetConf.Session.player_number
     var correct_dict = {"my_peer_id":NetworkingCode.my_peer_id, "player_id":corr_id, "player_name":"Computer", "player_number":SetConf.Session.player_number, "player_team":2, "server_unique_id":NetworkingCode.my_server_unique_id}
     assert_dict_equal(correct_dict, NetworkingCode._on_my_data_changed(), 
         "Assertion #3. TeamWidget.current_val did not set NetworkingCode.my_data to the correct dictionary values.")

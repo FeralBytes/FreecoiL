@@ -1,7 +1,5 @@
 package com.feralbytes.games.freecoiljava;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -18,12 +16,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.Vibrator;
-/*import androidx.legacy.app.ActivityCompat;
-import androidx.legacy.content.ContextCompat;*/
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -32,13 +26,13 @@ import org.godotengine.godot.Godot;
 import org.godotengine.godot.GodotLib;
 import org.godotengine.godot.plugin.GodotPlugin;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import javax.microedition.khronos.opengles.GL10;
+
+//import androidx.fragment.app.FragmentActivity;
 
 
 public class FreecoiLPlugin extends GodotPlugin {
@@ -73,7 +67,7 @@ public class FreecoiLPlugin extends GodotPlugin {
 
     private static final byte BLASTER_TYPE_PISTOL = (byte)2;
     private static final byte BLASTER_TYPE_RIFLE = (byte)1;
-    private static byte lazerType = BLASTER_TYPE_PISTOL;
+    private static byte laserType = BLASTER_TYPE_PISTOL;
     public static final int SHOT_MODE_FULL_AUTO = 1;
     public static final int SHOT_MODE_SINGLE = 2;
     public static final int SHOT_MODE_BURST = 4;
@@ -136,11 +130,11 @@ public class FreecoiLPlugin extends GodotPlugin {
     public List<String> getPluginMethods() {
         return Arrays.asList("hello", "init", "bluetoothStatus",
                 "enableBluetooth", "fineAccessPermissionStatus", "enableFineAccess", "startBluetoothScan",
-                "stopBluetoothScan", "vibrate", "setLazerId", "startReload", "finishReload", "setShotMode", "enableRecoil");
+                "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode", "enableRecoil");
     }
 
     public String hello() {
-        System.out.println(HELLO_WORLD);
+        Log.i(TAG, "Got the appActivity.");
         return HELLO_WORLD;
     }
 
@@ -210,7 +204,7 @@ public class FreecoiLPlugin extends GodotPlugin {
         vibrator.vibrate(durationMillis);
     }
 
-    public void setLazerId(final int player_id) {
+    public void setLaserId(final int player_id) {
         trackedPlayerId = player_id;
         byte[] command = new byte[20];
         commandId += COMMAND_ID_INCREMENT;
@@ -281,7 +275,7 @@ public class FreecoiLPlugin extends GodotPlugin {
         else if (shotMode == SHOT_MODE_BURST) {
             config[3] = (byte)0x03;
             config[4] = (byte)0x03;
-            if (lazerType == BLASTER_TYPE_RIFLE)
+            if (laserType == BLASTER_TYPE_RIFLE)
                 config[9] = (byte)0x78; // Reduce rifle recoil strength to allow 3 recoils to occur in time.
         }
         else if (shotMode == SHOT_MODE_FULL_AUTO) {
@@ -354,7 +348,7 @@ public class FreecoiLPlugin extends GodotPlugin {
            3 = error
            4 = critical
            5 = exception */
-        GodotLib.calldeferred(instanceId, "_new_status", new Object[]{TAG + message, level});
+        GodotLib.calldeferred(instanceId, "_new_status", new Object[]{message, level});
         if (level >= 2) {
             makeToast(message, true);
         }
@@ -376,7 +370,7 @@ public class FreecoiLPlugin extends GodotPlugin {
                         bluetoothService.connect(btDeviceAddress);
                     }
                 });
-                // TODO: Send Godot the new perfered Lazer Tagger for reconnects.
+                // TODO: Send Godot the new perfered laser Tagger for reconnects.
             }
 
             @Override
@@ -418,19 +412,19 @@ public class FreecoiLPlugin extends GodotPlugin {
        19 00 Unused?
      */
     private void processTelemetryData() {
-        /* https://wiki.lazerswarm.com/wiki/Recoil:Main_Page */
+        /* https://wiki.laserswarm.com/wiki/Recoil:Main_Page */
         final byte[] data = telemetryCharacteristic.getValue();
         if (data != null && data.length > 0) {
             int continuousCounter = (byte)(data[RECOIL_OFFSET_COMMAND_ID] & (byte)0x0F);
             int commandId = (byte)(data[RECOIL_OFFSET_COMMAND_ID] >> 4 & (byte)0x0F);
             if (commandId != trackedCommandId) {
                 trackedCommandId = commandId;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_commandId", new Object[]{trackedCommandId});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_commandId", new Object[]{trackedCommandId});
             }
             int playerId = data[RECOIL_OFFSET_PLAYER_ID];
             if (playerId != trackedPlayerId) {
                 trackedPlayerId = playerId;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_playerId", new Object[]{trackedPlayerId});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_playerId", new Object[]{trackedPlayerId});
             }
             int buttonsPressed = data[RECOIL_OFFSET_BUTTONS_BITMASK];
             if (buttonsPressed != 0) {
@@ -444,30 +438,30 @@ public class FreecoiLPlugin extends GodotPlugin {
             int triggerBtnCounter = (byte)(data[RECOIL_OFFSET_RELOAD_TRIGGER_COUNTER] & (byte)0x0F);
             if (triggerBtnCounter != trackedTriggerBtnCounter) {
                 trackedTriggerBtnCounter = triggerBtnCounter;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_triggerBtnCounter", new Object[]{trackedTriggerBtnCounter});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_triggerBtnCounter", new Object[]{trackedTriggerBtnCounter});
             }
             /* NOTE: Below is a conversion performed on the nibble (last/low 4-bits) to make it act
             * as a proper 4-bit int which counts 0-15. */
             int reloadBtnCounter = (byte)(data[RECOIL_OFFSET_RELOAD_TRIGGER_COUNTER] >> 4 & (byte)0x0F);
             if (reloadBtnCounter != trackedReloadBtnCounter) {
                 trackedReloadBtnCounter = reloadBtnCounter;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_reloadBtnCounter", new Object[]{trackedReloadBtnCounter});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_reloadBtnCounter", new Object[]{trackedReloadBtnCounter});
             }
             int thumbBtnCounter = data[RECOIL_OFFSET_THUMB_COUNTER];
             if (thumbBtnCounter != trackedThumbBtnCounter) {
                 trackedThumbBtnCounter = thumbBtnCounter;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_thumbBtnCounter", new Object[]{trackedThumbBtnCounter});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_thumbBtnCounter", new Object[]{trackedThumbBtnCounter});
             }
             int powerBtnCounter = data[RECOIL_OFFSET_POWER_COUNTER];
             if (powerBtnCounter != trackedPowerBtnCounter) {
                 trackedPowerBtnCounter = powerBtnCounter;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_powerBtnCounter", new Object[]{trackedPowerBtnCounter});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_powerBtnCounter", new Object[]{trackedPowerBtnCounter});
             }
             /* We send the battery telemetry every time, so we can track the battery average
                and we use it to track if we are still connected to the gun. */
             int batteryLvl = data[RECOIL_OFFSET_BATTERY_LEVEL];
             trackedBatteryLvl = batteryLvl;
-            GodotLib.calldeferred(instanceId, "_lazer_telem_batteryLvl", new Object[]{trackedBatteryLvl});
+            GodotLib.calldeferred(instanceId, "_laser_telem_batteryLvl", new Object[]{trackedBatteryLvl});
             /* bytes are always signed in Java and if you don't do "& 0xFF" here, you will get
                negative numbers in the hitById# field when using player IDs > 32 */
             /* shotById1 defaults to 0 and a shot counter of 0. So using a player ID of 0 would
@@ -505,13 +499,13 @@ public class FreecoiLPlugin extends GodotPlugin {
                 any time that shotCounter rolls back to 0.
                 shotById2 is only non-zero if the gun recieves 2 shots at the same time and thus
                 shotById1 will also have to be non-zero. */
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_shot_data", new Object[]{shotById1, shotCounter1, shotById2, shotCounter2});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_shot_data", new Object[]{shotById1, shotCounter1, shotById2, shotCounter2});
                 logger("sesorsHit = " + sensorsHit, 1);
             }
             int shotsRemaining = data[RECOIL_OFFSET_SHOTS_REMAINING] & 0xFF;
             if (shotsRemaining != trackedShotsRemaining) {
                 trackedShotsRemaining = shotsRemaining;
-                GodotLib.calldeferred(instanceId, "_changed_lazer_telem_shotsRemaining", new Object[]{trackedShotsRemaining});
+                GodotLib.calldeferred(instanceId, "_changed_laser_telem_shotsRemaining", new Object[]{trackedShotsRemaining});
             }
             int status = data[RECOIL_OFFSET_STATUS];
             int playerIdAccepted = data[RECOIL_OFFSET_PLAYER_ID_ACCEPT];
@@ -588,17 +582,17 @@ public class FreecoiLPlugin extends GodotPlugin {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
-                GodotLib.calldeferred(instanceId, "_on_lazer_gun_connected", new Object[]{});
+                GodotLib.calldeferred(instanceId, "_on_laser_gun_connected", new Object[]{});
             }
             else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
-                //GodotLib.calldeferred(instanceId, "_on_lazer_gun_disconnected", new Object[]{});
+                //GodotLib.calldeferred(instanceId, "_on_laser_gun_disconnected", new Object[]{});
                 //This is called too often to be reliable even when the device is still connected.
             }
             else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
                 //displayGattServices(mBluetoothLeService.getSupportedGattServices());
                 //logger("Services discovered!", 1);
-                //GodotLib.calldeferred(instanceId, "_on_lazer_gun_connected", new Object[]{});
+                //GodotLib.calldeferred(instanceId, "_on_laser_gun_connected", new Object[]{});
                 for (BluetoothGattService gattService : bluetoothService.getSupportedGattServices()) {
                     logger("Service: " + gattService.getUuid().toString(), 1);
                     if (gattService.getUuid().toString().equals(GattAttributes.RECOIL_MAIN_SERVICE)) {
@@ -629,8 +623,8 @@ public class FreecoiLPlugin extends GodotPlugin {
                 processTelemetryData();
             }
             else if (bluetoothService.ID_DATA_AVAILABLE.equals(action)) {
-                lazerType = intent.getByteExtra(BluetoothLeService.EXTRA_DATA, BLASTER_TYPE_PISTOL);
-                if (lazerType == BLASTER_TYPE_RIFLE) {
+                laserType = intent.getByteExtra(BluetoothLeService.EXTRA_DATA, BLASTER_TYPE_PISTOL);
+                if (laserType == BLASTER_TYPE_RIFLE) {
                     logger("Riffle detected.", 1);
                 }
                 else {
@@ -668,6 +662,7 @@ public class FreecoiLPlugin extends GodotPlugin {
     @Override
     public View onMainCreateView(Activity activity) {
         this.appActivity = activity;
+        this.appContext = this.appActivity.getApplicationContext();
         View view = activity.getLayoutInflater().inflate(R.layout.freecoil_view, null);
         Log.i(TAG, "Got the appActivity.");
         return view;
@@ -687,7 +682,7 @@ public class FreecoiLPlugin extends GodotPlugin {
     public FreecoiLPlugin(Godot godot) {
         super(godot);
         Log.i(TAG, "FreecoiL Plugin is being constructed.");
-        this.appContext = godot.getApplicationContext();
+        //this.appContext = godot.getApplicationContext();
         this.appInstance = this;
         Log.i(TAG, "Construction complete.");
     }

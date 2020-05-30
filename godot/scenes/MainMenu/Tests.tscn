@@ -14,8 +14,8 @@ script/source = "extends Button
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    if LazerInterface.state_lazer_gun_is_connected:
-        text = \"Connected to \" + str(LazerInterface.state_lazer_gun_id)
+    if FreecoiLInterface.state_laser_gun_is_connected:
+        text = \"Connected to \" + str(FreecoiLInterface.state_laser_gun_id)
     else:
         text = \"Connect Gun\"
 
@@ -26,10 +26,10 @@ func _ready():
 
 
 func _on_Button_pressed():
-    if LazerInterface.state_lazer_gun_is_connected:
+    if FreecoiLInterface.state_laser_gun_is_connected:
         pass
     else:
-        LazerInterface.connect_to_lazer_gun()
+        FreecoiLInterface.connect_to_laser_gun()
 "
 
 [sub_resource type="GDScript" id=2]
@@ -43,21 +43,21 @@ script/source = "extends Button
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    add_to_group(\"lazercoil\")
-    if LazerInterface.recoil_enabled:
+    add_to_group(\"FreecoiL\")
+    if FreecoiLInterface.recoil_enabled:
         text = \"Recoil Enabled: Press to Disable Recoil.\"
     else:
         text = \"Recoil Disabled: Press to Enable Recoil.\"
 
-func li_recoil_enabled_changed():
-    if LazerInterface.recoil_enabled:
+func fi_recoil_enabled_changed():
+    if FreecoiLInterface.recoil_enabled:
         text = \"Recoil Enabled: Press to Disable Recoil.\"
     else:
         text = \"Recoil Disabled: Press to Enable Recoil.\"
 
 
 func _on_Button2_pressed():
-    LazerInterface.enable_recoil(!LazerInterface.recoil_enabled)
+    FreecoiLInterface.enable_recoil(!FreecoiLInterface.recoil_enabled)
 "
 
 [sub_resource type="GDScript" id=3]

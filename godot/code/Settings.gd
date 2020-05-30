@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.0-dev15"
+const VERSION = "0.3.0-dev16"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -15,7 +15,7 @@ const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signal.
 
 var DEBUG_GUI = false
-var DEBUG_LEVEL = 0
+var DEBUG_LEVEL = 1
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
@@ -64,6 +64,7 @@ class Data:
             register_data("SETTINGS_VERSION", SETTINGS_VERSION, false)
         
     func set_data(data_name, new_val, called_by_sync=false, emit_a_signal=true):
+        Settings.Log("Settings: set_data(): " + self.name + ": " + str(data_name) + " = " + str(new_val))
         if not __settings.has(data_name):
             register_data(data_name, new_val)
         else:

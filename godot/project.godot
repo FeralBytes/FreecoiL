@@ -29,7 +29,7 @@ output_latency=1
 
 Helpers="*res://code/Helpers.gd"
 Settings="*res://code/Settings.gd"
-LazerInterface="*res://code/LazerInterface.gd"
+FreecoiLInterface="*res://code/FreecoiLInterface.gd"
 
 [display]
 

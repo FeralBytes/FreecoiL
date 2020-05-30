@@ -39,67 +39,67 @@ onready var WaitForPlayers = get_node("WaitForPlayersPopup")
 # Called when the node enters the scene tree for the first time.
 func _ready():
     WaitForPlayers.popup()
-    reset_li_vars()
-    add_to_group("lazercoil")
+    reset_fi_vars()
+    add_to_group("FreecoiL")
     add_to_group("in_game")
-    LazerInterface.set_lazer_id(SetConf.Session.player_id)
+    FreecoiLInterface.set_laser_id(SetConf.Session.player_id)
     init_shot_mode()
-    CurrentAmmo.text = "%03d" % LazerInterface.shots_remaining
+    CurrentAmmo.text = "%03d" % FreecoiLInterface.shots_remaining
     Magazine.text = "%03d" % SetConf.Session.magazine
     AmmoBar.value = 0
-    CurrentHealth.text = "%02d" % LazerInterface.current_health
-    FullHealth.text = "%03d" % LazerInterface.full_health
-    HealthBar.value = LazerInterface.full_health
-    Kills.text = "%02d" % LazerInterface.player_kills
-    Deaths.text = "%02d" % LazerInterface.player_deaths
+    CurrentHealth.text = "%02d" % FreecoiLInterface.current_health
+    FullHealth.text = "%03d" % FreecoiLInterface.full_health
+    HealthBar.value = FreecoiLInterface.full_health
+    Kills.text = "%02d" % FreecoiLInterface.player_kills
+    Deaths.text = "%02d" % FreecoiLInterface.player_deaths
     update_recoil()
-    li_player_id_changed()
+    fi_player_id_changed()
     reload_timer.one_shot = true
     reload_timer.connect("timeout", self, "reload_finish")
-    reload_timer.wait_time = LazerInterface.reload_delay
+    reload_timer.wait_time = FreecoiLInterface.reload_delay
     build_team_filter()
     add_child(reload_timer)
     add_child(end_game_timer)
     respawn_start(0)
-    LazerInterface.enable_recoil(false)
+    FreecoiLInterface.enable_recoil(false)
     call_deferred("defered_send_ready")
     
 func defered_send_ready():
     # We defer calling ready to let a frame go by and make sure everything is finished.
     NetworkingCode.tell_server_i_am_ready()
     
-func reset_li_vars():
-    LazerInterface.current_health = 0
-    LazerInterface.player_deaths = 0
-    LazerInterface.player_kills = 0
+func reset_fi_vars():
+    FreecoiLInterface.current_health = 0
+    FreecoiLInterface.player_deaths = 0
+    FreecoiLInterface.player_kills = 0
     
 ###############################################################################
 # TIMER Functions
 ###############################################################################
 func reload_start():
-    LazerInterface.reload_start()
+    FreecoiLInterface.reload_start()
     reload_timer.start()
     CurrentAmmo.text = "000"
     reload_sound.play()
     
 func reload_finish():
-    LazerInterface.reload_finish()
+    FreecoiLInterface.reload_finish()
     CurrentAmmo.text = "%03d" % SetConf.Session.magazine
     AmmoBar.value = SetConf.Session.magazine
 
 func respawn_start(shooter_id):
-    LazerInterface.is_player_alive = false
-    LazerInterface.reload_start()
+    FreecoiLInterface.is_player_alive = false
+    FreecoiLInterface.reload_start()
     StatusMessages.text = "Reload Start Called, should not be able to shot.\n" + StatusMessages.text
     CurrentAmmo.text = str("000")
     AmmoBar.value = 0
     if shooter_id > 0:
         # Killed By shooter_id
-        LazerInterface.player_deaths += 1
-        NetworkingCode.record_game_event("killed", [shooter_id, LazerInterface.player_deaths])
-        Deaths.text = "%02d" % LazerInterface.player_deaths
+        FreecoiLInterface.player_deaths += 1
+        NetworkingCode.record_game_event("killed", [shooter_id, FreecoiLInterface.player_deaths])
+        Deaths.text = "%02d" % FreecoiLInterface.player_deaths
         if SetConf.Session.end_game == "deaths":
-            if LazerInterface.player_deaths == SetConf.Session.end_game_death_limit:
+            if FreecoiLInterface.player_deaths == SetConf.Session.end_game_death_limit:
                 end_game("LIVES!")
                 NetworkingCode.record_game_event("end_game", ["lives"])
             else:
@@ -112,27 +112,27 @@ func respawn_start(shooter_id):
         pass  # End of Game if shooter_id = -1
     
 func respawn_finish():
-    LazerInterface.current_health = LazerInterface.full_health
-    HealthBar.value = LazerInterface.current_health
-    CurrentHealth.text = "%03d" % LazerInterface.current_health
-    LazerInterface.is_player_alive = true
+    FreecoiLInterface.current_health = FreecoiLInterface.full_health
+    HealthBar.value = FreecoiLInterface.current_health
+    CurrentHealth.text = "%03d" % FreecoiLInterface.current_health
+    FreecoiLInterface.is_player_alive = true
     reload_sound.play()
     reload_finish()
     NetworkingCode.record_game_event("reloaded", [])
 
 ###############################################################################
-# lazercoil group callback Functions
+# FreecoiL group callback Functions
 ###############################################################################  
-func li_trigger_btn_pushed():
-    if LazerInterface.shots_remaining == 0:
+func fi_trigger_btn_pushed():
+    if FreecoiLInterface.shots_remaining == 0:
             empty_sound.play()
             
     
-func li_reload_btn_pushed():
-    if LazerInterface.is_player_alive:
+func fi_reload_btn_pushed():
+    if FreecoiLInterface.is_player_alive:
         reload_start()
 
-func li_got_shot(shooter_id):
+func fi_got_shot(shooter_id):
     # We vibrate here just to make the player aware they are being shot 
     # It gives them a chance to shout "I'm Dead."
     var legit_hit = false
@@ -142,60 +142,60 @@ func li_got_shot(shooter_id):
         if SetConf.Session.teams:  # Team Match
             # Don't get shot by your own team.
             if shooter_id > max_team_id or shooter_id < min_team_id:
-                if LazerInterface.is_player_alive:
+                if FreecoiLInterface.is_player_alive:
                     legit_hit = true
         else:  # Free For All
-            if LazerInterface.is_player_alive:
+            if FreecoiLInterface.is_player_alive:
                 legit_hit = true    
     if legit_hit:
-        LazerInterface.current_health -= 1
-        NetworkingCode.record_game_event("got_shot", [shooter_id, LazerInterface.current_health])
-        HealthBar.value = LazerInterface.current_health
-        CurrentHealth.text = "%03d" % LazerInterface.current_health
-        if LazerInterface.current_health <= 0:
+        FreecoiLInterface.current_health -= 1
+        NetworkingCode.record_game_event("got_shot", [shooter_id, FreecoiLInterface.current_health])
+        HealthBar.value = FreecoiLInterface.current_health
+        CurrentHealth.text = "%03d" % FreecoiLInterface.current_health
+        if FreecoiLInterface.current_health <= 0:
             respawn_start(shooter_id)
         MainSection.self_modulate = Color("e01010")
         HitIndicatorTimer.start()
 
-func li_player_id_changed():
+func fi_player_id_changed():
     PlayerNum.text = "Player # " + str(SetConf.Session.player_number)
     StatusMessages.text = "Self Player ID Set as ID # " + str(SetConf.Session.player_id) + "\n" + StatusMessages.text
     
-func li_shots_remaining_changed():
-    if LazerInterface.is_player_alive:
-        if LazerInterface.shots_remaining == SetConf.Session.magazine:
+func fi_shots_remaining_changed():
+    if FreecoiLInterface.is_player_alive:
+        if FreecoiLInterface.shots_remaining == SetConf.Session.magazine:
             pass
-        elif LazerInterface.shots_remaining == 0:
+        elif FreecoiLInterface.shots_remaining == 0:
             pass
         else:
-            NetworkingCode.record_game_event("shooting", [LazerInterface.shots_remaining])
+            NetworkingCode.record_game_event("shooting", [FreecoiLInterface.shots_remaining])
             gun_sound.play()
-        CurrentAmmo.text = "%03d" % LazerInterface.shots_remaining
-        AmmoBar.value = LazerInterface.shots_remaining
+        CurrentAmmo.text = "%03d" % FreecoiLInterface.shots_remaining
+        AmmoBar.value = FreecoiLInterface.shots_remaining
     
-func li_recoil_enabled_changed():
+func fi_recoil_enabled_changed():
     update_recoil()
     
-func li_thumb_btn_pushed():
+func fi_thumb_btn_pushed():
     set_shot_mode()
     
-func li_power_btn_pushed():
-    if LazerInterface.recoil_enabled:
-        LazerInterface.enable_recoil(false)
+func fi_power_btn_pushed():
+    if FreecoiLInterface.recoil_enabled:
+        FreecoiLInterface.enable_recoil(false)
     else:
-        LazerInterface.enable_recoil(true)
+        FreecoiLInterface.enable_recoil(true)
 
-# li_battery_lvl_changed
+# fi_battery_lvl_changed
 
 ###############################################################################
 # In Game Functions
 ###############################################################################
 func build_team_filter():
-    max_team_id = SetConf.Session.player_team * LazerInterface.players_per_team
-    min_team_id = max_team_id - LazerInterface.players_per_team + 1
+    max_team_id = SetConf.Session.player_team * FreecoiLInterface.players_per_team
+    min_team_id = max_team_id - FreecoiLInterface.players_per_team + 1
 
 func update_recoil():
-    if LazerInterface.recoil_enabled:
+    if FreecoiLInterface.recoil_enabled:
         Recoil.text = "Recoil: Enabled"
     else:
         Recoil.text = "Recoil: Disabled"
@@ -242,7 +242,7 @@ func init_shot_mode():
     update_shot_mode()
 
 func update_shot_mode():
-    LazerInterface.set_shot_mode(shot_mode, indoor_outdoor_mode)
+    FreecoiLInterface.set_shot_mode(shot_mode, indoor_outdoor_mode)
     if shot_mode == "auto":
         ShotMode.text = "Shot Mode: Full-Auto"
     elif shot_mode == "single":
@@ -251,7 +251,7 @@ func update_shot_mode():
         ShotMode.text = "Shot Mode: 3-Round Burst"
     
 func delayed_vibrate():
-    LazerInterface.vibrate(150)  # May want to bump it up to 250.
+    FreecoiLInterface.vibrate(150)  # May want to bump it up to 250.
     
 ###############################################################################
 # Popup Functions

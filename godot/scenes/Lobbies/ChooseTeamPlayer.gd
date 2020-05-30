@@ -13,10 +13,10 @@ func _ready():
     PlayerWidget.set_val(SetConf.Session.player_number)
 
 func update_player_id():
-    SetConf.Session.player_id = ((SetConf.Session.player_team - 1) * LazerInterface.players_per_team) + SetConf.Session.player_number
+    SetConf.Session.player_id = ((SetConf.Session.player_team - 1) * FreecoiLInterface.players_per_team) + SetConf.Session.player_number
 
 func calc_players_per_team():
-    LazerInterface.players_per_team = LazerInterface.MAX_PLAYERS / SetConf.Session.num_of_teams
+    FreecoiLInterface.players_per_team = FreecoiLInterface.MAX_PLAYERS / SetConf.Session.num_of_teams
 
 func _on_TeamWidget_PMWidChanged(new_val):
     if new_val > SetConf.Session.num_of_teams:
@@ -27,8 +27,8 @@ func _on_TeamWidget_PMWidChanged(new_val):
 
 
 func _on_PlayerWidget_PMWidChanged(new_val):
-    if new_val > LazerInterface.players_per_team:
-        PlayerWidget.set_val(LazerInterface.players_per_team)
+    if new_val > FreecoiLInterface.players_per_team:
+        PlayerWidget.set_val(FreecoiLInterface.players_per_team)
     else:
         SetConf.Session.player_number = new_val
         update_player_id()

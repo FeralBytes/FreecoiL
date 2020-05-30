@@ -115,23 +115,31 @@ onready var Team = get_parent().get_node(\"HBoxContainer/VBoxContainer/Team\")
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"check_if_team_assigned\")
-    check_if_team_assigned()
+    Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"check_if_team_assigned\")
+    check_if_team_assigned(null)
     
-func check_if_team_assigned():
-    if Settings.Session.get_data(\"player_team\") == null:
-        text = \"Join This Team\"
-        disabled = false
-    elif Team.text == str(Settings.Session.get_data(\"player_team\")):
-        text = \"You Are On This Team\"
-        disabled = true
+func check_if_team_assigned(__):
+    if Settings.InGame.get_data(\"game_teams\"):
+        if Settings.Session.get_data(\"player_team\") == null:
+            Settings.Session.set_data(\"player_team\", 0)
+        if Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+            text = \"Pick a team other than Team 0.\"
+            disabled = true
+        elif Settings.Session.get_data(\"ui_team_being_viewed\") == Settings.Session.get_data(\"player_team\"):
+            text = \"You Are On This Team\"
+            disabled = true
+        else:
+            text = \"Join This Team\"
+            disabled = false
     else:
-        text = \"Switch To This Team\"
-        disabled = false
+        text = \"Teams are Disabled\"
+        disabled = true
 
 
 
 func _on_Button_pressed():
-    var new_team = int(Team.text)
+    print(\"Team text = \" + Team.text)
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
     Settings.Session.set_data(\"player_team\", new_team)
     get_tree().call_group(\"Network\", \"set_player_team\")
     
@@ -161,11 +169,11 @@ onready var TeamNumLbl = get_parent().get_parent().get_node(\"Team\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.InGame.connect(Settings.InGame.monitor_data(\"player_team_by_id\"), self, \"update_team_list\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams_by_team_num_by_id\"), self, \"update_team_list\")
     Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
     Settings.Session.set_data(\"ui_team_being_viewed\", 0)  #TODO: Team 0 as unassigned players.
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
-    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_team_list\")
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"update_team_list\")
     update_team_list(null)
 
@@ -174,7 +182,10 @@ func update_team_list(__):
     if Settings.InGame.get_data(\"game_teams\"):
         LeftBtn.disabled = false
         RightBtn.disabled = false
-        TeamNumLbl.text = \"Team \" + str(Settings.Session.get_data(\"ui_team_being_viewed\"))
+        if Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+            TeamNumLbl.text = \"Rogue Players (No Team)\"
+        else:
+            TeamNumLbl.text = \"Team \" + str(Settings.Session.get_data(\"ui_team_being_viewed\"))
     else:
         LeftBtn.disabled = true
         RightBtn.disabled = true
@@ -184,12 +195,12 @@ func update_team_list(__):
         child.queue_free()
     if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) > 0:
         var mups_ready = Settings.Network.get_data(\"mups_ready\")
-        if Settings.Session.get_data(\"ui_team_being_viewed\") in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\"):
+        if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) - 1 >= Settings.Session.get_data(\"ui_team_being_viewed\"):
             for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
                 var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
                 var new_player_btn = Button.new()
                 new_player_btn.text = player_name
-                new_player_btn.rect_min_size.x = 275
+                new_player_btn.rect_min_size.x = 260
                 new_player_btn.clip_text = true
                 new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
                 var ready_btn = Button.new()
@@ -200,12 +211,15 @@ func update_team_list(__):
                         ready_btn.text = \"Ready\"
                         ready_btn.modulate = Color(\"03ff13\")
                     else:
-                        ready_btn.text = \"Not Ready\"
+                        if Settings.InGame.get_data(\"game_teams\") and Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+                            ready_btn.text = \"Pick a Team\"
+                        else:
+                            ready_btn.text = \"Not Ready\"
                         ready_btn.modulate = Color(\"ff0505\")
                 else:
                     ready_btn.text = \"Not Ready\"
                     ready_btn.modulate = Color(\"ff0505\")
-                ready_btn.rect_min_size.x = 145
+                ready_btn.rect_min_size.x = 160
                 ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
                 var hbox_container = HBoxContainer.new()
                 hbox_container.add_constant_override(\"separation\", 10)
@@ -216,15 +230,18 @@ func update_team_list(__):
                 add_child(hbox_container)
 
 func mups_not_ready(btn, mups_ready):
+    print(\"here 2\")
     btn.modulate = Color(\"ff0505\")
     btn.text = \"Not Ready\"
     mups_ready[Settings.Session.get_data(\"mup_id\")] = false
     return mups_ready
     
 func mups_pick_team(btn, mups_ready):
+    print(\"here\")
     btn.modulate = Color(\"ff0505\")
     btn.text = \"Pick a Team\"
     mups_ready[Settings.Session.get_data(\"mup_id\")] = false
+    print(\"here1\")
     return mups_ready
 
 func mups_ready(btn, mups_ready):
@@ -234,23 +251,21 @@ func mups_ready(btn, mups_ready):
     return mups_ready 
 
 func on_player_ready(btn, entry):
-    var mups_ready = Settings.Network.get_data(\"mups_ready\")
     if Settings.Session.get_data(\"mup_id\") == entry:
+        var mups_status = Settings.Network.get_data(\"mups_ready\").duplicate()
         if btn.modulate == Color(\"ff0505\"):  # Red
             if Settings.InGame.get_data(\"game_teams\"):
-                if Settings.InGame.get_data(\"player_team_by_id\").has(Settings.Session.get_data(\"mup_id\")):
-                    if Settings.InGame.get_data(\"player_team_by_id\")[Settings.Session.get_data(\"mup_id\")] == 0:
-                        mups_ready = mups_pick_team(btn, mups_ready)
-                    else:
-                        mups_ready = mups_ready(btn, mups_ready)
+                if Settings.InGame.get_data(\"player_team_by_id\")[Settings.Session.get_data(\"mup_id\")] == 0:
+                    mups_status = mups_pick_team(btn, mups_status)
                 else:
-                    mups_ready = mups_pick_team(btn, mups_ready)
+                    mups_status = mups_ready(btn, mups_status)
             else:
-                mups_ready = mups_ready(btn, mups_ready)
+                mups_status = mups_ready(btn, mups_status)
         else:
-            mups_ready = mups_not_ready(btn, mups_ready)
-        if mups_ready != Settings.Network.get_data(\"mups_ready\"):
-            Settings.Network.set_data(\"mups_ready\", mups_ready)
+            mups_status = mups_not_ready(btn, mups_status)
+        if mups_status != Settings.Network.get_data(\"mups_ready\"):
+            Settings.Network.set_data(\"mups_ready\", mups_status)
+        print(btn.text)
 
 func on_player_entry_clicked(name):
     print(\"on_player_entry_clicked() \" + str(name))
@@ -428,9 +443,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
-margin_left = 2.0
 margin_top = 3.0
-margin_right = 542.0
+margin_right = 540.0
 margin_bottom = 836.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -454,11 +468,11 @@ script = SubResource( 3 )
 margin_top = 94.0
 margin_right = 540.0
 margin_bottom = 129.0
-text = "Teams are turned \"OFF\"."
+text = "Teams are turned \"OFF\". # of teams 0"
 align = 1
 script = SubResource( 4 )
 
-[node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+[node name="JoinTeam" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_top = 139.0
 margin_right = 540.0
 margin_bottom = 178.0
@@ -549,9 +563,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
-margin_left = 2.0
 margin_top = 3.0
-margin_right = 542.0
+margin_right = 540.0
 margin_bottom = 836.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -786,7 +799,7 @@ margin_right = 540.0
 margin_bottom = 197.0
 [connection signal="item_selected" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
-[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/Button" to="0,0-Game Lobby/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" to="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
 [connection signal="item_selected" from="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" to="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]

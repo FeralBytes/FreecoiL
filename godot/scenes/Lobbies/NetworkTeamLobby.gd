@@ -18,7 +18,7 @@ func _ready():
     TeamsLR.set_selected_by_index(0)
 
 func calc_players_per_team():
-    LazerInterface.players_per_team = LazerInterface.MAX_PLAYERS / SetConf.Session.num_of_teams
+    FreecoiLInterface.players_per_team = FreecoiLInterface.MAX_PLAYERS / SetConf.Session.num_of_teams
 
 func _on_TeamWidget_PMWidChanged(new_val):
     if new_val > SetConf.Session.num_of_teams:
