@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=42 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=2]
@@ -13,34 +13,404 @@
 [ext_resource path="res://assets/sounds/gun_shot_fast.wav" type="AudioStream" id=11]
 [ext_resource path="res://scenes/InGame/InGame.gd" type="Script" id=12]
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=1]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="DynamicFont" id=5]
+[sub_resource type="DynamicFont" id=2]
 size = 40
 font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 40
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=19]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_start_delay\"), self, \"update_time_remaining\")
+
+func update_time_remaining(new_val):
+    var time_minutes = int(new_val / 60)
+    var time_seconds_left = new_val - (time_minutes * 60)
+    text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
+"
+
+[sub_resource type="StyleBoxEmpty" id=4]
+
+[sub_resource type="DynamicFont" id=5]
+size = 50
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"player_deaths_by_id\"), self, \"update_player_deaths\")
+
+
+func update_player_deaths(new_vals):
+    text = \"%03d\" % new_vals[Settings.Session.get_data(\"mups_id\")]
+"
+
+[sub_resource type="GDScript" id=11]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"player_kills_by_id\"), self, \"update_player_kills\")
+
+
+func update_player_kills(new_vals):
+    text = \"%03d\" % new_vals[Settings.Session.get_data(\"mups_id\")]
+"
+
+[sub_resource type="GDScript" id=10]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
+"
+
+[sub_resource type="DynamicFont" id=6]
+size = 50
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=13]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"update_weapon_mag_ammo\")
+
+
+func update_weapon_mag_ammo(new_val):
+    text = str(new_val) + \"/\" + str(Settings.Session.get_data(\"game_weapon_magazine_size\"))
+"
+
+[sub_resource type="GDScript" id=15]
+script/source = "extends ProgressBar
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"update_weapon_mag_ammo\")
+
+
+func update_weapon_mag_ammo(new_val):
+    value = new_val
+    max_value = Settings.Session.get_data(\"game_weapon_magazine_size\")
+"
+
+[sub_resource type="GDScript" id=16]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_health\"), self, \"update_player_health\")
+
+
+func update_player_health(new_val):
+    text = str(new_val) + \"/\" + str(Settings.InGame.get_data(\"game_start_health\"))
+"
+
+[sub_resource type="GDScript" id=17]
+script/source = "extends ProgressBar
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Sesion.monitor_data(\"game_player_health\"), self, \"update_player_health\")
+
+
+func update_player_health(new_val):
+    value = new_val
+    max_value = Settings.InGame.get_data(\"game_start_health\")
+"
+
+[sub_resource type="DynamicFont" id=14]
+size = 40
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=18]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_time_remaining\"), self, \"update_time_remaining\")
+
+func update_time_remaining(new_val):
+    var time_minutes = int(new_val / 60)
+    var time_seconds_left = new_val - (time_minutes * 60)
+    text = \"Time Remaining: \" + str(time_minutes) + \":\" + str(time_seconds_left)
+"
+
+[sub_resource type="StyleBoxFlat" id=7]
+bg_color = Color( 0.666667, 0.145098, 0, 1 )
 
 [sub_resource type="DynamicFont" id=8]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="StyleBoxEmpty" id=1]
+[sub_resource type="GDScript" id=20]
+script/source = "extends Label
 
-[sub_resource type="DynamicFont" id=2]
-size = 50
-font_data = ExtResource( 4 )
 
-[sub_resource type="DynamicFont" id=3]
-size = 50
-font_data = ExtResource( 4 )
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
 
-[sub_resource type="StyleBoxFlat" id=6]
-bg_color = Color( 0.666667, 0.145098, 0, 1 )
 
-[sub_resource type="DynamicFont" id=7]
-size = 40
-font_data = ExtResource( 4 )
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_respawn_delay\"), self, \"update_time_remaining\")
+
+func update_time_remaining(new_val):
+    var time_minutes = int(new_val / 60)
+    var time_seconds_left = new_val - (time_minutes * 60)
+    text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
+"
+
+[sub_resource type="GDScript" id=9]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+"
+
+[sub_resource type="GDScript" id=21]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    update_value(Settings.InGame.get_data(\"player_laser_by_id\")[Settings.Session.get_data(\"mup_id\")])
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=23]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    update_value(Settings.InGame.get_data(\"player_name_by_id\")[Settings.Session.get_data(\"mup_id\")])
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=22]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_type\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=24]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_damage\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=25]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_shot_modes\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=26]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_shot_mode\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=27]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_size\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=28]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=29]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_health\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
 
 [node name="InGame" type="Control"]
 anchor_right = 1.0
@@ -51,12 +421,15 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="-1,0-Waiting For Other Players" type="ReferenceRect" parent="."]
+[node name="0,-1-Waiting For Other Players" type="ReferenceRect" parent="."]
 margin_top = -960.0
 margin_right = 540.0
 rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="CenterContainer" type="CenterContainer" parent="-1,0-Waiting For Other Players"]
+[node name="CenterContainer" type="CenterContainer" parent="0,-1-Waiting For Other Players"]
 margin_right = 540.0
 margin_bottom = 560.0
 rect_min_size = Vector2( 540, 560 )
@@ -64,16 +437,16 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="-1,0-Waiting For Other Players/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Waiting For Other Players/CenterContainer"]
 margin_top = 171.0
 margin_right = 540.0
 margin_bottom = 388.0
 rect_min_size = Vector2( 540, 0 )
 
-[node name="Label" type="Label" parent="-1,0-Waiting For Other Players/CenterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="0,-1-Waiting For Other Players/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 217.0
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 1 )
 text = "Waiting for the other players to finish loading the game.
 Please be patient..."
 align = 1
@@ -82,7 +455,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="-1,1-Start Game Delay" type="ReferenceRect" parent="."]
+[node name="1,-1-Start Game Delay" type="ReferenceRect" parent="."]
 margin_left = 540.0
 margin_top = -960.0
 margin_right = 1080.0
@@ -91,7 +464,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="CenterContainer" parent="-1,1-Start Game Delay"]
+[node name="CenterContainer" type="CenterContainer" parent="1,-1-Start Game Delay"]
 margin_right = 540.0
 margin_bottom = 560.0
 rect_min_size = Vector2( 540, 560 )
@@ -99,26 +472,27 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Start Game Delay/CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="1,-1-Start Game Delay/CenterContainer"]
 margin_top = 220.0
 margin_right = 540.0
 margin_bottom = 340.0
 rect_min_size = Vector2( 540, 0 )
 
-[node name="Label" type="Label" parent="-1,1-Start Game Delay/CenterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="1,-1-Start Game Delay/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 55.0
-custom_fonts/font = SubResource( 5 )
+custom_fonts/font = SubResource( 2 )
 text = "Game Starting"
 align = 1
 
-[node name="Label2" type="Label" parent="-1,1-Start Game Delay/CenterContainer/VBoxContainer"]
+[node name="Label2" type="Label" parent="1,-1-Start Game Delay/CenterContainer/VBoxContainer"]
 margin_top = 65.0
 margin_right = 540.0
 margin_bottom = 120.0
-custom_fonts/font = SubResource( 8 )
+custom_fonts/font = SubResource( 3 )
 text = "in: 00 seconds."
 align = 1
+script = SubResource( 19 )
 
 [node name="-1,0-Map" type="ReferenceRect" parent="."]
 margin_left = -540.0
@@ -160,44 +534,14 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
-margin_top = 11.0
+margin_top = 46.0
 margin_right = 540.0
-margin_bottom = 851.0
+margin_bottom = 816.0
 rect_min_size = Vector2( 540, 0 )
 
-[node name="HSplitContainer" type="HSplitContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_right = 540.0
-margin_bottom = 35.0
-split_offset = 8
-
-[node name="HBoxContainer" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer/HSplitContainer"]
-margin_right = 324.0
-margin_bottom = 35.0
-
-[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HSplitContainer/HBoxContainer"]
-margin_right = 316.0
-margin_bottom = 35.0
-rect_min_size = Vector2( 316, 0 )
-text = "Player Name"
-clip_text = true
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer/HSplitContainer"]
-margin_left = 332.0
-margin_right = 540.0
-margin_bottom = 35.0
-alignment = 2
-
-[node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HSplitContainer/HBoxContainer2"]
-margin_left = 18.0
-margin_right = 208.0
-margin_bottom = 35.0
-rect_min_size = Vector2( 190, 0 )
-text = "Player ID = 00"
-
 [node name="CenterContainer" type="CenterContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 45.0
 margin_right = 540.0
-margin_bottom = 517.0
+margin_bottom = 472.0
 rect_min_size = Vector2( 540, 472 )
 
 [node name="ReferenceRect" type="ReferenceRect" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
@@ -226,13 +570,14 @@ skew = 4.37114e-08
 texture = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-margin_left = 467.0
+margin_left = 430.0
 margin_top = 423.0
 margin_right = 541.0
 margin_bottom = 486.0
-custom_styles/normal = SubResource( 1 )
-custom_fonts/font = SubResource( 2 )
-text = "00"
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
+text = "000"
+script = SubResource( 12 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -242,9 +587,19 @@ margin_left = -2.0
 margin_top = 423.0
 margin_right = 72.0
 margin_bottom = 486.0
-custom_styles/normal = SubResource( 1 )
-custom_fonts/font = SubResource( 2 )
-text = "00"
+custom_styles/normal = SubResource( 4 )
+custom_fonts/font = SubResource( 5 )
+text = "000"
+script = SubResource( 11 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+margin_right = 12.0
+margin_bottom = 39.0
+text = "See Data"
+script = SubResource( 10 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -349,9 +704,9 @@ polygon_rotation = -90.0
 collision_shape = true
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 527.0
+margin_top = 482.0
 margin_right = 540.0
-margin_bottom = 594.0
+margin_bottom = 549.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
@@ -359,9 +714,10 @@ margin_left = 11.0
 margin_right = 255.0
 margin_bottom = 67.0
 rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 6 )
 text = "15/30"
 align = 1
+script = SubResource( 13 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 259.0
@@ -378,18 +734,13 @@ rect_min_size = Vector2( 240, 67 )
 max_value = 30.0
 step = 1.0
 value = 15.0
-
-[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 604.0
-margin_right = 540.0
-margin_bottom = 639.0
-text = "Shot Mode: Semi-Automatic"
-align = 1
+percent_visible = false
+script = SubResource( 15 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 649.0
+margin_top = 559.0
 margin_right = 540.0
-margin_bottom = 716.0
+margin_bottom = 626.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
@@ -397,9 +748,10 @@ margin_left = 3.0
 margin_right = 247.0
 margin_bottom = 67.0
 rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 6 )
 text = "15/30"
 align = 1
+script = SubResource( 16 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
 margin_left = 251.0
@@ -416,18 +768,22 @@ rect_min_size = Vector2( 240, 67 )
 max_value = 30.0
 step = 1.0
 value = 15.0
+percent_visible = false
+script = SubResource( 17 )
 
 [node name="ObjectiveTracker" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 726.0
+margin_top = 636.0
 margin_right = 540.0
-margin_bottom = 761.0
+margin_bottom = 691.0
+custom_fonts/font = SubResource( 14 )
 text = "Time Remaining: 00:00"
 align = 1
+script = SubResource( 18 )
 
 [node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 771.0
+margin_top = 701.0
 margin_right = 540.0
-margin_bottom = 840.0
+margin_bottom = 770.0
 text = "
 "
 
@@ -487,6 +843,9 @@ margin_left = -540.0
 margin_top = 960.0
 margin_bottom = 1920.0
 rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="CenterContainer" type="CenterContainer" parent="-1,1-Scoreboard"]
 margin_right = 40.0
@@ -527,8 +886,8 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_styles/normal = SubResource( 6 )
-custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 7 )
+custom_fonts/font = SubResource( 8 )
 text = "You have been Killed."
 align = 1
 
@@ -536,8 +895,8 @@ align = 1
 margin_top = 61.0
 margin_right = 540.0
 margin_bottom = 112.0
-custom_styles/normal = SubResource( 6 )
-custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 7 )
+custom_fonts/font = SubResource( 8 )
 text = "Killed by: Player Name"
 align = 1
 
@@ -551,8 +910,8 @@ custom_constants/separation = 100
 margin_top = 232.0
 margin_right = 540.0
 margin_bottom = 283.0
-custom_styles/normal = SubResource( 6 )
-custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 7 )
+custom_fonts/font = SubResource( 8 )
 text = "You will respawn"
 align = 1
 
@@ -560,10 +919,11 @@ align = 1
 margin_top = 293.0
 margin_right = 540.0
 margin_bottom = 344.0
-custom_styles/normal = SubResource( 6 )
-custom_fonts/font = SubResource( 7 )
+custom_styles/normal = SubResource( 7 )
+custom_fonts/font = SubResource( 8 )
 text = "in: 00"
 align = 1
+script = SubResource( 20 )
 
 [node name="2,0-InGame Settings" type="ReferenceRect" parent="."]
 margin_left = 1080.0
@@ -584,13 +944,211 @@ margin_top = 20.0
 margin_right = 20.0
 margin_bottom = 20.0
 
-[node name="EmptyShot" type="AudioStreamPlayer2D" parent="."]
+[node name="1,1-TestOutput" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = 960.0
+margin_right = 580.0
+margin_bottom = 1000.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="1,1-TestOutput"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 540, 960 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,1-TestOutput/CenterContainer"]
+margin_top = 258.0
+margin_right = 540.0
+margin_bottom = 702.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Button" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 39.0
+text = "Back To In Game"
+script = SubResource( 9 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 49.0
+margin_right = 540.0
+margin_bottom = 84.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 183.0
+margin_right = 317.0
+margin_bottom = 35.0
+text = "Player ID:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 321.0
+margin_right = 357.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 21 )
+
+[node name="HBoxContainer9" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 94.0
+margin_right = 540.0
+margin_bottom = 129.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
+margin_left = 160.0
+margin_right = 340.0
+margin_bottom = 35.0
+text = "Player Name:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
+margin_left = 344.0
+margin_right = 380.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 23 )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 139.0
+margin_right = 540.0
+margin_bottom = 174.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 158.0
+margin_right = 341.0
+margin_bottom = 35.0
+text = "Weapon Type:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 345.0
+margin_right = 381.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 22 )
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 184.0
+margin_right = 540.0
+margin_bottom = 219.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 136.0
+margin_right = 363.0
+margin_bottom = 35.0
+text = "Weapon Damage:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 367.0
+margin_right = 403.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 24 )
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 229.0
+margin_right = 540.0
+margin_bottom = 264.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 168.0
+margin_right = 332.0
+margin_bottom = 35.0
+text = "Shot Modes:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 336.0
+margin_right = 372.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 25 )
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 274.0
+margin_right = 540.0
+margin_bottom = 309.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
+margin_left = 121.0
+margin_right = 379.0
+margin_bottom = 35.0
+text = "Weapon Shot Mode:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
+margin_left = 383.0
+margin_right = 419.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 26 )
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 319.0
+margin_right = 540.0
+margin_bottom = 354.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
+margin_left = 96.0
+margin_right = 403.0
+margin_bottom = 35.0
+text = "Weapon Magazine Size:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
+margin_left = 407.0
+margin_right = 443.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 27 )
+
+[node name="HBoxContainer7" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 364.0
+margin_right = 540.0
+margin_bottom = 399.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
+margin_left = 148.0
+margin_right = 352.0
+margin_bottom = 35.0
+text = "Weapon Ammo:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
+margin_left = 356.0
+margin_right = 392.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 28 )
+
+[node name="HBoxContainer8" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 409.0
+margin_right = 540.0
+margin_bottom = 444.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
+margin_left = 154.0
+margin_right = 346.0
+margin_bottom = 35.0
+text = "Player Health:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
+margin_left = 350.0
+margin_right = 386.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 29 )
+
+[node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )
 
-[node name="GunShot" type="AudioStreamPlayer2D" parent="."]
+[node name="GunShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 11 )
 
-[node name="Reload" type="AudioStreamPlayer2D" parent="."]
+[node name="ReloadSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 9 )
 
 [node name="HitIndicatorTimer" type="Timer" parent="."]
@@ -600,3 +1158,10 @@ stream = ExtResource( 9 )
 [node name="RespawnDelayTimer" type="Timer" parent="."]
 
 [node name="StartGamedelayTimer" type="Timer" parent="."]
+
+[node name="ReloadTimer" type="Timer" parent="."]
+
+[node name="TickTocTimer" type="Timer" parent="."]
+[connection signal="pressed" from="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" to="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="timeout" from="TickTocTimer" to="." method="tick_toc" flags=3]

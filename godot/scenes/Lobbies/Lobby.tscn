@@ -8,19 +8,45 @@
 script/source = "extends ReferenceRect
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    if get_tree().is_network_server():
+        Settings.Session.connect(Settings.Session.monitor_data(\"all_ready\"), self, \"set_player_laser_ids\")
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
+func set_player_laser_ids(all_ready):
+    if all_ready:
+        if get_tree().is_network_server():
+            Settings.Session.set_data(\"all_ready\", false, false, false)
+            var player_laser_by_id = {}
+            var player_score_by_id = {}
+            var player_deaths_by_id = {}
+            var mups_ready = Settings.Network.get_data(\"mups_ready\").duplicate()  # Reuse
+            if Settings.InGame.get_data(\"game_teams\"):
+                var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
+                var game_number_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+                var players_per_team = int(Settings.MAX_PLAYERS / game_number_of_teams)
+                var game_teams_by_team_num_by_id = Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")
+                for mups_id in mups_ready:
+                    var player_team = player_team_by_id[mups_id]
+                    var player_team_index_pos = game_teams_by_team_num_by_id[player_team].find(mups_id)
+                    player_laser_by_id[mups_id] = ((player_team - 1) * players_per_team) + player_team_index_pos + 1
+                    player_score_by_id[mups_id] = 0
+                    player_deaths_by_id[mups_id] = 0
+            else:
+                for mups_id in mups_ready:
+                    player_laser_by_id[mups_id] = mups_id
+                    player_score_by_id[mups_id] = 0
+                    player_deaths_by_id[mups_id] = 0
+            Settings.InGame.set_data(\"player_laser_by_id\", player_laser_by_id)
+            Settings.InGame.set_data(\"game_history\", [])
+            Settings.InGame.set_data(\"game_actions_count\", 0)
+            Settings.InGame.set_data(\"game_team_scores\", [0, 0])
+            Settings.InGame.set_data(\"player_kills_by_id\", player_score_by_id)
+            Settings.InGame.set_data(\"player_deaths_by_id\", player_deaths_by_id)
+            get_tree().call_group(\"Network\", \"unready_all_mups\")
+            get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/InGame/InGame.tscn\")
 "
 
 [sub_resource type="GDScript" id=2]
@@ -230,18 +256,15 @@ func update_team_list(__):
                 add_child(hbox_container)
 
 func mups_not_ready(btn, mups_ready):
-    print(\"here 2\")
     btn.modulate = Color(\"ff0505\")
     btn.text = \"Not Ready\"
     mups_ready[Settings.Session.get_data(\"mup_id\")] = false
     return mups_ready
     
 func mups_pick_team(btn, mups_ready):
-    print(\"here\")
     btn.modulate = Color(\"ff0505\")
     btn.text = \"Pick a Team\"
     mups_ready[Settings.Session.get_data(\"mup_id\")] = false
-    print(\"here1\")
     return mups_ready
 
 func mups_ready(btn, mups_ready):
@@ -264,8 +287,7 @@ func on_player_ready(btn, entry):
         else:
             mups_status = mups_not_ready(btn, mups_status)
         if mups_status != Settings.Network.get_data(\"mups_ready\"):
-            Settings.Network.set_data(\"mups_ready\", mups_status)
-        print(btn.text)
+            get_tree().call_group(\"Network\", \"tell_server_i_am_ready\", mups_status[Settings.Session.get_data(\"mup_id\")])
 
 func on_player_entry_clicked(name):
     print(\"on_player_entry_clicked() \" + str(name))
@@ -546,7 +568,6 @@ margin_right = 540.0
 margin_bottom = 1920.0
 rect_min_size = Vector2( 540, 960 )
 theme = ExtResource( 2 )
-script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -665,7 +686,6 @@ margin_right = 540.0
 margin_bottom = -6.10352e-05
 rect_min_size = Vector2( 540, 960 )
 theme = ExtResource( 2 )
-script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -757,7 +777,6 @@ margin_right = 1080.0
 margin_bottom = -6.10352e-05
 rect_min_size = Vector2( 540, 960 )
 theme = ExtResource( 2 )
-script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }

@@ -31,6 +31,9 @@ var websockets_test_client_requested_closed = false
 var websockets_test_server_disconnected = false
 var websockets_test_client_disconnected = false
 var testing = false
+var netsync_start_time = null
+
+onready var NetSyncTimer = get_node("NetSyncTimer")
     
 func invert_mups_to_peers(mups_to_peers):
     if get_tree().get_network_peer() == null:
@@ -228,6 +231,22 @@ func setup_server_part2():
     set_process(true)
     Settings.Log("Network: Server: Server created and sending out UDP invites with a UID of " + str(host_udp_broadcast_uid) + ".")
 
+func tell_server_i_am_ready(ready_or_not):
+    if get_tree().is_network_server():
+        remote_tell_server_i_am_ready(ready_or_not)
+    else:
+        rpc_id(1, "remote_tell_server_i_am_ready", ready_or_not)
+
+remote func remote_tell_server_i_am_ready(ready_or_not):
+    if get_tree().is_network_server():
+        var sender_peer_id = get_tree().get_rpc_sender_id()
+        if sender_peer_id == 0:  # Was not called as a rpc, but was called on the server, by the server.
+            sender_peer_id = 1
+        var mup_id = Settings.Network.get_data("peers_to_mups")[sender_peer_id]
+        var mups_ready = Settings.Network.get_data("mups_ready").duplicate()
+        mups_ready[mup_id] = ready_or_not
+        Settings.Network.set_data("mups_ready", mups_ready)
+
 func check_if_all_mups_ready(mups_ready):
     if testing:
         test_all_mups_were_ready = true
@@ -241,22 +260,13 @@ func check_if_all_mups_ready(mups_ready):
             all_ready = false
         if all_ready:
             Settings.Session.set_data("all_ready", true)
-            call_deferred("synchronize_start_game_data")
-     
-func synchronize_start_game_data():
+            
+func unready_all_mups():
     if get_tree().is_network_server():
-        var mups_ready = Settings.Network.get_data("mups_ready")  # Reuse
-        for mups in mups_ready:
-            mups_ready[mups] = false
-        Settings.Network.set_data("mups_ready", mups_ready)  # network peer id is not equal to mup_id
-        Settings.InGame.set_data("game_type", ["LAN", "1v1", "Match"])
-        Settings.InGame.set_data("default_tile_color", "b2b2b2")
-        Settings.InGame.set_data("player_type_by_id", {"1":"network", "2":"network"})
-        Settings.InGame.set_data("color_by_id", {"1":"253a9a", "2":"960e0e"})
-        Settings.InGame.set_data("names_by_id", {"1":"Blue", "2":"Red"})
-        Settings.InGame.set_data("scores_by_id", {"1":2, "2":2})
-        Settings.InGame.set_data("current_players_turn", "1")
-        get_tree().call_group("Container", "do_remote_goto_scene", "res://scenes/InGame/InGame.tscn")
+        var mups_ready = Settings.Network.get_data("mups_ready").duplicate()  # Reuse
+        for mups_id in mups_ready:
+            mups_ready[mups_id] = false
+        Settings.Network.set_data("mups_ready", mups_ready)
 
 #### SCENETREE CLIENT NETWORKING FUNCTIONS
 func _connected_ok():
@@ -544,3 +554,12 @@ func websocket_client_send_data(data):
 func websocket_client_disconnect():
     websocket_client.disconnect_from_host()
 
+func start_net_sync():
+    netsync_start_time = OS.getticksmsec()
+    rpc("rx_ping")
+    
+remote func rx_ping():
+    pass
+    
+remote func rx_pong():
+    pass

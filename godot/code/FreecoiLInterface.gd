@@ -99,9 +99,9 @@ func reload_start():
     if FreecoiL != null:
         FreecoiL.startReload()
 
-func reload_finish():
+func reload_finish(new_rounds):
     if FreecoiL != null:
-        FreecoiL.finishReload(Settings.Session.get_data("magazine"))
+        FreecoiL.finishReload(new_rounds)
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
     # SHOT_MODE_FULL_AUTO = 1
