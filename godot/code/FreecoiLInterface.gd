@@ -38,14 +38,14 @@ var is_player_alive
 
 var status_scroll = null
 # State vars below.
-var state_laser_gun_is_connected
-var state_auto_reconnect_bt_dev
-var state_laser_gun_id
-var state_shot_mode
+var laser_is_connected
+var auto_reconnect_laser
+var laser_gun_id
+var shot_mode
 # Permission related vars below.
-var state_bt_on
-var state_bt_scanning
-var state_fine_access_location
+var bt_on
+var bt_scanning
+var fine_access_location
 # Various timer vars below.
 var bt_connect_timeout = Timer.new()
 var bt_connection_timed_out = Timer.new()
@@ -86,22 +86,23 @@ func stop_bt_scan():
     if FreecoiL != null:
         FreecoiL.stopBluetoothScan()
 
-#TODO: Godot now has a vibrate feature no need to do it through Java.
 func vibrate(duration_millis):
-    if FreecoiL != null:
-        FreecoiL.vibrate(duration_millis)
+    Input.vibrate_handheld(duration_millis)
 
 func set_laser_id(new_id):
     if FreecoiL != null:
-        FreecoiL.setlaserId(new_id)
+        if laser_is_connected:
+            FreecoiL.setLaserId(new_id)
 
 func reload_start():
     if FreecoiL != null:
-        FreecoiL.startReload()
+        if laser_is_connected:
+            FreecoiL.startReload()
 
 func reload_finish(new_rounds):
     if FreecoiL != null:
-        FreecoiL.finishReload(new_rounds)
+        if laser_is_connected:
+            FreecoiL.finishReload(new_rounds)
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
     # SHOT_MODE_FULL_AUTO = 1
@@ -123,13 +124,15 @@ func set_shot_mode(shot_mode, indoor_outdoor_mode):
     else:  # "indoor_no_cone"
         indoor_outdoor_mode = 2
     if FreecoiL != null:
-        FreecoiL.setShotMode(shot_mode, indoor_outdoor_mode)
+        if laser_is_connected:
+            FreecoiL.setShotMode(shot_mode, indoor_outdoor_mode)
 
 func enable_recoil(enabled):
     if FreecoiL != null:
         print("Sending Recoil = ", enabled)
         recoil_enabled = enabled
-        FreecoiL.enableRecoil(recoil_enabled)
+        if laser_is_connected:
+            FreecoiL.enableRecoil(recoil_enabled)
         get_tree().call_group("FreecoiL", "fi_recoil_enabled_changed")
         
 
@@ -168,27 +171,27 @@ func init_vars():
     player_deaths = 0
     reload_delay = 1.5
     is_player_alive = false
-    state_laser_gun_is_connected = false
-    state_auto_reconnect_bt_dev = false
-    state_laser_gun_id = 0
-    state_shot_mode = 2
+    laser_is_connected = false
+    auto_reconnect_laser = false
+    laser_gun_id = 0
+    shot_mode = 2
     recoil_enabled = true
-    state_bt_on = null
-    state_bt_scanning = false
-    state_fine_access_location = null
+    bt_on = null
+    bt_scanning = false
+    fine_access_location = null
     shots_remaining = 0
     command_id = 0
         
 func _bt_status():
     if FreecoiL != null:
-        state_bt_on = FreecoiL.bluetoothStatus()
+        bt_on = FreecoiL.bluetoothStatus()
     
 func _bt_on():
-    if state_bt_on == 1:
+    if bt_on == 1:
         print('Bluetooth is on.')
         _fine_access_location_status()
         call_deferred('_fine_access_location_enabled')
-    elif state_bt_on == 0:
+    elif bt_on == 0:
         print('Bluetooth is off.')
         if FreecoiL != null:
             FreecoiL.enableBluetooth()
@@ -197,10 +200,10 @@ func _bt_on():
     
 func _fine_access_location_status():
     print(OS.get_granted_permissions())
-    #state_fine_access_location = FreecoiL.fineAccessPermissionStatus()
+    #fine_access_location = FreecoiL.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
-    if state_fine_access_location == 1:
+    if fine_access_location == 1:
         print('Fine Access Enabled!')
     else:
         if FreecoiL != null:
@@ -215,25 +218,25 @@ func _on_bt_connect_timeout():
 func _on_bt_connection_timed_out():
     bt_connection_timed_out.stop()
     get_tree().call_group("FreecoiL", "fi_bt_connection_timed_out")
-    if state_laser_gun_is_connected:
+    if laser_is_connected:
         _on_laser_gun_disconnected()
-    if state_auto_reconnect_bt_dev:
+    if auto_reconnect_laser:
       pass  # TODO: generic connect to device, and delete from _on_laser_gun_disconnected()
 
 func _on_laser_gun_connected():
     _new_status("laser gun, connected.", 1)
-    state_laser_gun_is_connected = true
+    laser_is_connected = true
     get_tree().call_group("FreecoiL", "fi_laser_gun_connected")
     bt_connect_timeout.stop()
     bt_connection_timed_out.start()
 
 func _on_laser_gun_disconnected():
     _new_status("laser gun, disconnected.", 1)
-    state_laser_gun_is_connected = false
+    laser_is_connected = false
     get_tree().call_group("FreecoiL", "fi_laser_gun_disconnected")
     Settings.Session.set_data("battery_lvl", 0)
     bt_connection_timed_out.stop()
-    if state_auto_reconnect_bt_dev:
+    if auto_reconnect_laser:
         connect_to_laser_gun()
 # FreecoiL Callbacks
 func _on_mod_init():
@@ -264,6 +267,7 @@ func _changed_laser_telem_playerId(playerId):
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
     shots_remaining = shotsRemaining
     get_tree().call_group("FreecoiL", "fi_shots_remaining_changed")
+    Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
     get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2

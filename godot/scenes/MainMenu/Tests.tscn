@@ -14,8 +14,8 @@ script/source = "extends Button
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    if FreecoiLInterface.state_laser_gun_is_connected:
-        text = \"Connected to \" + str(FreecoiLInterface.state_laser_gun_id)
+    if FreecoiLInterface.laser_is_connected:
+        text = \"Connected to \" + str(FreecoiLInterface.laser_gun_id)
     else:
         text = \"Connect Gun\"
 
@@ -26,7 +26,7 @@ func _ready():
 
 
 func _on_Button_pressed():
-    if FreecoiLInterface.state_laser_gun_is_connected:
+    if FreecoiLInterface.laser_is_connected:
         pass
     else:
         FreecoiLInterface.connect_to_laser_gun()

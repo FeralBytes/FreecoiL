@@ -6,11 +6,12 @@ onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
 onready var GunShotSound = get_node("GunShotSound")
 onready var HitIndicatorTimer = get_node("HitIndicatorTimer")
-onready var TimeRemaining = get_node("TimeRemainingTimer")
+onready var TimeRemainingTimer = get_node("TimeRemainingTimer")
 onready var RespawnTimer = get_node("RespawnDelayTimer")
 onready var StartGameTimer = get_node("StartGamedelayTimer")
 onready var ReloadTimer = get_node("ReloadTimer")
 onready var TickTocTimer = get_node("TickTocTimer")
+onready var EndReason = get_node("0,1-End of Game/CenterContainer/VBoxContainer/EndReason")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -33,6 +34,7 @@ func set_player_respawn_vars():
     Settings.Session.set_data("game_weapon_magazine_size", Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
     Settings.Session.set_data("game_weapon_magazine_ammo", Settings.Session.get_data("game_weapon_magazine_size"))
     Settings.Session.set_data("game_player_health", Settings.InGame.get_data("game_start_health"))
+    Settings.Session.set_data("game_player_alive", false)
     Settings.Session.set_data("game_player_ammo", Settings.InGame.get_data("game_start_ammo"))
     Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
     Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
@@ -48,6 +50,9 @@ func set_player_respawn_vars():
     ReloadTimer.wait_time = Settings.Session.get_data("game_weapon_reload_speed")
     ReloadTimer.connect("timeout", self, "reload_finish")
     ReloadTimer.one_shot = true
+    TimeRemainingTimer.connect("timeout", self, "end_game", ["time"])
+    TimeRemainingTimer.wait_time = Settings.InGame.get_data("game_time_limit")
+    TimeRemainingTimer.one_shot = true
     
 func start_game_start_delay(__):
     if get_tree().is_network_server():
@@ -61,12 +66,17 @@ remotesync func remote_start_game_start_delay():
     
 func start_the_game():
     Settings.Session.set_data("game_started", true)
-    back_to_Playing()
+    TimeRemainingTimer.start()
+    get_tree().call_group("Container", "next_menu", "0,0")
+    respawn_finish()
     
 func back_to_Playing():
-    get_tree().call_group("Container", "next_menu", "0,0")
-    reload_start()
+    pass
     
+func end_game(reason):
+    get_tree().call_group("Container", "next_menu", "0,1")
+    if reason == "time":
+        EndReason.text = "Out of Time"
 
 ###############################################################################
 # TIMER Functions
@@ -86,6 +96,7 @@ func reload_start():
     FreecoiLInterface.reload_start()
     ReloadTimer.start()
     Settings.Session.set_data("game_weapon_magazine_ammo", 0)
+    ReloadSound.pitch_scale = 0.5 / Settings.Session.get_data("game_weapon_reload_speed")
     ReloadSound.play()
     
 func reload_finish():
@@ -99,20 +110,26 @@ func reload_finish():
 
 func respawn_start(shooter_id):
     FreecoiLInterface.is_player_alive = false
+    Settings.Session.get_data("game_player_alive", false)
     FreecoiLInterface.reload_start()
     
 func respawn_finish():
     FreecoiLInterface.current_health = FreecoiLInterface.full_health
     FreecoiLInterface.is_player_alive = true
-    ReloadSound.play()
-    reload_finish()
+    Settings.Session.get_data("game_player_alive", true)
+    reload_start()
+
+func delayed_vibrate():
+    FreecoiLInterface.vibrate(200)
 
 ###############################################################################
 # FreecoiL group callback Functions
 ###############################################################################  
 func fi_trigger_btn_pushed():
     if FreecoiLInterface.shots_remaining == 0:
-            EmptyShotSound.play()
+        EmptyShotSound.play()
+    else:
+        GunShotSound.play()
             
     
 func fi_reload_btn_pushed():
@@ -133,7 +150,7 @@ func fi_shots_remaining_changed():
         elif FreecoiLInterface.shots_remaining == 0:
             pass
         else:
-            GunShotSound.play()
+            pass
     
 func fi_power_btn_pushed():
     if FreecoiLInterface.recoil_enabled:

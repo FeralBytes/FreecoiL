@@ -23,7 +23,7 @@ func _ready():
     blink_timer.connect("timeout", self, "_on_adjust_blink")
     blink_timer.wait_time = 0.02
     add_child(blink_timer)
-    if FreecoiLInterface.state_laser_gun_is_connected:
+    if FreecoiLInterface.laser_is_connected:
         self.disabled = true
         self.texture_normal = pistol_clear
         self.state = "connected"

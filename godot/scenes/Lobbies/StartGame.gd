@@ -15,7 +15,7 @@ func _ready():
 
 func _on_StartGame_pressed():
     SetConf.Session.quick_start_complete = true
-    if not FreecoiLInterface.state_laser_gun_is_connected:
+    if not FreecoiLInterface.laser_is_connected:
         get_tree().call_group("connect_weapon", "connect_weapon_guard", "res://scenes/InGame/InGameNoNetwork.tscn")
     else:
         SceneManager.goto_scene("res://scenes/InGame/InGameNoNetwork.tscn")

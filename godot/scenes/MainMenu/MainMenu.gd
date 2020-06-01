@@ -31,7 +31,7 @@ func _on_Testing_pressed():
 
 
 func _on_QuickStart_pressed():
-    if not FreecoiLInterface.state_laser_gun_is_connected:
+    if not FreecoiLInterface.laser_is_connected:
         get_tree().call_group("connect_weapon", "connect_weapon_guard", "res://scenes/InGame/InGameNoNetwork.tscn")
     else:
         get_tree().call_group("Container", "goto_scene", "res://scenes/InGame/InGameNoNetwork.tscn")
