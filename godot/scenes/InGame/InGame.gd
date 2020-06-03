@@ -53,6 +53,9 @@ func set_player_respawn_vars():
     TimeRemainingTimer.connect("timeout", self, "end_game", ["time"])
     TimeRemainingTimer.wait_time = Settings.InGame.get_data("game_time_limit")
     TimeRemainingTimer.one_shot = true
+    HitIndicatorTimer.wait_time = Settings.Preferences.get_data("player_hit_indicator_duration")
+    HitIndicatorTimer.one_shot = true
+    HitIndicatorTimer.connect("timeout", self, "hit_indicator_stop")
     
 func start_game_start_delay(__):
     if get_tree().is_network_server():
@@ -121,6 +124,12 @@ func respawn_finish():
 
 func delayed_vibrate():
     FreecoiLInterface.vibrate(200)
+    
+func hit_indicator_start():
+    pass
+    
+func hit_indicator_stop():
+    pass
 
 ###############################################################################
 # FreecoiL group callback Functions

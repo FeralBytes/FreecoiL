@@ -87,7 +87,7 @@ script/source = "extends LineEdit
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    pass # Replace with function body.
+    Settings.Preferences.set_data(\"player_hit_indicator_duration\", 3)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -371,7 +371,7 @@ func _ready():
 
 
 func _on_Button_pressed():
-    Settings.InGame.set_data(\"game_limit_mode\", \"kill\")
+    Settings.InGame.set_data(\"game_limit_mode\", \"deaths\")
     get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
 "
 
@@ -429,6 +429,7 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"game_start_weapon_type\", \"M9\")
     Settings.InGame.set_data(\"game_start_health\", 30)
     Settings.InGame.set_data(\"game_start_ammo\", {\"M9\": 300})
+    Settings.InGame.set_data(\"game_friendly_fire\", false)
     get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
@@ -1054,15 +1055,15 @@ custom_constants/separation = 32
 alignment = 1
 
 [node name="Button" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 117.0
-margin_right = 243.0
+margin_left = 100.0
+margin_right = 260.0
 margin_bottom = 39.0
-text = "Kill Limit"
+text = "Death Limit"
 script = SubResource( 15 )
 
 [node name="Button2" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 275.0
-margin_right = 422.0
+margin_left = 292.0
+margin_right = 439.0
 margin_bottom = 39.0
 text = "Time Limit"
 script = SubResource( 16 )

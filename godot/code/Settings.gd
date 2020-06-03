@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.0-dev18"
+const VERSION = "0.3.0-dev19"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -28,13 +28,6 @@ var InGame = Data.new("InGame", USER_DIR + "InGame.json", false, true, true)
 var Session = Data.new("Session")
 # warning-ignore:unused_class_variable
 var Network = Data.new("Network", null, false, false, true)
-# Called when the node enters the scene tree for the first time.
-#func _ready():
-#    pass
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
 
 func Log(to_print, level="debug"):
     if DEBUG_LEVELS.find(level) >= DEBUG_LEVEL:
@@ -64,7 +57,7 @@ class Data:
             register_data("SETTINGS_VERSION", SETTINGS_VERSION, false)
         
     func set_data(data_name, new_val, called_by_sync=false, emit_a_signal=true):
-        Settings.Log("Settings: set_data(): " + self.name + ": " + str(data_name) + " = " + str(new_val))
+        Settings.Log("Settings: set_data(): " + self.name + ": " + str(data_name) + " = " + str(new_val), "debug")
         if not __settings.has(data_name):
             register_data(data_name, new_val)
         else:
@@ -95,9 +88,9 @@ class Data:
             if add_signal:
                 Settings.__signals_used += 1
                 if Settings.__signals_used > Settings.__MAX_SIGNALS:
-                    printerr("Error Out of Signals: Settings Autoload: Max Data Signals exhausted! " +
+                    Settings.Log("Error Out of Signals: Settings Autoload: Max Data Signals exhausted! " +
                             "Please add more or reduce the amount of settings. " + 
-                            "Max signals = " + str(Settings.__MAX_SIGNALS + 1))
+                            "Max signals = " + str(Settings.__MAX_SIGNALS + 1), "critical")
                     Helpers.get_tree().quit()
                 __settings[data_name] = [new_val, "S" + str(Settings.__signals_used)]
             else:
@@ -143,8 +136,8 @@ class Data:
         var config = ConfigFile.new()
         var error = config.load(settings_path)
         if error != OK:
-            printerr("Error loading the settings file " + str(settings_path) + 
-                ". Error code: " + str(error) + " " + Helpers.error_lookup(error))
+            Settings.Log("Error loading the settings file " + str(settings_path) + 
+                ". Error code: " + str(error) + " " + Helpers.error_lookup(error), "debug")
             return error
         else:
             var file = File.new()
@@ -153,8 +146,8 @@ class Data:
             __settings = parse_json(text)
             file.close()
             if __settings["SETTINGS_VERSION"][0] != SETTINGS_VERSION:
-                printerr("SETTINGS_VERSION mismatch. Current Program SETTINGS_VERSION = " + str(SETTINGS_VERSION) +
-                        "  | Saved SETTINGS_VERSION = " + str(__settings["SETTINGS_VERSION"]))
+                Settings.Log("SETTINGS_VERSION mismatch. Current Program SETTINGS_VERSION = " + str(SETTINGS_VERSION) +
+                        "  | Saved SETTINGS_VERSION = " + str(__settings["SETTINGS_VERSION"]), "debug")
                 # Run Upgrades as needed. Downgrades autofail, unless we find a need for that usecase.
             return OK
     

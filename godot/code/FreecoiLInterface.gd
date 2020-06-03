@@ -20,23 +20,6 @@ extends Node
 # The FreecoiL Singleton
 var FreecoiL = null
 
-# constants for max and mins
-const MAX_PLAYERS = 63  # 0-63, but 0 is not useable as it is the laser's default for no shot.
-# It could be used if we detected the shooter_id at the same time as the shot_counter. 
-const MAX_TEAMS = 31  # Literally teams but also players per team. i.e.: 2 players per team would be 31 teams.
-const MIN_TEAMS = 2  # FFA is not a team battle.
-# vars for storing game details
-var players_per_team
-var full_health
-var current_health
-var player_kills
-var player_deaths
-var reload_delay
-var is_player_alive
-# var current_ammo = shots_remaining
-
-
-var status_scroll = null
 # State vars below.
 var laser_is_connected
 var auto_reconnect_laser
@@ -153,9 +136,6 @@ func _ready():
     call_deferred('_on_delay_loading')
    
 func _on_delay_loading():
-    if get_node("/root").has_node("TestContainer"):
-        if get_node("/root/TestContainer").has_node("StatusScroll"):
-            status_scroll = get_node("/root/TestContainer/StatusScroll")
     if Engine.has_singleton("FreecoiL"):
         FreecoiL = Engine.get_singleton("FreecoiL")
         FreecoiL.hello()
@@ -164,13 +144,6 @@ func _on_delay_loading():
 func init_vars():
     # We initialize the vars here to allow loading from saved defaults but also to 
     # improve Godot error checking by removing the warnings about unused vars.
-    players_per_team = 31
-    full_health = 30
-    current_health = 20
-    player_kills = 0
-    player_deaths = 0
-    reload_delay = 1.5
-    is_player_alive = false
     laser_is_connected = false
     auto_reconnect_laser = false
     laser_gun_id = 0
@@ -270,7 +243,8 @@ func _changed_laser_telem_shotsRemaining(shotsRemaining):
     Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
-    get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2
+    #get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2
+    get_tree().call_group("FreecoiL", "fi_trigger_btn_pushed")
     trigger_btn_counter = triggerBtnCounter 
 
 func _changed_laser_telem_reloadBtnCounter(reloadBtnCounter):
@@ -349,16 +323,5 @@ func _new_status(status, level):
     #     3 = error
     #     4 = critical
     #     5 = exception
-    print('FreecoiL Java: DEBUG: ', status) # debug level always print
-    if status_scroll != null:
-        if level == 1:
-            status_scroll.text = 'FreecoiL Java: INFO: ' + status + '\n' + status_scroll.text
-        elif level == 2:
-            status_scroll.text = 'FreecoiL Java: WARNING: ' + status + '\n' + status_scroll.text
-        elif level == 3:
-            status_scroll.text = 'FreecoiL Java: ERROR: ' + status + '\n' + status_scroll.text
-        elif level == 4:
-            status_scroll.text = 'FreecoiL Java: CRITICAL: ' + status + '\n' + status_scroll.text
-        elif level == 5:
-            status_scroll.text = 'FreecoiL Java: EXCEPTION: ' + status + '\n' + status_scroll.text
+    Settings.Log('FreecoiL Java: DEBUG: ' + status) # debug level always print
     
