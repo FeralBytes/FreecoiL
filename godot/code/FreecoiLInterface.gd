@@ -43,7 +43,6 @@ var battery_lvl_avg = null
 var prev_battery_lvl_avg = null
 var battery_lvl_array = []
 
-var shots_remaining
 var command_id
 var recoil_enabled
 
@@ -152,7 +151,6 @@ func init_vars():
     bt_on = null
     bt_scanning = false
     fine_access_location = null
-    shots_remaining = 0
     command_id = 0
         
 func _bt_status():
@@ -238,13 +236,12 @@ func _changed_laser_telem_playerId(playerId):
     playerId = null
 
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
-    shots_remaining = shotsRemaining
-    get_tree().call_group("FreecoiL", "fi_shots_remaining_changed")
     Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
-    #get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2
-    get_tree().call_group("FreecoiL", "fi_trigger_btn_pushed")
+    get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2
+    Settings.Session.set_data("game_weapon_btn_trigger", triggerBtnCounter)
+    #get_tree().call_group("FreecoiL", "fi_trigger_btn_pushed")
     trigger_btn_counter = triggerBtnCounter 
 
 func _changed_laser_telem_reloadBtnCounter(reloadBtnCounter):

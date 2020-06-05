@@ -21,35 +21,15 @@ onready var SceneFader = $Camera/TopLayer/SceneFader
 func _ready():
     add_to_group("Container")
     var test_file = File.new()
-    if OS.get_environment("FeralBytes_UNIT_TEST") == "true":
-        call_deferred("run_unit_tests")
-        Settings.Testing.register_data("testing_active", true)
-    elif test_file.file_exists("res://FeralBytes_UNIT_TEST"):
-        call_deferred("run_unit_tests")
-        Settings.Testing.register_data("testing_active", true)
-    elif OS.get_environment("FeralBytes_INTEGRATION_TEST") == "true":
-        call_deferred("run_integration_tests")
-        Settings.Testing.register_data("testing_active", true)
-    elif test_file.file_exists("res://FeralBytes_INTEGRATION_TEST"):
-        call_deferred("run_integration_tests")
-        Settings.Testing.register_data("testing_active", true)
-    elif OS.get_environment("FeralBytes_MULTIPLAYER_TEST") == "true":
-        call_deferred("run_multiplayer_tests")
-        Settings.Testing.register_data("testing_active", true)
-    elif OS.get_environment("FeralBytes_2PLAYER_TEST") == "true":
-        call_deferred("run_2player_tests")
-        Settings.Testing.register_data("testing_active", true)
-    else:
-        Settings.Testing.register_data("testing_active", false)
-        Settings.InGame.register_data("except_pause_disable_input", false)
-        current_scene = SplashScene
-        $Scene0.add_child(current_scene)
-        self.add_child(splash_timer)
-        splash_timer.one_shot = true
-        splash_timer.wait_time = 1  # TODO: 4
-        splash_timer.connect("timeout",self,"_on_splash_timer_timeout") 
-        splash_timer.start()
-        SplashScene = null
+    Settings.InGame.register_data("except_pause_disable_input", false)
+    current_scene = SplashScene
+    $Scene0.add_child(current_scene)
+    self.add_child(splash_timer)
+    splash_timer.one_shot = true
+    splash_timer.wait_time = 1  # TODO: 4
+    splash_timer.connect("timeout",self,"_on_splash_timer_timeout") 
+    splash_timer.start()
+    SplashScene = null
         
         
 
@@ -194,24 +174,3 @@ func load_lobby():
     
 func _on_splash_timer_timeout():
     goto_scene("res://scenes/MainMenu/MainMenu.tscn")
-    
-func run_unit_tests():
-    var test_runner = load("res://tests/RunUnitTests.gd")
-    test_runner = test_runner.new()
-    add_child(test_runner)
-
-func run_integration_tests():
-    integration_testing = true 
-    var test_runner = load("res://tests/RunIntegrationTests.gd")
-    test_runner = test_runner.new()
-    add_child(test_runner)
-
-func run_multiplayer_tests():
-    var test_runner = load("res://tests/RunMultiplayerTests.gd")
-    test_runner = test_runner.new()
-    add_child(test_runner)
-
-func run_2player_tests():
-    var test_runner = load("res://tests/Run2PlayerTests.gd")
-    test_runner = test_runner.new()
-    add_child(test_runner)

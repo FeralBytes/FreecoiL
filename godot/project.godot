@@ -44,7 +44,7 @@ window/stretch/aspect="keep"
 
 [editor_plugins]
 
-enabled=PoolStringArray( "regular_polygon2d_node" )
+enabled=PoolStringArray( "gut", "regular_polygon2d_node" )
 
 [input]
 

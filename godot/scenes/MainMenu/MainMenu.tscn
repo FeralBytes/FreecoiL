@@ -419,11 +419,12 @@ func _ready():
 
 
 func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"3,1\")
     var respawn_delay = get_parent().get_node(\"PlusMinusWidget\").current_val
     Settings.InGame.set_data(\"game_respawn_delay\", respawn_delay)
     # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
     Settings.InGame.set_data(\"game_start_delay\", 5)
-    Settings.InGame.set_data(\"game_time_limit\", 60)
+    Settings.InGame.set_data(\"game_time_limit\", 600)
     Settings.InGame.set_data(\"game_weapon_types\",{\"M9\": {\"magazine_size\": 15, \"damage\": 1, 
         \"shot_modes\": [\"semi-automatic\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
     Settings.InGame.set_data(\"game_start_weapon_type\", \"M9\")

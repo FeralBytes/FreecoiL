@@ -1,6 +1,6 @@
 extends Node
 
-const VERSION = "0.3.0-dev19"
+const VERSION = "0.3.0-dev20"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -43,6 +43,7 @@ class Data:
     var settings_path
     var network_sync
     var name
+    var load_on_ready = false
     
     func _init(set_name, path=null, load_on_init=false, set_auto_save=false, set_network_sync=false):
         name = set_name
@@ -50,6 +51,10 @@ class Data:
         auto_save = set_auto_save
         network_sync = set_network_sync
         if load_on_init:
+            load_on_ready = load_on_init
+            
+    func loading_on_ready():
+        if load_on_ready:
             var result = load_settings()
             if result != OK:
                 register_data("SETTINGS_VERSION", SETTINGS_VERSION, false)
@@ -417,3 +422,10 @@ class Data:
     # warning-ignore:unused_signal
     signal S127
         ######## END SIGNALS ########
+
+func _ready():
+    Testing.loading_on_ready()
+    Preferences.loading_on_ready()
+    InGame.loading_on_ready()
+    Session.loading_on_ready()
+    Network.loading_on_ready()

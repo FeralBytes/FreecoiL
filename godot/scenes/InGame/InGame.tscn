@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=2]
+[gd_scene load_steps=46 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=2]
@@ -230,7 +230,7 @@ func _ready():
 
 
 func _on_Button_pressed():
-    get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
+    get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
 "
 
 [sub_resource type="StyleBoxFlat" id=18]
@@ -418,7 +418,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=33]
 script/source = "extends Label
 
 
@@ -433,6 +433,64 @@ func _ready():
 
 func update_value(new_val):
     text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=32]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_team\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=30]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_teammates\"), self, \"update_value\")
+
+func update_value(new_val):
+    text = str(new_val)
+"
+
+[sub_resource type="GDScript" id=31]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button2_pressed():
+    Settings.Session.set_data(\"game_weapon_magazine_ammo\", 10)
+    get_tree().call_group(\"FreecoiL\", \"fi_trigger_btn_pushed\")
 "
 
 [node name="InGame" type="Control"]
@@ -982,11 +1040,14 @@ __meta__ = {
 margin_right = 40.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,1-TestOutput/CenterContainer"]
-margin_top = 258.0
+margin_top = 188.0
 margin_right = 540.0
-margin_bottom = 702.0
+margin_bottom = 771.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Button" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
@@ -1164,12 +1225,57 @@ margin_left = 350.0
 margin_right = 386.0
 margin_bottom = 35.0
 text = "01"
+script = SubResource( 33 )
+
+[node name="HBoxContainer10" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 454.0
+margin_right = 540.0
+margin_bottom = 489.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
+margin_left = 161.0
+margin_right = 338.0
+margin_bottom = 35.0
+text = "Player Team:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
+margin_left = 342.0
+margin_right = 378.0
+margin_bottom = 35.0
+text = "01"
+script = SubResource( 32 )
+
+[node name="HBoxContainer11" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 499.0
+margin_right = 540.0
+margin_bottom = 534.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
+margin_left = 120.0
+margin_right = 379.0
+margin_bottom = 35.0
+text = "Player Teammates:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
+margin_left = 383.0
+margin_right = 419.0
+margin_bottom = 35.0
+text = "01"
 script = SubResource( 30 )
+
+[node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 544.0
+margin_right = 540.0
+margin_bottom = 583.0
+text = "Test"
+script = SubResource( 31 )
 
 [node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )
 
-[node name="GunShotSound" type="AudioStreamPlayer2D" parent="."]
+[node name="GunShotSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 11 )
 pitch_scale = 1.7
 
@@ -1191,4 +1297,5 @@ pitch_scale = 0.17
 [connection signal="pressed" from="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" to="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,1-End of Game/CenterContainer/VBoxContainer/Button" to="0,1-End of Game/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="timeout" from="TickTocTimer" to="." method="tick_toc" flags=3]

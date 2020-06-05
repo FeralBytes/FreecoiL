@@ -164,7 +164,6 @@ func check_if_team_assigned(__):
 
 
 func _on_Button_pressed():
-    print(\"Team text = \" + Team.text)
     var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
     Settings.Session.set_data(\"player_team\", new_team)
     get_tree().call_group(\"Network\", \"set_player_team\")
@@ -197,7 +196,7 @@ onready var TeamNumLbl = get_parent().get_parent().get_node(\"Team\")
 func _ready():
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams_by_team_num_by_id\"), self, \"update_team_list\")
     Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
-    Settings.Session.set_data(\"ui_team_being_viewed\", 0)  #TODO: Team 0 as unassigned players.
+    Settings.Session.set_data(\"ui_team_being_viewed\", 0) 
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_team_list\")
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"update_team_list\")
