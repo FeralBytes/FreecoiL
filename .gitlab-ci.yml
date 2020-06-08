@@ -3,7 +3,7 @@ image: openjdk:8-jdk
 variables:
   GODOT_ZIP: "godot_3.2.2-beta4_linux_headless.zip"
   GODOT_EXC: "godot_editor/Godot_v3.2.2-beta4_linux_headless.64"
-  GODOT_DOWNLOAD_URL: "https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v3.2.2-beta4_x11.64.zip"
+  GODOT_DOWNLOAD_URL: "https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v3.2.2-beta4_linux_headless.64.zip"
 
 before_script:
   - pwd
