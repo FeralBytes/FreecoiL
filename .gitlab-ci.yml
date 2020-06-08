@@ -35,7 +35,9 @@ unit_tests:
     DEBIAN_FRONTEND: noninteractive
   script:
     - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - ls -a
     - unzip -q -d godot_editor $GODOT_ZIP
+    - ls -a godot_editor
     - chmod +x $GODOT_EXC
     - python3 $DOCKER_HOME/godot/tests/run_unit_tests.py
 
