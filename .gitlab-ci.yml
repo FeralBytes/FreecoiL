@@ -4,6 +4,7 @@ variables:
   GODOT_ZIP: "godot_3.2.2-beta4_linux_headless.zip"
   GODOT_EXC: "godot_editor/Godot_v3.2.2-beta4_linux_headless.64"
   GODOT_DOWNLOAD_URL: "https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v3.2.2-beta4_linux_headless.64.zip"
+  GODOT_EXPORT_TEMPLATES: "https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v3.2.2-beta4_export_templates.tpz"
   ANDROID_COMPILE_SDK: "29"
   ANDROID_BUILD_TOOLS: "29.0.3"
   ANDROID_SDK_TOOLS:   "6514223"
@@ -71,7 +72,7 @@ build_apk:
   stage: build_for_android
   script:
     - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
-    - wget --quiet --output-document=GodotExportTemplates.tpz
+    - wget --quiet --output-document=GodotExportTemplates.tpz $GODOT_EXPORT_TEMPLATES
     - unzip -q -d godot_editor $GODOT_ZIP
     - unzip -q -d ~/.local/share/godot GodotExportTemplates.tpz
     - ls -a ~/.local/share/godot
