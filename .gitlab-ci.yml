@@ -1,12 +1,12 @@
 image: openjdk:8-jdk
 
 variables:
-  GODOT_VERSION: "3.2.2-beta3"
+  GODOT_VERSION: "3.2.2-beta4"
 
 before_script:
   - pwd
   - export DOCKER_HOME=$PWD
-  - export GODOT_VERSION=3.2.2-beta3
+  - export GODOT_VERSION=3.2.2-beta4
   # Locale must be set or else it will cause additional errors for Godot 
   - apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
   - sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
@@ -25,15 +25,16 @@ stages:
   - integration_test
   - multiplayer_unit_test
   - multiplayer_integration_test
+  - build_for_android
 
 unit_tests:
-  stage: automated_tests
+  stage: unit_test
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
     # Download Server version of Godot
-    - wget --quiet --output-document=godot_$GODOT_VERSION_server.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta3/Godot_v$GODOT_VERSION_linux_server.64.zip
-    - unzip -q -d godot_editor godot_3.1_server.zip
+    - wget --quiet --output-document=godot_$GODOT_VERSION_server.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_server.64.zip
+    - unzip -q -d godot_editor godot_$GODOT_VERSION_server.zip
     - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_server.64
     - python3 $DOCKER_HOME/godot/tests/run_unit_tests.py
 
@@ -41,7 +42,7 @@ integration_tests:
   stage: integration_test
   script:
     # Download Headless version of Godot
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta3/Godot_v$GODOT_VERSION_linux_headless.64.zip
+    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
     - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
     - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
     - python3 $DOCKER_HOME/godot/tests/run_integration_tests.py
@@ -50,7 +51,7 @@ multiplayer_unit_tests:
   stage: multiplayer_integration_test
   script:
     # Download Headless version of Godot. Don't use the server version in these tests.
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta3/Godot_v$GODOT_VERSION_linux_headless.64.zip
+    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
     - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
     - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
     - python3 $DOCKER_HOME/godot/tests/run_multiplayer_unit_tests.py
@@ -59,7 +60,20 @@ multiplayer_integration_tests:
   stage: multiplayer_integration_test
   script:
     # Download Headless version of Godot. Don't use the server version in these tests.
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta3/Godot_v$GODOT_VERSION_linux_headless.64.zip
+    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
     - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
     - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
     - python3 $DOCKER_HOME/godot/tests/run_multiplayer_integration_tests.py
+
+build_apk:
+  stage: build_for_android
+  script:
+    # Download Headless version of Godot.
+    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
+    - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
+    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
+    - godot_editor/Godot_v$GODOT_VERSION_linux_headless.64 --path godot --export-debug Android FreecoiL.apk
+  artifacts:
+    paths:
+    - Freecoil.apk
+    expire_in: 1 week
