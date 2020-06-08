@@ -1,7 +1,9 @@
 image: openjdk:8-jdk
 
 variables:
-  GODOT_VERSION: "3.2.2-beta4"
+  GODOT_ZIP: "godot_3.2.2-beta4_linux_headless.zip"
+  GODOT_EXC: "godot_editor/Godot_v3.2.2-beta4_linux_headless.64"
+  GODOT_DOWNLOAD_URL: "https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v3.2.2-beta4_x11.64.zip"
 
 before_script:
   - pwd
@@ -32,47 +34,45 @@ unit_tests:
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
-    # Download Server version of Godot
-    - wget --quiet --output-document=godot_$GODOT_VERSION_server.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_server.64.zip
-    - unzip -q -d godot_editor godot_$GODOT_VERSION_server.zip
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_server.64
+    - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - unzip -q -d godot_editor $GODOT_ZIP
+    - chmod +x $GODOT_EXC
     - python3 $DOCKER_HOME/godot/tests/run_unit_tests.py
 
 integration_tests:
   stage: integration_test
   script:
-    # Download Headless version of Godot
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
-    - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
+    - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - unzip -q -d godot_editor $GODOT_ZIP
+    - chmod +x $GODOT_EXC
     - python3 $DOCKER_HOME/godot/tests/run_integration_tests.py
 
 multiplayer_unit_tests:
   stage: multiplayer_integration_test
   script:
-    # Download Headless version of Godot. Don't use the server version in these tests.
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
-    - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
+    - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - unzip -q -d godot_editor $GODOT_ZIP
+    - chmod +x $GODOT_EXC
     - python3 $DOCKER_HOME/godot/tests/run_multiplayer_unit_tests.py
 
 multiplayer_integration_tests:
   stage: multiplayer_integration_test
   script:
-    # Download Headless version of Godot. Don't use the server version in these tests.
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
-    - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
+    - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - unzip -q -d godot_editor $GODOT_ZIP
+    - chmod +x $GODOT_EXC
     - python3 $DOCKER_HOME/godot/tests/run_multiplayer_integration_tests.py
 
 build_apk:
   stage: build_for_android
   script:
-    # Download Headless version of Godot.
-    - wget --quiet --output-document=godot_$GODOT_VERSION_linux_headless.zip https://downloads.tuxfamily.org/godotengine/3.2.2/beta4/Godot_v$GODOT_VERSION_linux_headless.64.zip
-    - unzip -q -d godot_editor godot_$GODOT_VERSION_linux_headless.zip
-    - chmod +x $DOCKER_HOME/godot_editor/Godot_v$GODOT_VERSION_linux_headless.64
-    - godot_editor/Godot_v$GODOT_VERSION_linux_headless.64 --path godot --export-debug Android FreecoiL.apk
+    - wget --quiet --output-document=$GODOT_ZIP $GODOT_DOWNLOAD_URL
+    - wget --quiet --output-docuemnt=GodotExportTemplates.tpz
+    - unzip -q -d godot_editor $GODOT_ZIP
+    - unzip -q -d ~/.local/share/godot GodotExportTemplates.tpz
+    - ls -a ~/.local/share/godot
+    - chmod +x $GODOT_EXC
+    - $GODOT_EXC --path godot --export-debug Android FreecoiL.apk
   artifacts:
     paths:
     - Freecoil.apk
