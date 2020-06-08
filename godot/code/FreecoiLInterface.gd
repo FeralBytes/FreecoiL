@@ -21,7 +21,6 @@ extends Node
 var FreecoiL = null
 
 # State vars below.
-var laser_is_connected
 var auto_reconnect_laser
 var laser_gun_id
 var shot_mode
@@ -57,8 +56,12 @@ var shot_counter_2 = null
 #####################
 
 func connect_to_laser_gun():
+    Settings.Session.set_data("fi_laser_is_connected", 1)
     start_bt_scan()
     bt_connect_timeout.start()
+    prev_battery_lvl_avg = null
+    battery_lvl_array = []
+    battery_lvl_avg = null
   
 func start_bt_scan():
     if FreecoiL != null:
@@ -73,17 +76,17 @@ func vibrate(duration_millis):
 
 func set_laser_id(new_id):
     if FreecoiL != null:
-        if laser_is_connected:
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
             FreecoiL.setLaserId(new_id)
 
 func reload_start():
     if FreecoiL != null:
-        if laser_is_connected:
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
             FreecoiL.startReload()
 
 func reload_finish(new_rounds):
     if FreecoiL != null:
-        if laser_is_connected:
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
             FreecoiL.finishReload(new_rounds)
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
@@ -106,16 +109,25 @@ func set_shot_mode(shot_mode, indoor_outdoor_mode):
     else:  # "indoor_no_cone"
         indoor_outdoor_mode = 2
     if FreecoiL != null:
-        if laser_is_connected:
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
             FreecoiL.setShotMode(shot_mode, indoor_outdoor_mode)
 
 func enable_recoil(enabled):
     if FreecoiL != null:
-        print("Sending Recoil = ", enabled)
         recoil_enabled = enabled
-        if laser_is_connected:
-            FreecoiL.enableRecoil(recoil_enabled)
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
+            FreecoiL.enableRecoil(recoil_enabled)     
         get_tree().call_group("FreecoiL", "fi_recoil_enabled_changed")
+        
+func toggle_recoil():
+    var fi_laser_recoil = Settings.Session.get_data("fi_laser_recoil")
+    if fi_laser_recoil != 0:
+        if fi_laser_recoil == 1:
+            Settings.Session.set_data("fi_laser_recoil", 2)
+            FreecoiL.enableRecoil(false)
+        else:
+            Settings.Session.set_data("fi_laser_recoil", 1)
+            FreecoiL.enableRecoil(true)
         
 
 #####################
@@ -143,7 +155,12 @@ func _on_delay_loading():
 func init_vars():
     # We initialize the vars here to allow loading from saved defaults but also to 
     # improve Godot error checking by removing the warnings about unused vars.
-    laser_is_connected = false
+    # fi_laser_is_connected:
+    # Pent state: 0=never connected, 1=trying, 2=connected, 3=disconnected, 4=retrying.
+    Settings.Session.set_data("fi_laser_is_connected", 0)
+    #fi_laser_recoil:
+    # Tri state: 0=disconnected, 1=enabled, 2=disabled.
+    Settings.Session.set_data("fi_laser_recoil", 0)
     auto_reconnect_laser = false
     laser_gun_id = 0
     shot_mode = 2
@@ -184,28 +201,31 @@ func _fine_access_location_enabled():
 func _on_bt_connect_timeout():
     if FreecoiL != null:
         FreecoiL.stopBluetoothScan()
+    if Settings.Session.get_data("fi_laser_is_connected") == 1:
+        Settings.Session.set_data("fi_laser_is_connected", 0)
+    elif Settings.Session.get_data("fi_laser_is_connected") == 4:
+        Settings.Session.set_data("fi_laser_is_connected", 3)
     get_tree().call_group("FreecoiL", "fi_bt_connect_timeout")
     
 func _on_bt_connection_timed_out():
     bt_connection_timed_out.stop()
     get_tree().call_group("FreecoiL", "fi_bt_connection_timed_out")
-    if laser_is_connected:
+    if Settings.Session.get_data("fi_laser_is_connected") == 2:
         _on_laser_gun_disconnected()
     if auto_reconnect_laser:
       pass  # TODO: generic connect to device, and delete from _on_laser_gun_disconnected()
 
 func _on_laser_gun_connected():
-    _new_status("laser gun, connected.", 1)
-    laser_is_connected = true
-    get_tree().call_group("FreecoiL", "fi_laser_gun_connected")
+    Settings.Session.set_data("fi_laser_is_connected", 2)
+    Settings.Session.set_data("fi_laser_recoil", 1)
     bt_connect_timeout.stop()
     bt_connection_timed_out.start()
 
 func _on_laser_gun_disconnected():
-    _new_status("laser gun, disconnected.", 1)
-    laser_is_connected = false
-    get_tree().call_group("FreecoiL", "fi_laser_gun_disconnected")
-    Settings.Session.set_data("battery_lvl", 0)
+    Settings.Session.set_data("fi_laser_is_connected", 3)
+    #get_tree().call_group("FreecoiL", "fi_laser_gun_disconnected")
+    Settings.Session.set_data("fi_laser_battery_lvl", 0)
+    Settings.Session.set_data("fi_laser_recoil", 0)
     bt_connection_timed_out.stop()
     if auto_reconnect_laser:
         connect_to_laser_gun()
@@ -265,7 +285,7 @@ func _laser_telem_batteryLvl(batteryLvl):
     # up pretty quick. The SR-12 uses 6 AA instead of 4 and the 
     # battery level value will be 50% higher than the RK-45 
     battery_lvl_array.append(batteryLvl)
-    if battery_lvl_array.size() > 30:  # is 3 seconds of battery level.
+    if battery_lvl_array.size() > 60:  # is 6 seconds of battery level.
         battery_lvl_array.pop_front()
     var battery_sum = 0
     for i in range(0, battery_lvl_array.size() - 1):
@@ -273,7 +293,7 @@ func _laser_telem_batteryLvl(batteryLvl):
     battery_lvl_avg = battery_sum / battery_lvl_array.size()
     if battery_lvl_avg != prev_battery_lvl_avg:
         # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
-        Settings.Session.set_data("battery_lvl", FreecoiLInterface.battery_lvl_avg * 6.25)
+        Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
         prev_battery_lvl_avg = battery_lvl_avg
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
     _on_laser_gun_still_connected()

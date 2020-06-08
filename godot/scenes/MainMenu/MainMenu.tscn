@@ -1,51 +1,88 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=29 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
-[ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/themes/default/default_LineEdit.theme" type="Theme" id=3]
 [ext_resource path="res://scenes/Widgets/PlusMinusWidget.tscn" type="PackedScene" id=4]
-[ext_resource path="res://assets/themes/default/LineEdit_theme.tres" type="StyleBox" id=5]
+[ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=5]
 [ext_resource path="res://scenes/MainMenu/Tests.tscn" type="PackedScene" id=6]
+[ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=7]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ReferenceRect
 
 
-onready var GunStatus = get_node(\"CenterContainer/VBoxContainer/GunStatus\")
+onready var PlayerName = get_node(\"CenterContainer/VBoxContainer/HBoxContainer/PlayerName\")
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    add_to_group(\"FreecoiL\")
-    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_active\")
+    Settings.Preferences.connect(Settings.Preferences.monitor_data(\"player_name\"), self, \"update_player_name\")
+    Settings.Preferences.set_data(\"player_hit_indicator_duration\", 3)
+    update_player_name(Settings.Preferences.get_data(\"player_name\"))
 
 
-func check_if_active(menu):
-    if menu == \"1,-1\":
-        start_gun_scan()
-
-func start_gun_scan():
-    if FreecoiLInterface.laser_is_connected:
-        GunStatus.text = \"Gun is Connected\"
+func update_player_name(new_name):
+    if new_name == null:
+        pass
     else:
-        GunStatus.text = \"Gun is Disconnected\"
-        FreecoiLInterface.connect_to_laser_gun()
-
-func fi_laser_gun_connected():
-    GunStatus.text = \"Gun is Connected\"
-    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
-    
-func fi_laser_gun_disconnected():
-    GunStatus.text = \"Gun is Disconnected\"
-    
-func fi_bt_connect_timeout():
-    fi_laser_gun_disconnected()
-    
-func fi_bt_connection_timed_out():
-    fi_laser_gun_disconnected()
+        PlayerName.text = new_name
 "
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="DynamicFont" id=2]
+size = 48
+font_data = ExtResource( 2 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Preferences.connect(Settings.Preferences.monitor_data(\"player_name\"), self, \"update_val\")
+
+
+func update_val(val):
+    if val == null:
+        text = \"\"
+    else:
+        text = str(val)
+
+
+func _on_PlayerName_text_entered(new_text):
+    Settings.Preferences.set_data(\"player_name\", new_text)
+    get_tree().call_group(\"Network\", \"set_player_name\")
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+"
+
+[sub_resource type="GDScript" id=5]
 script/source = "extends ReferenceRect
 
 
@@ -64,6 +101,7 @@ func _ready():
 
 func force_player_name(__):
     if Settings.Preferences.get_data(\"player_name\") == null:
+        Settings.Preferences.set_data(\"player_name\", \"No Name\")
         if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
 #    if FreecoiLInterface.laser_is_connected != true:
@@ -76,7 +114,7 @@ func force_gun_connection(__):
             get_tree().call_group(\"Container\", \"next_menu\", \"1,-1\")
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=6]
 script/source = "extends LineEdit
 
 
@@ -87,12 +125,7 @@ script/source = "extends LineEdit
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.Preferences.set_data(\"player_hit_indicator_duration\", 3)
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
+    pass
 
 
 func _on_LineEdit_text_entered(new_text):
@@ -106,11 +139,11 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
-[sub_resource type="DynamicFont" id=4]
+[sub_resource type="DynamicFont" id=7]
 size = 60
 font_data = ExtResource( 2 )
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=8]
 script/source = "extends Button
 
 
@@ -134,7 +167,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,1\")
 "
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=9]
 script/source = "extends Button
 
 
@@ -157,7 +190,7 @@ func _on_Button4_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"-1,0\")
 "
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=10]
 script/source = "extends Button
 
 
@@ -181,7 +214,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Network\", \"search_for_peers\")
 "
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=11]
 script/source = "extends Button
 
 
@@ -205,7 +238,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Network\", \"setup_server_part1\")
 "
 
-[sub_resource type="GDScript" id=9]
+[sub_resource type="GDScript" id=12]
 script/source = "extends Button
 
 
@@ -229,7 +262,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,3\")
 "
 
-[sub_resource type="GDScript" id=10]
+[sub_resource type="GDScript" id=13]
 script/source = "extends Button
 
 
@@ -254,7 +287,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"1,3\")
 "
 
-[sub_resource type="GDScript" id=11]
+[sub_resource type="GDScript" id=14]
 script/source = "extends Button
 
 
@@ -278,7 +311,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"2,3\")
 "
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=15]
 script/source = "extends Button
 
 
@@ -303,7 +336,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"2,3\")
 "
 
-[sub_resource type="GDScript" id=13]
+[sub_resource type="GDScript" id=16]
 script/source = "extends Button
 
 
@@ -327,7 +360,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Button
 
 
@@ -351,7 +384,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=18]
 script/source = "extends Button
 
 
@@ -375,7 +408,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
 "
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Button
 
 
@@ -399,7 +432,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Button
 
 
@@ -434,7 +467,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=21]
 script/source = "extends OptionButton
 
 
@@ -485,61 +518,104 @@ __meta__ = {
 [node name="Tests" parent="-1,0-Tests" instance=ExtResource( 6 )]
 margin_bottom = 460.0
 
-[node name="1,-1-ConnectGun" type="ReferenceRect" parent="."]
-margin_left = 540.0
+[node name="1,-1-ConnectGun" parent="." instance=ExtResource( 5 )]
+
+[node name="Header2" parent="1,-1-ConnectGun" instance=ExtResource( 7 )]
+my_menu = "1,-1"
+
+[node name="2,-1-Preferences" type="ReferenceRect" parent="."]
+margin_left = 1080.0
 margin_top = -960.0
-margin_right = 1080.0
+margin_right = 1620.0
+margin_bottom = -920.0
 rect_min_size = Vector2( 540, 960 )
 script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="CenterContainer" parent="1,-1-ConnectGun"]
-margin_top = 120.0
-margin_right = 40.0
-margin_bottom = 160.0
-rect_min_size = Vector2( 540, 460 )
-
-[node name="VBoxContainer" type="VBoxContainer" parent="1,-1-ConnectGun/CenterContainer"]
-margin_top = 212.0
+[node name="CenterContainer" type="CenterContainer" parent="2,-1-Preferences"]
+margin_top = 100.0
 margin_right = 540.0
-margin_bottom = 247.0
+margin_bottom = 660.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="2,-1-Preferences/CenterContainer"]
+margin_top = 182.0
+margin_right = 540.0
+margin_bottom = 377.0
 rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
 
-[node name="GunStatus" type="Label" parent="1,-1-ConnectGun/CenterContainer/VBoxContainer"]
+[node name="Label" type="Label" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
-text = "Gun is Disconnected"
+margin_bottom = 61.0
+custom_fonts/font = SubResource( 2 )
+text = "Player Preferences"
 align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
+margin_top = 91.0
+margin_right = 540.0
+margin_bottom = 126.0
+rect_min_size = Vector2( 540, 0 )
+alignment = 1
+
+[node name="Label" type="Label" parent="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 33.0
+rect_min_size = Vector2( 300, 0 )
+text = "Callsign:"
+
+[node name="PlayerName" type="LineEdit" parent="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 35.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 3 )
+script = SubResource( 3 )
+
+[node name="Button" type="Button" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
+margin_top = 156.0
+margin_right = 540.0
+margin_bottom = 195.0
+text = "Return To Main Menu"
+script = SubResource( 4 )
+
+[node name="Header2" parent="2,-1-Preferences" instance=ExtResource( 7 )]
+my_menu = "2,-1"
+allow_preferences = false
 
 [node name="0,-1-Get Player Name" type="ReferenceRect" parent="."]
 margin_top = -960.0
 margin_right = 540.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 2 )
+script = SubResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="CenterContainer" type="CenterContainer" parent="0,-1-Get Player Name"]
-margin_top = 120.0
+margin_top = 100.0
 margin_right = 540.0
-margin_bottom = 580.0
+margin_bottom = 560.0
 rect_min_size = Vector2( 540, 460 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Get Player Name/CenterContainer"]
-margin_top = 135.0
+margin_top = 124.0
 margin_right = 540.0
-margin_bottom = 324.0
-custom_constants/separation = 8
+margin_bottom = 335.0
 
 [node name="Label" type="Label" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 103.0
+margin_bottom = 99.0
 rect_min_size = Vector2( 540, 0 )
 text = "Welcome to FreecoiL!
 
@@ -547,22 +623,32 @@ Enter your callsign, soldier!"
 align = 1
 autowrap = true
 
-[node name="LineEdit" type="LineEdit" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
-margin_top = 111.0
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
+margin_top = 107.0
 margin_right = 540.0
-margin_bottom = 142.0
-custom_styles/normal = ExtResource( 5 )
-align = 1
-placeholder_alpha = 0.15
-script = SubResource( 3 )
+margin_bottom = 211.0
+custom_constants/separation = 30
 
-[node name="Button" type="Button" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer"]
-margin_top = 150.0
+[node name="LineEdit" type="LineEdit" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 189.0
+margin_bottom = 35.0
+theme = ExtResource( 3 )
+align = 1
+context_menu_enabled = false
+placeholder_text = "Callsign?"
+placeholder_alpha = 0.15
+caret_blink = true
+script = SubResource( 6 )
+
+[node name="Button" type="Button" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 65.0
+margin_right = 540.0
+margin_bottom = 104.0
 text = "Login"
 
-[node name="HeaderSection" parent="0,-1-Get Player Name" instance=ExtResource( 3 )]
+[node name="Header2" parent="0,-1-Get Player Name" instance=ExtResource( 7 )]
+my_menu = "0,-1"
+allow_main_menu = false
 
 [node name="0,0-Game Options" type="ReferenceRect" parent="."]
 margin_right = 40.0
@@ -582,58 +668,65 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer"]
-margin_top = 121.0
+margin_top = 114.0
 margin_right = 540.0
-margin_bottom = 338.0
+margin_bottom = 345.0
 custom_constants/separation = 8
 
 [node name="Label" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 76.0
 rect_min_size = Vector2( 540, 0 )
-custom_fonts/font = SubResource( 4 )
+custom_fonts/font = SubResource( 7 )
 text = "FREECOIL"
 align = 1
 autowrap = true
 
 [node name="Label2" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 88.0
+margin_top = 84.0
 margin_right = 540.0
-margin_bottom = 123.0
+margin_bottom = 115.0
 text = "BRINGING THE GAME TO THE WORLD"
 align = 1
 
-[node name="Button" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-visible = false
-margin_top = 131.0
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+margin_top = 123.0
 margin_right = 540.0
-margin_bottom = 170.0
+margin_bottom = 231.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
+visible = false
+margin_top = 8.0
+margin_right = 540.0
+margin_bottom = 47.0
 disabled = true
 text = "Quick Start Game"
 
-[node name="Button2" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 131.0
+[node name="Button2" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 170.0
+margin_bottom = 39.0
 text = "Start A Networked Game"
-script = SubResource( 5 )
+script = SubResource( 8 )
 
-[node name="Button3" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
+[node name="Button3" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
 visible = false
-margin_top = 178.0
+margin_top = 49.0
 margin_right = 540.0
-margin_bottom = 217.0
+margin_bottom = 88.0
 disabled = true
 text = "Start A No Network Game"
 
-[node name="Button4" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
-margin_top = 178.0
+[node name="Button4" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 69.0
 margin_right = 540.0
-margin_bottom = 217.0
+margin_bottom = 108.0
 text = "Test Mode"
-script = SubResource( 6 )
+script = SubResource( 9 )
 
-[node name="HeaderSection" parent="0,0-Game Options" instance=ExtResource( 3 )]
+[node name="Header2" parent="0,0-Game Options" instance=ExtResource( 7 )]
+allow_main_menu = false
 
 [node name="0,1-Networked Game 1" type="ReferenceRect" parent="."]
 margin_top = 960.0
@@ -654,48 +747,49 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Networked Game 1/CenterContainer"]
-margin_top = 181.0
+margin_top = 187.0
 margin_right = 540.0
-margin_bottom = 378.0
+margin_bottom = 372.0
 
 [node name="Label" type="Label" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 rect_min_size = Vector2( 540, 0 )
 text = "Network Game Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 148.0
+margin_bottom = 138.0
 text = "Will you be the host or a client?
 Host sets up the game and it's rules.
 Clients simply join in."
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer"]
-margin_top = 158.0
+margin_top = 146.0
 margin_right = 540.0
-margin_bottom = 197.0
-custom_constants/separation = 32
+margin_bottom = 185.0
+custom_constants/separation = 60
 alignment = 1
 
 [node name="Button" type="Button" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 173.0
-margin_right = 262.0
+margin_left = 159.0
+margin_right = 248.0
 margin_bottom = 39.0
 text = "Client"
-script = SubResource( 7 )
+script = SubResource( 10 )
 
 [node name="Button2" type="Button" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 294.0
-margin_right = 366.0
+margin_left = 308.0
+margin_right = 380.0
 margin_bottom = 39.0
 text = "Host"
-script = SubResource( 8 )
+script = SubResource( 11 )
 
-[node name="HeaderSection" parent="0,1-Networked Game 1" instance=ExtResource( 3 )]
+[node name="Header2" parent="0,1-Networked Game 1" instance=ExtResource( 7 )]
+my_menu = "0,1"
 
 [node name="1,1-Networked Game 2" type="ReferenceRect" parent="."]
 margin_left = 540.0
@@ -707,8 +801,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="1,1-Networked Game 2" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="1,1-Networked Game 2"]
 margin_top = 120.0
 margin_right = 540.0
@@ -719,30 +811,30 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,1-Networked Game 2/CenterContainer"]
-margin_top = 215.0
+margin_top = 221.0
 margin_right = 540.0
-margin_bottom = 344.0
+margin_bottom = 338.0
 
 [node name="Label2" type="Label" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Network Game Setup"
 align = 1
 
 [node name="Label" type="Label" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 rect_min_size = Vector2( 540, 0 )
 text = "What type of match?"
 align = 1
 
 [node name="Button" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
-margin_top = 90.0
+margin_top = 78.0
 margin_right = 540.0
-margin_bottom = 129.0
+margin_bottom = 117.0
 text = "Custom Match Setup"
-script = SubResource( 9 )
+script = SubResource( 12 )
 
 [node name="Button2" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer"]
 visible = false
@@ -751,6 +843,9 @@ margin_right = 540.0
 margin_bottom = 178.0
 disabled = true
 text = "Scenario Match Selection"
+
+[node name="Header2" parent="1,1-Networked Game 2" instance=ExtResource( 7 )]
+my_menu = "1,1"
 
 [node name="2,1-Networked Game 3" type="ReferenceRect" parent="."]
 margin_left = 1080.0
@@ -762,8 +857,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="2,1-Networked Game 3" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="2,1-Networked Game 3"]
 margin_top = 120.0
 margin_right = 540.0
@@ -774,23 +867,26 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,1-Networked Game 3/CenterContainer"]
-margin_top = 240.0
+margin_top = 245.0
 margin_right = 540.0
-margin_bottom = 320.0
+margin_bottom = 315.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Network Game Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 text = "Searching for a Server..."
 align = 1
+
+[node name="Header2" parent="2,1-Networked Game 3" instance=ExtResource( 7 )]
+my_menu = "2,1"
 
 [node name="3,1-Networked Game 4" type="ReferenceRect" parent="."]
 margin_left = 1620.0
@@ -802,8 +898,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="3,1-Networked Game 4" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="3,1-Networked Game 4"]
 margin_top = 120.0
 margin_right = 540.0
@@ -814,16 +908,19 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,1-Networked Game 4/CenterContainer"]
-margin_top = 262.0
+margin_top = 264.0
 margin_right = 540.0
-margin_bottom = 297.0
+margin_bottom = 295.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="3,1-Networked Game 4/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Loading the Lobby."
 align = 1
+
+[node name="Header2" parent="3,1-Networked Game 4" instance=ExtResource( 7 )]
+my_menu = "3,1"
 
 [node name="0,3-Custom Setup 1" type="ReferenceRect" parent="."]
 margin_top = 2880.0
@@ -844,49 +941,50 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,3-Custom Setup 1/CenterContainer"]
-margin_top = 215.0
+margin_top = 221.0
 margin_right = 540.0
-margin_bottom = 344.0
+margin_bottom = 338.0
 
 [node name="Label" type="Label" parent="0,3-Custom Setup 1/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 rect_min_size = Vector2( 540, 0 )
 text = "Custom Match Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="0,3-Custom Setup 1/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 text = "Do you want Teams?"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,3-Custom Setup 1/CenterContainer/VBoxContainer"]
-margin_top = 90.0
+margin_top = 78.0
 margin_right = 540.0
-margin_bottom = 129.0
-custom_constants/separation = 32
+margin_bottom = 117.0
+custom_constants/separation = 60
 alignment = 1
 
 [node name="Button" type="Button" parent="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 202.0
-margin_right = 260.0
+margin_left = 188.0
+margin_right = 246.0
 margin_bottom = 39.0
 text = "Yes"
-script = SubResource( 10 )
+script = SubResource( 13 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Button2" type="Button" parent="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 292.0
-margin_right = 338.0
+margin_left = 306.0
+margin_right = 352.0
 margin_bottom = 39.0
 text = "No"
-script = SubResource( 11 )
+script = SubResource( 14 )
 
-[node name="HeaderSection" parent="0,3-Custom Setup 1" instance=ExtResource( 3 )]
+[node name="Header2" parent="0,3-Custom Setup 1" instance=ExtResource( 7 )]
+my_menu = "0,3"
 
 [node name="1,3-Custom Setup 2" type="ReferenceRect" parent="."]
 margin_left = 540.0
@@ -898,8 +996,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="1,3-Custom Setup 2" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="1,3-Custom Setup 2"]
 margin_top = 120.0
 margin_right = 540.0
@@ -910,29 +1006,35 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,3-Custom Setup 2/CenterContainer"]
-margin_top = 187.0
+margin_top = 183.0
 margin_right = 540.0
-margin_bottom = 373.0
+margin_bottom = 377.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Custom Match Setup"
 align = 1
 autowrap = true
 
 [node name="Label2" type="Label" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 text = "How Many Teams?"
 align = 1
 
-[node name="PlusMinusWidget" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer" instance=ExtResource( 4 )]
-margin_top = 90.0
+[node name="VBoxContainer" type="VBoxContainer" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
+margin_top = 78.0
 margin_right = 540.0
-margin_bottom = 137.0
+margin_bottom = 194.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="PlusMinusWidget" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_right = 540.0
+margin_bottom = 47.0
 current_val = 2
 allow_zero = false
 apply_minimum_value = true
@@ -940,12 +1042,15 @@ minimum_value = 2
 apply_maximum_value = true
 maximum_value = 4
 
-[node name="Button" type="Button" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
-margin_top = 147.0
+[node name="Button" type="Button" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 77.0
 margin_right = 540.0
-margin_bottom = 186.0
+margin_bottom = 116.0
 text = "Submit"
-script = SubResource( 12 )
+script = SubResource( 15 )
+
+[node name="Header2" parent="1,3-Custom Setup 2" instance=ExtResource( 7 )]
+my_menu = "1,3"
 
 [node name="2,3-Custom Setup 3" type="ReferenceRect" parent="."]
 margin_left = 1080.0
@@ -957,8 +1062,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="2,3-Custom Setup 3" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="2,3-Custom Setup 3"]
 margin_top = 120.0
 margin_right = 540.0
@@ -969,44 +1072,47 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,3-Custom Setup 3/CenterContainer"]
-margin_top = 215.0
+margin_top = 221.0
 margin_right = 540.0
-margin_bottom = 344.0
+margin_bottom = 338.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Custom Match Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 text = "Playing Indoors or Outdoors?"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer"]
-margin_top = 90.0
+margin_top = 78.0
 margin_right = 540.0
-margin_bottom = 129.0
-custom_constants/separation = 32
+margin_bottom = 117.0
+custom_constants/separation = 60
 alignment = 1
 
 [node name="Button" type="Button" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 128.0
-margin_right = 245.0
+margin_left = 114.0
+margin_right = 231.0
 margin_bottom = 39.0
 text = "Indoors"
-script = SubResource( 13 )
+script = SubResource( 16 )
 
 [node name="Button2" type="Button" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 277.0
-margin_right = 411.0
+margin_left = 291.0
+margin_right = 425.0
 margin_bottom = 39.0
 text = "Outdoors"
-script = SubResource( 14 )
+script = SubResource( 17 )
+
+[node name="Header2" parent="2,3-Custom Setup 3" instance=ExtResource( 7 )]
+my_menu = "2,3"
 
 [node name="3,3-Custom Setup 4" type="ReferenceRect" parent="."]
 margin_left = 1620.0
@@ -1018,8 +1124,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="3,3-Custom Setup 4" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="3,3-Custom Setup 4"]
 margin_top = 120.0
 margin_right = 540.0
@@ -1030,44 +1134,48 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,3-Custom Setup 4/CenterContainer"]
-margin_top = 215.0
+margin_top = 221.0
 margin_right = 540.0
-margin_bottom = 344.0
+margin_bottom = 338.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Custom Match Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 80.0
+margin_bottom = 70.0
 text = "Which End Game Objective?"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer"]
-margin_top = 90.0
+margin_top = 78.0
 margin_right = 540.0
-margin_bottom = 129.0
-custom_constants/separation = 32
+margin_bottom = 117.0
+custom_constants/separation = 60
 alignment = 1
 
 [node name="Button" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 100.0
-margin_right = 260.0
+margin_left = 86.0
+margin_right = 246.0
 margin_bottom = 39.0
+custom_constants/hseparation = 60
 text = "Death Limit"
-script = SubResource( 15 )
+script = SubResource( 18 )
 
 [node name="Button2" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 292.0
-margin_right = 439.0
+margin_left = 306.0
+margin_right = 453.0
 margin_bottom = 39.0
 text = "Time Limit"
-script = SubResource( 16 )
+script = SubResource( 19 )
+
+[node name="Header2" parent="3,3-Custom Setup 4" instance=ExtResource( 7 )]
+my_menu = "3,3"
 
 [node name="4,3-Custom Setup 5" type="ReferenceRect" parent="."]
 margin_left = 2160.0
@@ -1079,8 +1187,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="HeaderSection" parent="4,3-Custom Setup 5" instance=ExtResource( 3 )]
-
 [node name="CenterContainer" type="CenterContainer" parent="4,3-Custom Setup 5"]
 margin_top = 120.0
 margin_right = 540.0
@@ -1091,37 +1197,45 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="4,3-Custom Setup 5/CenterContainer"]
-margin_top = 187.0
-margin_right = 540.0
-margin_bottom = 373.0
+margin_top = 183.0
+margin_right = 547.0
+margin_bottom = 377.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
-margin_right = 540.0
-margin_bottom = 35.0
+margin_right = 547.0
+margin_bottom = 31.0
 text = "Custom Match Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
-margin_top = 45.0
-margin_right = 540.0
-margin_bottom = 80.0
+margin_top = 39.0
+margin_right = 547.0
+margin_bottom = 70.0
 text = "How long of a respawn delay in seconds?"
 align = 1
 
-[node name="PlusMinusWidget" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer" instance=ExtResource( 4 )]
-margin_top = 90.0
-margin_right = 540.0
-margin_bottom = 137.0
+[node name="VBoxContainer" type="VBoxContainer" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
+margin_top = 78.0
+margin_right = 547.0
+margin_bottom = 194.0
+custom_constants/separation = 30
+
+[node name="PlusMinusWidget" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_right = 547.0
+margin_bottom = 47.0
 current_val = 15
 apply_minimum_value = true
 
-[node name="Button" type="Button" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
-margin_top = 147.0
-margin_right = 540.0
-margin_bottom = 186.0
+[node name="Button" type="Button" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 77.0
+margin_right = 547.0
+margin_bottom = 116.0
 text = "Submit"
-script = SubResource( 17 )
+script = SubResource( 20 )
+
+[node name="Header2" parent="4,3-Custom Setup 5" instance=ExtResource( 7 )]
+my_menu = "4,3"
 
 [node name="0,2-No Network Game 1" type="ReferenceRect" parent="."]
 margin_top = 1920.0
@@ -1160,56 +1274,59 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Networked IP Conflict/CenterContainer"]
-margin_top = 91.0
+margin_top = 100.0
 margin_right = 540.0
-margin_bottom = 469.0
+margin_bottom = 460.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 31.0
 text = "Network Game Setup"
 align = 1
 
 [node name="Label2" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 39.0
 margin_right = 540.0
-margin_bottom = 114.0
+margin_bottom = 104.0
 text = "An IP Address Conflict has been detected. "
 align = 1
 autowrap = true
 
 [node name="OptionButton" type="OptionButton" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
-margin_top = 124.0
+margin_top = 112.0
 margin_right = 540.0
-margin_bottom = 163.0
+margin_bottom = 151.0
 align = 1
-script = SubResource( 18 )
+script = SubResource( 21 )
 
 [node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
-margin_top = 173.0
+margin_top = 159.0
 margin_right = 540.0
-margin_bottom = 378.0
+margin_bottom = 360.0
 text = "NOTE: The program has the ability to work around this, but the functionality, is currently not implemented. Please Contact FeralBytes on discord and let him know of the issue.
 https://discordapp.com/invite/tn4hThV"
 align = 1
 autowrap = true
 
-[node name="HeaderSection" parent="-1,1-Networked IP Conflict" instance=ExtResource( 3 )]
-[connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]
-[connection signal="pressed" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/Button" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/LineEdit" method="_on_Button_pressed" flags=3]
-[connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/Button2" to="0,0-Game Options/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
-[connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/Button4" to="0,0-Game Options/CenterContainer/VBoxContainer/Button4" method="_on_Button4_pressed" flags=3]
+[node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
+my_menu = "-1,-1"
+[connection signal="text_entered" from="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" to="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" method="_on_PlayerName_text_entered" flags=3]
+[connection signal="pressed" from="2,-1-Preferences/CenterContainer/VBoxContainer/Button" to="2,-1-Preferences/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]
+[connection signal="pressed" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/Button" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2" to="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button4" to="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button4" method="_on_Button4_pressed" flags=3]
 [connection signal="pressed" from="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button" to="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" to="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button" to="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
-[connection signal="pressed" from="1,3-Custom Setup 2/CenterContainer/VBoxContainer/Button" to="1,3-Custom Setup 2/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" to="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button" to="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
-[connection signal="pressed" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/Button" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]

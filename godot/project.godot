@@ -16,6 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="FreecoiL"
+config/description="Bringing the game to the world! For the Recoil laser tag system."
 run/main_scene="res://scenes/Container/Container.tscn"
 boot_splash/image="res://assets/images/boot_splash.png"
 boot_splash/bg_color=Color( 0, 0, 0, 1 )
@@ -37,7 +38,6 @@ window/size/width=540
 window/size/height=960
 window/size/resizable=false
 window/vsync/use_vsync=false
-window/energy_saving/keep_screen_on=false
 window/handheld/orientation="portrait"
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"

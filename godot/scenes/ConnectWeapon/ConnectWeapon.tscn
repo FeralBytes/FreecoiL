@@ -23,6 +23,9 @@ texture_hover = ExtResource( 2 )
 expand = true
 stretch_mode = 4
 script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="ConnectionCompleteSnd" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 4 )

@@ -179,7 +179,6 @@ remote func identify(pup_id, godot_peer_id):
                     Server.disconnect_peer(real_rpc_id, true)
                     return
             Settings.Network.sync_peer(godot_peer_id)
-            print("Player Name = " + str(Settings.InGame.get_data("player_name_by_id")))
             Settings.InGame.sync_peer(godot_peer_id)
             Settings.Network.set_data("mups_status", mups_status)
 
@@ -299,6 +298,8 @@ remote func set_mup_id(new_id):
             Settings.Session.set_data("mup_id", new_id)
 
 func set_player_name():
+    if get_tree().get_network_peer() == null:
+        return
     if get_tree().is_network_server():
         set_player_name_remote(Settings.Preferences.get_data("player_name"))
     else:

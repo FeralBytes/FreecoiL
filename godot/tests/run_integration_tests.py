@@ -5,13 +5,14 @@ import pathlib
 import subprocess
 import sys
 
+GODOT_VERSION = "3.2.2-beta4"
 cwd = pathlib.Path.cwd()
 
 if getpass.getuser() == "wolfrage":
-    app_path = pathlib.Path("~/Apps/Godot/Godot_v3.2.2-beta3_x11.64").expanduser()
+    app_path = pathlib.Path("~/Apps/Godot/Godot_v" + GODOT_VERSION + "_x11.64").expanduser()
     proj_path = cwd.joinpath("..")
 else:
-    app_path = cwd.joinpath("godot_editor/Godot_v3.2.1-stable_linux_headless.64")
+    app_path = cwd.joinpath("godot_editor/Godot_v" + GODOT_VERSION + "_linux_headless.64")
     proj_path = cwd.joinpath("godot")
 
 returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=integration"])

@@ -23,11 +23,11 @@ font_data = ExtResource( 5 )
 size = 28
 font_data = ExtResource( 5 )
 
-[sub_resource type="DynamicFont" id=7]
+[sub_resource type="DynamicFont" id=4]
 size = 28
 font_data = ExtResource( 5 )
 
-[sub_resource type="DynamicFont" id=8]
+[sub_resource type="DynamicFont" id=5]
 size = 28
 font_data = ExtResource( 5 )
 
@@ -80,7 +80,7 @@ margin_left = 3.87708
 margin_top = 149.913
 margin_right = 363.877
 margin_bottom = 191.913
-custom_fonts/font = SubResource( 7 )
+custom_fonts/font = SubResource( 4 )
 text = "Change Callsign"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -91,7 +91,7 @@ margin_left = 5.0
 margin_top = 222.0
 margin_right = 365.0
 margin_bottom = 264.0
-custom_fonts/font = SubResource( 8 )
+custom_fonts/font = SubResource( 5 )
 text = "Exit App"
 
 [node name="ConnectWeapon" parent="." instance=ExtResource( 6 )]
@@ -127,7 +127,7 @@ margin_top = 40.0
 margin_right = 136.0
 margin_bottom = 60.0
 custom_fonts/font = SubResource( 6 )
-text = " Ver: 0.3.0-dev8 "
+text = " Ver: 0.3.0-dev21 "
 __meta__ = {
 "_edit_use_anchors_": false
 }

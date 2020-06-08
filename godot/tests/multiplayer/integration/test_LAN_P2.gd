@@ -52,39 +52,49 @@ func after_all():
 
 func test_loads_to_main_menu():
     while _obj.current_scene.name != "MainMenu":
-        yield(yield_for(1.0), YIELD)
-    assert_eq(true, true)
-    yield(yield_for(1), YIELD) # To finish loading and screen transition.
+        yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.name, "MainMenu")
+    while _obj.loading_state != "idle":
+        yield(get_tree(), 'idle_frame')
         
 func test_can_click_start_a_networked_game():
-    yield(do_a_left_click(Vector2(240, 400)), "completed")
+    var btn = _obj.get_node("Scene1/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,1")
 
 func test_can_click_client():
-    yield(do_a_left_click(Vector2(215, 480)), "completed")
-    assert_true(Settings.Session.get_data("current_menu") == "2,1" or Settings.Session.get_data("current_menu") == "3,1")
+    var btn = _obj.get_node("Scene1/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "2,1")
 
 func test_can_join_team_1():
     while _obj.current_scene.name != "Lobbies":
-        yield(yield_for(1.0), YIELD)
-    while Settings.InGame.get_data("game_teams") != true:
         yield(get_tree(), 'idle_frame')
-    yield(yield_for(1), YIELD) # To finish loading and screen transition.
-    yield(do_a_left_click(Vector2(518, 640)), "completed")
+    assert_eq(_obj.current_scene.name, "Lobbies")
+    while _obj.loading_state != "idle":
+        yield(get_tree(), 'idle_frame')
+    while Settings.InGame.get_data("game_number_of_teams") != 2:
+        yield(get_tree(), 'idle_frame')
+    var btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
-    yield(do_a_left_click(Vector2(266, 280)), "completed")
+    btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("player_team"), 1)
-    yield(do_a_left_click(Vector2(415, 381)), "completed")
-    assert_eq(Settings.Network.get_data("mups_ready")[2], true)
+    var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
+    btn = tmp.get_child(0).get_child(1)
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
 
 func test_can_start_a_match():
-    while _obj.current_scene.name != "InGame":
-        yield(yield_for(1.0), YIELD)
-    yield(yield_for(1), YIELD) # To finish loading and screen transition.
-    while Settings.Session.get_data("game_started") == false:
+    while Settings.Session.get_data("game_started") != true:
         yield(get_tree(), 'idle_frame')
     pending()
 
 func test_yield_to_show_result():
-    yield(yield_for(5), YIELD)
+    yield(yield_for(20), YIELD)
     pending()

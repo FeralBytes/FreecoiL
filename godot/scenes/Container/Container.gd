@@ -127,6 +127,7 @@ func set_new_scene(scene_resource=null):
         scene_resource = threaded_scene_loader1.wait_to_finish()
     previous_scene = current_scene
     current_scene = scene_resource.instance()
+    load_theme_details()
     update_progress([0.999])
     call_deferred("set_new_scene_part2")
     
@@ -174,3 +175,15 @@ func load_lobby():
     
 func _on_splash_timer_timeout():
     goto_scene("res://scenes/MainMenu/MainMenu.tscn")
+    
+func load_theme_details():
+    if Settings.Preferences.get_data("ThemeName") == null:
+        Settings.Preferences.set_data("ThemeName", "default")
+    var file = File.new()
+    file.open("res://assets/themes/" + Settings.Preferences.get_data("ThemeName") + 
+        "/" + Settings.Preferences.get_data("ThemeName") + ".json", file.READ)
+    var text = file.get_as_text()
+    var theme = parse_json(text)
+    file.close()
+    for detail in theme:
+        Settings.Session.set_data(detail, theme[detail])

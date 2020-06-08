@@ -1,7 +1,6 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://scenes/SceneFader/SceneFader.gd" type="Script" id=1]
-[ext_resource path="res://icon.png" type="Texture" id=2]
 [ext_resource path="res://assets/images/white.png" type="Texture" id=3]
 [ext_resource path="res://scenes/SceneFader/Fade_In.tres" type="Animation" id=4]
 [ext_resource path="res://scenes/SceneFader/Fade_Out.tres" type="Animation" id=5]
@@ -11,18 +10,15 @@
 ]]
 script = ExtResource( 1 )
 
-[node name="TestSprite" type="Sprite" parent="."]
-visible = false
-position = Vector2( 921.933, 531.401 )
-scale = Vector2( 23.9699, 12.8118 )
-texture = ExtResource( 2 )
-
 [node name="TextureRect" type="TextureRect" parent="."]
 modulate = Color( 0, 0, 0, 0 )
 margin_right = 1920.0
 margin_bottom = 1080.0
 texture = ExtResource( 3 )
 expand = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TextureRect"]
 anims/Fade_In = ExtResource( 4 )

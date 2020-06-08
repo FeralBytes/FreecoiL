@@ -15,10 +15,20 @@ onready var EndReason = get_node("0,1-End of Game/CenterContainer/VBoxContainer/
 onready var FastGunShot = get_node("GunShotSound").stream
 
 
+func invert_mups_to_lasers(mups_to_lasers):
+    if get_tree().is_network_server():
+        var lasers_to_mups = {}
+        for key in mups_to_lasers:
+            lasers_to_mups[mups_to_lasers[key]] = key
+        # NOTE: For JSON Objects must have keys that are strings not Integers.
+        # Invert players and do not store in JSON.
+        Settings.InGame.set_data("player_id_by_laser", lasers_to_mups)
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
     if get_tree().is_network_server():
         Settings.Session.connect(Settings.Session.monitor_data("all_ready"), self, "start_game_start_delay")
+        invert_mups_to_lasers(Settings.InGame.get_data("player_laser_by_id"))
     add_to_group("FreecoiL")
     get_tree().call_group("Container", "next_menu", "0,-1")
     FreecoiLInterface.set_laser_id(Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
@@ -36,6 +46,7 @@ func set_player_start_game_vars():
     Settings.Session.set_data("game_started", false)
     Settings.Session.set_data("game_player_team", Settings.InGame.get_data("player_team_by_id")[Settings.Session.get_data("mup_id")])
     Settings.Session.set_data("game_player_teammates", Settings.InGame.get_data("game_teams_by_team_num_by_id")[Settings.Session.get_data("game_player_team")])
+    Settings.Session.set_data("game_player_last_killed_by", "")
     StartGameTimer.wait_time = Settings.InGame.get_data("game_start_delay")
     StartGameTimer.connect("timeout", self, "start_the_game")
     StartGameTimer.one_shot = true
@@ -48,6 +59,9 @@ func set_player_start_game_vars():
     HitIndicatorTimer.wait_time = Settings.Preferences.get_data("player_hit_indicator_duration")
     HitIndicatorTimer.one_shot = true
     HitIndicatorTimer.connect("timeout", self, "hit_indicator_stop")
+    RespawnTimer.connect("timeout", self, "respawn_finish")
+    RespawnTimer.wait_time = Settings.InGame.get_data("game_respawn_delay")
+    RespawnTimer.one_shot = true
     
 func set_player_respawn_vars():
     var weapon_type = Settings.InGame.get_data("game_start_weapon_type")
@@ -67,12 +81,13 @@ func set_player_respawn_vars():
 func start_game_start_delay(__):
     if get_tree().is_network_server():
         get_tree().call_group("Network", "unready_all_mups")
+        yield(get_tree().create_timer(0.2), "timeout")  # Just to let the network settle out.
         rpc("remote_start_game_start_delay")
     
 remotesync func remote_start_game_start_delay():
     TickTocTimer.start()
     StartGameTimer.start()
-    get_tree().call_group("Container", "next_menu", "1,-1")
+    get_tree().call_group("Container", "next_menu", "-1,-1")
     
 func start_the_game():
     Settings.Session.set_data("game_started", true)
@@ -84,7 +99,8 @@ func back_to_Playing():
     pass
     
 func end_game(reason):
-    respawn_start(-1)
+    Settings.Session.set_data("game_player_alive", false)
+    FreecoiLInterface.reload_start()
     get_tree().call_group("Container", "next_menu", "0,1")
     if reason == "time":
         EndReason.text = "Out of Time"
@@ -126,13 +142,21 @@ func reload_finish():
 
 func respawn_start(shooter_id):
     Settings.Session.set_data("game_player_alive", false)
+    RespawnTimer.start()
     FreecoiLInterface.reload_start()
-    if shooter_id >= 0:
-        get_tree().call_group("Container", "next_menu", "1,0")
+    Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
+    if shooter_id != 0:
+        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[shooter_id]
+        var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
+        Settings.Session.set_data("game_player_last_killed_by", shooter_name)
+    else:
+        Settings.Session.set_data("game_player_last_killed_by", "ID 0")
+    get_tree().call_group("Container", "next_menu", "1,0")
     
 func respawn_finish():
     set_player_respawn_vars()
     reload_start()
+    get_tree().call_group("Container", "next_menu", "0,0")
 
 func delayed_vibrate():
     FreecoiLInterface.vibrate(200)
@@ -150,7 +174,9 @@ func fi_trigger_btn_pushed():
     if Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
         EmptyShotSound.play()
     else:
-        GunShotSound.play()
+        if Settings.Session.get_data("game_player_alive"):
+            GunShotSound.play()
+        #else your dead so pass.
             
     
 func fi_reload_btn_pushed():

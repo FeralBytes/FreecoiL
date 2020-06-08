@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
-[ext_resource path="res://scenes/MainMenu/HeaderSection.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends Button
@@ -14,7 +14,7 @@ script/source = "extends Button
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    if FreecoiLInterface.laser_is_connected:
+    if Settings.Session.get_data(\"fi_laser_is_connected\") == 2:
         text = \"Connected to \" + str(FreecoiLInterface.laser_gun_id)
     else:
         text = \"Connect Gun\"
@@ -26,7 +26,7 @@ func _ready():
 
 
 func _on_Button_pressed():
-    if FreecoiLInterface.laser_is_connected:
+    if Settings.Session.get_data(\"fi_laser_is_connected\") == 2:
         pass
     else:
         FreecoiLInterface.connect_to_laser_gun()
@@ -175,7 +175,8 @@ margin_bottom = 231.0
 align = 1
 script = SubResource( 4 )
 
-[node name="HeaderSection" parent="." instance=ExtResource( 2 )]
+[node name="Header2" parent="." instance=ExtResource( 2 )]
+my_menu = "-1,0"
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button2" to="CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button3" to="CenterContainer/VBoxContainer/Button3" method="_on_Button3_pressed" flags=3]
