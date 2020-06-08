@@ -15,6 +15,7 @@ before_script:
   - dpkg-reconfigure --frontend=noninteractive locales
   - update-locale LANG=en_US.UTF-8
   - export LANG=en_US.UTF-8
+  - apt-get install python3 gradle
   - mkdir -p ~/.config/godot/projects
   - mkdir -p ~/.godot
   - mkdir -p ~/.local/share/godot
