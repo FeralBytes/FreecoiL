@@ -33,7 +33,7 @@
 ## Font Sizes
 
 * Small = 16
-* Normal = 24
+* Normal = 28
 * Large = 48
 
 ## Notes

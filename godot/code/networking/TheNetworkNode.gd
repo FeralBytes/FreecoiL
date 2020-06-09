@@ -103,20 +103,16 @@ remote func sync_var(classname, var_name, var_val=null):   # class_name is a res
             Settings.InGame.set_data(var_name, var_val, true)
 
 func reset_networking():
-    if Server == null:
-        if Client != null:
-            #Client.queue_free()
-            Client = null
-    else:
+    if Server != null:
         #Server.queue_free()
         Server.close_connection()
         yield(get_tree().create_timer(0.1), "timeout")
         Server = null
-        if Client != null:
-            #Client.queue_free()
-            Client.close_connection()
-            yield(get_tree().create_timer(0.1), "timeout")
-            Client = null
+    if Client != null:
+        #Client.queue_free()
+        Client.close_connection()
+        yield(get_tree().create_timer(0.1), "timeout")
+        Client = null
     get_tree().set_network_peer(null)
     yield(get_tree(), "idle_frame")  # Yield at least one time to be a coroutine.
 
@@ -306,10 +302,15 @@ func set_player_name():
         rpc_id(1, "set_player_name_remote", Settings.Preferences.get_data("player_name"))
             
 remote func set_player_name_remote(new_name):
+    var rpc_sender_id = -1
     if get_tree().is_network_server():
-        Settings.Log("RPC: 'set_player_name()' to " + str(new_name) + " from sender_id = " + str(get_tree().get_rpc_sender_id()))
+        if get_tree().get_rpc_sender_id() == 0:
+            rpc_sender_id = 1
+        else:
+            rpc_sender_id = get_tree().get_rpc_sender_id()
+        Settings.Log("RPC: 'set_player_name_remote()' to " + str(new_name) + " from sender_id = " + str(rpc_sender_id))
         var player_name_by_id = Settings.InGame.get_data("player_name_by_id")
-        var mups = Settings.Network.get_data("peers_to_mups")[get_tree().get_rpc_sender_id()]
+        var mups = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
         player_name_by_id[mups] = new_name
         Settings.InGame.set_data("player_name_by_id", player_name_by_id)
 
@@ -326,7 +327,7 @@ remote func set_player_team_remote(new_team):
             rpc_sender_id = 1
         else:
             rpc_sender_id = get_tree().get_rpc_sender_id()
-        Settings.Log("RPC: 'set_player_team()' to " + str(new_team) + " from sender_id = " + str(rpc_sender_id))
+        Settings.Log("RPC: 'set_player_team_remote()' to " + str(new_team) + " from sender_id = " + str(rpc_sender_id))
         var player_team_by_id = Settings.InGame.get_data("player_team_by_id")
         var mups = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
         var previous_team = -1

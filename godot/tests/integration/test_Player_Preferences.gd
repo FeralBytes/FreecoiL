@@ -58,7 +58,11 @@ func test_can_click_preferences_btn():
     
 func test_can_change_player_name():
     var player_name = Settings.Preferences.get_data("player_name")
-    var new_player_name = player_name + "_test"
+    var new_player_name = ""
+    if "_test" in player_name:
+        new_player_name = player_name.replace("_test", "")
+    else:
+        new_player_name = player_name + "_test"
     var line_edit = _obj.get_node("Scene1/MainMenu/2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName")
     line_edit.text = new_player_name
     line_edit.emit_signal("text_entered", new_player_name)

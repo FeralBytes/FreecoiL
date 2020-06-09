@@ -33,7 +33,6 @@ var bt_connect_timeout = Timer.new()
 var bt_connection_timed_out = Timer.new()
 
 # Various counters below.
-var trigger_btn_counter = 0
 var reload_btn_counter = 0
 var thumb_btn_counter = 0
 var power_btn_counter = 0
@@ -259,10 +258,7 @@ func _changed_laser_telem_shotsRemaining(shotsRemaining):
     Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
-    get_tree().call_group_flags(2, "FreecoiL", "fi_trigger_btn_pushed")  # GROUP_CALL_REALTIME = 2
-    Settings.Session.set_data("game_weapon_btn_trigger", triggerBtnCounter)
-    #get_tree().call_group("FreecoiL", "fi_trigger_btn_pushed")
-    trigger_btn_counter = triggerBtnCounter 
+    Settings.Session.set_data("fi_trigger_btn_pushed", triggerBtnCounter)
 
 func _changed_laser_telem_reloadBtnCounter(reloadBtnCounter):
     reload_btn_counter = reloadBtnCounter

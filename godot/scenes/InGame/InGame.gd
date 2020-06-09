@@ -1,18 +1,27 @@
 extends Control
 
 var game_over = false
+var events_not_sent = []
+var events_not_acknowledged = []
+var game_history = []
+var rxd_events = []
+var acknowledged_events = []
+var event_counter = 0
+var event_template = {"server_rec_time": null, "client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
 onready var GunShotSound = get_node("GunShotSound")
+onready var TangoDownSound = get_node("TangoDownSound")
+onready var NiceSound = get_node("NiceSound")
 onready var HitIndicatorTimer = get_node("HitIndicatorTimer")
 onready var TimeRemainingTimer = get_node("TimeRemainingTimer")
 onready var RespawnTimer = get_node("RespawnDelayTimer")
 onready var StartGameTimer = get_node("StartGamedelayTimer")
 onready var ReloadTimer = get_node("ReloadTimer")
 onready var TickTocTimer = get_node("TickTocTimer")
+onready var EventRecordTimer = get_node("EventRecordTimer")
 onready var EndReason = get_node("0,1-End of Game/CenterContainer/VBoxContainer/EndReason")
-onready var FastGunShot = get_node("GunShotSound").stream
 
 
 func invert_mups_to_lasers(mups_to_lasers):
@@ -32,21 +41,27 @@ func _ready():
     add_to_group("FreecoiL")
     get_tree().call_group("Container", "next_menu", "0,-1")
     FreecoiLInterface.set_laser_id(Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
+    # Make Connections
+    Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
     set_player_start_game_vars()
     get_tree().call_group("Network", "tell_server_i_am_ready", true)
 
 
 func set_player_start_game_vars():
     set_player_respawn_vars()
+    setup_recording_vars()
     Settings.Session.set_data("game_player_alive", false)
     Settings.Session.set_data("game_tick_toc_start_delay", Settings.InGame.get_data("game_start_delay"))
     Settings.Session.set_data("game_tick_toc_time_remaining", Settings.InGame.get_data("game_time_limit"))
     Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
     Settings.Session.set_data("game_tick_toc_time_elapsed", 0)
-    Settings.Session.set_data("game_started", false)
+    Settings.Session.set_data("game_started", 0)  # Quad State: 0=Not Stated, 1=Started, 2=Paused, 3=Game Over
     Settings.Session.set_data("game_player_team", Settings.InGame.get_data("player_team_by_id")[Settings.Session.get_data("mup_id")])
     Settings.Session.set_data("game_player_teammates", Settings.InGame.get_data("game_teams_by_team_num_by_id")[Settings.Session.get_data("game_player_team")])
     Settings.Session.set_data("game_player_last_killed_by", "")
+    Settings.Session.set_data("game_player_deaths", 0)
+    Settings.Session.set_data("game_player_kills", 0)
+    Settings.Session.set_data("game_player_laser_id", Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
     StartGameTimer.wait_time = Settings.InGame.get_data("game_start_delay")
     StartGameTimer.connect("timeout", self, "start_the_game")
     StartGameTimer.one_shot = true
@@ -76,7 +91,7 @@ func set_player_respawn_vars():
     Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
     Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
     Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
-    Settings.Session.set_data("game_player_alive", true)
+    #Settings.Session.set_data("game_player_alive", true)
     
 func start_game_start_delay(__):
     if get_tree().is_network_server():
@@ -85,20 +100,25 @@ func start_game_start_delay(__):
         rpc("remote_start_game_start_delay")
     
 remotesync func remote_start_game_start_delay():
+    EventRecordTimer.start()
     TickTocTimer.start()
     StartGameTimer.start()
     get_tree().call_group("Container", "next_menu", "-1,-1")
+    if get_tree().is_network_server():
+        record_game_event("start_game_delay")
     
 func start_the_game():
-    Settings.Session.set_data("game_started", true)
+    Settings.Session.set_data("game_started", 1)
     TimeRemainingTimer.start()
     get_tree().call_group("Container", "next_menu", "0,0")
+    record_game_event("start_game")  # I want to see how much drift or lag we have already.
     respawn_finish()
     
 func back_to_Playing():
     pass
     
 func end_game(reason):
+    Settings.Session.set_data("game_started", 3)
     Settings.Session.set_data("game_player_alive", false)
     FreecoiLInterface.reload_start()
     get_tree().call_group("Container", "next_menu", "0,1")
@@ -106,14 +126,105 @@ func end_game(reason):
         EndReason.text = "Out of Time"
 
 ###############################################################################
+# Game Event Recording Functions
+###############################################################################
+
+func _process(__):
+    if events_not_sent.size() > 0:
+        send_game_event_to_server(events_not_sent.pop_front())
+    if rxd_events.size() > 0:
+        var event_to_sort = rxd_events.pop_front()
+        if Settings.Session.get_data("mup_id") == "1":  # mup_id of 1 = server.
+            event_to_sort["server_rec_time"] = EventRecordTimer.time_left
+        if game_history.size() > 0:
+            for index in range(game_history.size() - 1, -1, -1):
+                var event = game_history[index]
+                if event_to_sort["client_time"] < event["client_time"]:
+                    game_history.insert(index + 1, event_to_sort)
+                    break
+                elif event_to_sort["client_time"] == event["client_time"]:
+                    if event_to_sort["event_id"] > event["event_id"]:
+                        game_history.insert(index + 1, event_to_sort)
+                        break
+                    else:
+                        game_history.insert(index, event_to_sort)
+                        break
+        else:
+            event_to_sort["server_rec_time"] = EventRecordTimer.time_left
+            game_history.append(event_to_sort)
+        # Process Alerts
+        if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): # We already alert off our own events in real time.
+            if near_time(event_to_sort["client_time"]):
+                if event_to_sort["type"] == "fired":
+                    GunShotSound.volume_db = -20
+                    GunShotSound.play()
+                elif event_to_sort["type"] == "misfired":
+                    EmptyShotSound.volume_db = -20
+                    EmptyShotSound.play()
+                elif event_to_sort["type"] == "reloading":
+                    ReloadSound.volume_db = -20
+                    ReloadSound.pitch_scale = 0.45 / event_to_sort["additional"]["reload_speed"]
+                    ReloadSound.play()
+                elif event_to_sort["type"] == "died":
+                    if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                        Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
+                        TangoDownSound.play()
+                elif event_to_sort["type"] == "hit":
+                    if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                        if not NiceSound.playing:
+                            NiceSound.play()
+
+func setup_recording_vars():
+    if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
+        event_counter = int(Settings.Session.get_data("mup_id")) * 10000
+
+func record_game_event(type, additional={}):
+    var new_event = event_template.duplicate(true)
+    #{"server_rec_time": null, "client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
+    new_event["client_time"] = EventRecordTimer.time_left
+    new_event["event_id"] = event_counter
+    event_counter += 1
+    new_event["type"] = type
+    new_event["additional"] = additional
+    new_event["rec_by"] = Settings.Session.get_data("mup_id")
+    events_not_sent.append(new_event)
+
+func send_game_event_to_server(event):
+    if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
+        rpc("send_game_event_to_server_remote", event)
+        events_not_acknowledged.append(event)
+            
+remotesync func send_game_event_to_server_remote(event):
+    var rpc_sender_id = get_tree().get_rpc_sender_id()
+    Settings.Log("RPC: 'record_game_event_remote()' to " + str(event) + " from sender_id = " + str(rpc_sender_id))
+    var mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
+    if event["rec_by"] == mup:  # Server Validation, prevents spoofing.
+        rxd_events.append(event)
+        if get_tree().has_network_peer():
+            if get_tree().is_network_server():
+                if rpc_sender_id != 1:
+                    rpc_id(rpc_sender_id, "server_acks_event_remote", event["event_id"])
+                else:
+                    call_deferred("server_acks_event_remote", event["event_id"])
+                acknowledged_events.append(event["event_id"])
+
+remote func server_acks_event_remote(event_id):
+    for event in events_not_acknowledged:
+        if event["event_id"] == event_id:
+            events_not_acknowledged.erase(event)
+            
+func near_time(input):
+    return abs(EventRecordTimer.time_left - input) <= 1  # 2 is the currrent delta(min/max) variance allowed.
+
+###############################################################################
 # TIMER Functions
 ###############################################################################
 
 func tick_toc():
-    if Settings.Session.get_data("game_started"):
+    if Settings.Session.get_data("game_started") == 1:
         Settings.Session.set_data("game_tick_toc_time_remaining", Settings.Session.get_data("game_tick_toc_time_remaining") - 1)
         Settings.Session.set_data("game_tick_toc_time_elapsed", Settings.Session.get_data("game_tick_toc_time_elapsed") + 1)
-        if not Settings.Session.get_data("player_alive"):
+        if not Settings.Session.get_data("game_player_alive"):
             Settings.Session.set_data("game_tick_toc_respawn", Settings.Session.get_data("game_tick_toc_respawn") - 1)
     else:
         Settings.Session.set_data("game_tick_toc_start_delay", Settings.Session.get_data("game_tick_toc_start_delay") - 1)
@@ -125,8 +236,10 @@ func reload_start():
     var collect_magazine_ammo = Settings.Session.get_data("game_weapon_magazine_ammo") + Settings.Session.get_data("game_weapon_total_ammo")
     Settings.Session.set_data("game_weapon_total_ammo", collect_magazine_ammo)
     Settings.Session.set_data("game_weapon_magazine_ammo", 0)
-    ReloadSound.pitch_scale = 0.5 / Settings.Session.get_data("game_weapon_reload_speed")
+    ReloadSound.volume_db = 0
+    ReloadSound.pitch_scale = 0.45 / Settings.Session.get_data("game_weapon_reload_speed")
     ReloadSound.play()
+    record_game_event("reloading", {"gun": Settings.Session.get_data("game_weapon_type"), "reload_speed": Settings.Session.get_data("game_weapon_reload_speed")})
     
 func reload_finish():
     var remove_magazine_ammo = 0
@@ -140,21 +253,38 @@ func reload_finish():
     Settings.Session.set_data("game_weapon_total_ammo", remove_magazine_ammo)
     FreecoiLInterface.reload_finish(Settings.Session.get_data("game_weapon_magazine_ammo"))
 
-func respawn_start(shooter_id):
-    Settings.Session.set_data("game_player_alive", false)
-    RespawnTimer.start()
+func eliminated(laser_id):
     FreecoiLInterface.reload_start()
-    Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
-    if shooter_id != 0:
-        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[shooter_id]
+    Settings.Session.set_data("game_player_alive", false)
+    record_game_event("died", {"laser_id": laser_id})
+    if laser_id != 0:
+        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
         var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
         Settings.Session.set_data("game_player_last_killed_by", shooter_name)
     else:
         Settings.Session.set_data("game_player_last_killed_by", "ID 0")
+    Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
+    get_tree().call_group("Container", "next_menu", "2,0")
+
+func respawn_start(laser_id):
+    FreecoiLInterface.reload_start()
+    Settings.Session.set_data("game_player_alive", false)
+    RespawnTimer.start()
+    Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
+    record_game_event("died", {"laser_id": laser_id})
+    if laser_id != 0:
+        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+        var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
+        Settings.Session.set_data("game_player_last_killed_by", shooter_name)
+    else:
+        Settings.Session.set_data("game_player_last_killed_by", "ID 0")
+    Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
     get_tree().call_group("Container", "next_menu", "1,0")
     
 func respawn_finish():
     set_player_respawn_vars()
+    Settings.Session.set_data("game_player_alive", true)
+    record_game_event("alive")
     reload_start()
     get_tree().call_group("Container", "next_menu", "0,0")
 
@@ -170,12 +300,16 @@ func hit_indicator_stop():
 ###############################################################################
 # FreecoiL group callback Functions
 ###############################################################################  
-func fi_trigger_btn_pushed():
-    if Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
-        EmptyShotSound.play()
-    else:
-        if Settings.Session.get_data("game_player_alive"):
+func fi_trigger_btn_pushed(__):
+    if Settings.Session.get_data("game_player_alive"):
+        if Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
+            EmptyShotSound.volume_db = 0
+            EmptyShotSound.play()
+            record_game_event("misfired", {"gun": Settings.Session.get_data("game_weapon_type")})
+        else:
+            GunShotSound.volume_db = 0
             GunShotSound.play()
+            record_game_event("fired", {"gun": Settings.Session.get_data("game_weapon_type")})
         #else your dead so pass.
             
     
@@ -183,24 +317,26 @@ func fi_reload_btn_pushed():
     if Settings.Session.get_data("game_player_alive"):
         reload_start()
 
-func fi_got_shot(shooter_id):
-    # We vibrate here just to make the player aware they are being shot 
-    # It gives them a chance to shout "I'm Dead."
+func fi_got_shot(laser_id):
     var legit_hit = false
-    Settings.Log("Shot By Player ID # " + str(shooter_id))
-    if shooter_id != 0:
+    Settings.Log("Shot By Player ID # " + str(laser_id))
+    if laser_id != 0:
         if Settings.Session.get_data("game_player_alive"):
             if Settings.InGame.get_data("game_teams"):
                 if Settings.InGame.get_data("game_friendly_fire"):
                     legit_hit = true
                 else:
-                    if not (shooter_id in Settings.Session.get_data("game_player_teammates")):
+                    if not (laser_id in Settings.Session.get_data("game_player_teammates")):
                         legit_hit = true
     if legit_hit:
+        record_game_event("hit", {"laser_id": laser_id})
         Settings.Session.set_data("game_player_health", Settings.Session.get_data("game_player_health") - 1)
         call_deferred("delayed_vibrate")  # Because it was slowing down the processing of shots.
         if Settings.Session.get_data("game_player_health") <= 0:
-            respawn_start(shooter_id)
+            if Settings.Session.get_data("game_player_deaths") + 1 == Settings.InGame.get_data("game_death_limit"):
+                eliminated(laser_id)
+            else:
+                respawn_start(laser_id)
     
 func fi_power_btn_pushed():
     if FreecoiLInterface.recoil_enabled:

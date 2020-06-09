@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=2]
+[gd_scene load_steps=51 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -13,6 +13,8 @@
 [ext_resource path="res://assets/sounds/gun_shot_fast.wav" type="AudioStream" id=11]
 [ext_resource path="res://scenes/InGame/InGame.gd" type="Script" id=12]
 [ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=13]
+[ext_resource path="res://assets/sounds/Nice1.wav" type="AudioStream" id=14]
+[ext_resource path="res://assets/sounds/TangoDown.wav" type="AudioStream" id=15]
 
 [sub_resource type="DynamicFont" id=1]
 size = 40
@@ -62,11 +64,11 @@ script/source = "extends Label
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.InGame.connect(Settings.InGame.monitor_data(\"player_deaths_by_id\"), self, \"update_player_deaths\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_deaths\"), self, \"update_player_deaths\")
 
 
-func update_player_deaths(new_vals):
-    text = \"%03d\" % new_vals[Settings.Session.get_data(\"mups_id\")]
+func update_player_deaths(new_val):
+    text = \"%03d\" % new_val
 "
 
 [sub_resource type="GDScript" id=8]
@@ -80,11 +82,11 @@ script/source = "extends Label
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"player_kills_by_id\"), self, \"update_player_kills\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_kills\"), self, \"update_player_kills\")
 
 
-func update_player_kills(new_vals):
-    text = \"%03d\" % new_vals[Settings.Session.get_data(\"mups_id\")]
+func update_player_kills(new_val):
+    text = \"%03d\" % new_val
 "
 
 [sub_resource type="GDScript" id=9]
@@ -275,6 +277,24 @@ func update_time_remaining(new_val):
     var time_minutes = int(new_val / 60)
     var time_seconds_left = new_val - (time_minutes * 60)
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
+"
+
+[sub_resource type="GDScript" id=35]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    #Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_respawn\"), self, \"update_val\")
+    pass
+
+func update_val(new_val):
+    pass
 "
 
 [sub_resource type="GDScript" id=22]
@@ -507,8 +527,7 @@ func _ready():
 
 
 func _on_Button2_pressed():
-    Settings.Session.set_data(\"game_weapon_magazine_ammo\", 10)
-    get_tree().call_group(\"FreecoiL\", \"fi_trigger_btn_pushed\")
+    get_parent().get_parent().get_parent().get_parent().respawn_start(32)
 "
 
 [node name="InGame" type="Control"]
@@ -634,7 +653,7 @@ __meta__ = {
 }
 
 [node name="CenterContainer" type="CenterContainer" parent="0,0-Playing"]
-margin_top = 97.0
+margin_top = 100.0
 margin_right = 540.0
 margin_bottom = 960.0
 rect_min_size = Vector2( 540, 860 )
@@ -643,9 +662,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
-margin_top = 54.0
+margin_top = 48.0
 margin_right = 540.0
-margin_bottom = 808.0
+margin_bottom = 812.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="CenterContainer" type="CenterContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
@@ -896,7 +915,7 @@ script = SubResource( 16 )
 [node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
 margin_top = 689.0
 margin_right = 540.0
-margin_bottom = 754.0
+margin_bottom = 764.0
 text = "
 "
 
@@ -922,21 +941,21 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-End of Game/CenterContainer"]
-margin_top = 221.0
+margin_top = 214.0
 margin_right = 540.0
-margin_bottom = 338.0
+margin_bottom = 346.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 31.0
+margin_bottom = 36.0
 text = "The Game is Over!"
 align = 1
 
 [node name="EndReason" type="Label" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
-margin_top = 39.0
+margin_top = 44.0
 margin_right = 540.0
-margin_bottom = 70.0
+margin_bottom = 80.0
 text = "Reason Statement."
 align = 1
 
@@ -948,9 +967,9 @@ margin_bottom = 129.0
 text = "View the Scores"
 
 [node name="Button" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
-margin_top = 78.0
+margin_top = 88.0
 margin_right = 540.0
-margin_bottom = 117.0
+margin_bottom = 132.0
 text = "Return to the Main Menu"
 script = SubResource( 17 )
 
@@ -982,8 +1001,8 @@ margin_right = 20.0
 margin_bottom = 20.0
 
 [node name="1,0-Respawn" type="ReferenceRect" parent="."]
-margin_left = 540.95
-margin_right = 1080.95
+margin_left = 540.0
+margin_right = 1080.0
 margin_bottom = 960.0
 rect_min_size = Vector2( 540, 960 )
 __meta__ = {
@@ -991,8 +1010,9 @@ __meta__ = {
 }
 
 [node name="CenterContainer" type="CenterContainer" parent="1,0-Respawn"]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 660.0
 rect_min_size = Vector2( 540, 560 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -1052,24 +1072,78 @@ my_menu = "1,0"
 on_mainmenu_scene = false
 allow_preferences = false
 
-[node name="2,0-InGame Settings" type="ReferenceRect" parent="."]
+[node name="2,0-Eliminated" type="ReferenceRect" parent="."]
 margin_left = 1080.0
-margin_right = 1120.0
-margin_bottom = 40.0
+margin_right = 1620.0
+margin_bottom = 960.0
 rect_min_size = Vector2( 540, 960 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="CenterContainer" parent="2,0-InGame Settings"]
-margin_right = 40.0
-margin_bottom = 40.0
+[node name="CenterContainer" type="CenterContainer" parent="2,0-Eliminated"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 660.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
-[node name="VBoxContainer" type="VBoxContainer" parent="2,0-InGame Settings/CenterContainer"]
-margin_left = 20.0
-margin_top = 20.0
-margin_right = 20.0
-margin_bottom = 20.0
+[node name="VBoxContainer" type="VBoxContainer" parent="2,0-Eliminated/CenterContainer"]
+margin_top = 58.0
+margin_right = 540.0
+margin_bottom = 502.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 51.0
+custom_styles/normal = SubResource( 18 )
+custom_fonts/font = SubResource( 19 )
+text = "You have been Killed."
+align = 1
+
+[node name="Label2" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
+margin_top = 59.0
+margin_right = 540.0
+margin_bottom = 110.0
+custom_styles/normal = SubResource( 18 )
+custom_fonts/font = SubResource( 19 )
+text = "Killed by: Player Name"
+align = 1
+script = SubResource( 20 )
+
+[node name="HSeparator" type="HSeparator" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
+margin_top = 118.0
+margin_right = 540.0
+margin_bottom = 218.0
+custom_constants/separation = 100
+
+[node name="Label3" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
+margin_top = 226.0
+margin_right = 540.0
+margin_bottom = 385.0
+custom_styles/normal = SubResource( 18 )
+custom_fonts/font = SubResource( 19 )
+text = "You have been eliminated from the game."
+align = 1
+autowrap = true
+
+[node name="Label4" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
+margin_top = 393.0
+margin_right = 540.0
+margin_bottom = 444.0
+custom_styles/normal = SubResource( 18 )
+custom_fonts/font = SubResource( 19 )
+text = "Death Limit Reached."
+align = 1
+script = SubResource( 35 )
+
+[node name="Header2" parent="2,0-Eliminated" instance=ExtResource( 2 )]
+my_menu = "1,0"
+on_mainmenu_scene = false
+allow_preferences = false
 
 [node name="1,1-TestOutput" type="ReferenceRect" parent="."]
 margin_left = 540.0
@@ -1090,230 +1164,230 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,1-TestOutput/CenterContainer"]
-margin_top = 222.0
+margin_top = 190.0
 margin_right = 540.0
-margin_bottom = 737.0
+margin_bottom = 770.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Button" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 text = "Back To In Game"
 script = SubResource( 22 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 47.0
+margin_top = 52.0
 margin_right = 540.0
-margin_bottom = 78.0
+margin_bottom = 88.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 175.0
-margin_right = 317.0
-margin_bottom = 31.0
+margin_left = 162.0
+margin_right = 324.0
+margin_bottom = 36.0
 text = "Player ID:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 321.0
-margin_right = 365.0
-margin_bottom = 31.0
+margin_left = 328.0
+margin_right = 377.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 23 )
 
 [node name="HBoxContainer9" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 86.0
+margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 117.0
+margin_bottom = 132.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
-margin_left = 152.0
-margin_right = 340.0
-margin_bottom = 31.0
+margin_left = 136.0
+margin_right = 351.0
+margin_bottom = 36.0
 text = "Player Name:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
-margin_left = 344.0
-margin_right = 388.0
-margin_bottom = 31.0
+margin_left = 355.0
+margin_right = 404.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 24 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 125.0
+margin_top = 140.0
 margin_right = 540.0
-margin_bottom = 156.0
+margin_bottom = 176.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 150.0
-margin_right = 341.0
-margin_bottom = 31.0
+margin_left = 135.0
+margin_right = 352.0
+margin_bottom = 36.0
 text = "Weapon Type:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 345.0
-margin_right = 389.0
-margin_bottom = 31.0
+margin_left = 356.0
+margin_right = 405.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 25 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 164.0
+margin_top = 184.0
 margin_right = 540.0
-margin_bottom = 195.0
+margin_bottom = 220.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
-margin_left = 128.0
-margin_right = 363.0
-margin_bottom = 31.0
+margin_left = 110.0
+margin_right = 377.0
+margin_bottom = 36.0
 text = "Weapon Damage:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
-margin_left = 367.0
-margin_right = 411.0
-margin_bottom = 31.0
+margin_left = 381.0
+margin_right = 430.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 26 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 203.0
+margin_top = 228.0
 margin_right = 540.0
-margin_bottom = 234.0
+margin_bottom = 264.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 160.0
-margin_right = 332.0
-margin_bottom = 31.0
+margin_left = 144.0
+margin_right = 342.0
+margin_bottom = 36.0
 text = "Shot Modes:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 336.0
-margin_right = 380.0
-margin_bottom = 31.0
+margin_left = 346.0
+margin_right = 395.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 27 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 242.0
+margin_top = 272.0
 margin_right = 540.0
-margin_bottom = 273.0
+margin_bottom = 308.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
-margin_left = 113.0
-margin_right = 379.0
-margin_bottom = 31.0
+margin_left = 91.0
+margin_right = 396.0
+margin_bottom = 36.0
 text = "Weapon Shot Mode:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
-margin_left = 383.0
-margin_right = 427.0
-margin_bottom = 31.0
+margin_left = 400.0
+margin_right = 449.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 28 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 281.0
+margin_top = 316.0
 margin_right = 540.0
-margin_bottom = 312.0
+margin_bottom = 352.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
-margin_left = 88.0
-margin_right = 403.0
-margin_bottom = 31.0
+margin_left = 64.0
+margin_right = 422.0
+margin_bottom = 36.0
 text = "Weapon Magazine Size:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
-margin_left = 407.0
-margin_right = 451.0
-margin_bottom = 31.0
+margin_left = 426.0
+margin_right = 475.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 29 )
 
 [node name="HBoxContainer7" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 320.0
+margin_top = 360.0
 margin_right = 540.0
-margin_bottom = 351.0
+margin_bottom = 396.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
-margin_left = 140.0
-margin_right = 352.0
-margin_bottom = 31.0
+margin_left = 122.0
+margin_right = 365.0
+margin_bottom = 36.0
 text = "Weapon Ammo:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
-margin_left = 356.0
-margin_right = 400.0
-margin_bottom = 31.0
+margin_left = 369.0
+margin_right = 418.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 30 )
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 359.0
+margin_top = 404.0
 margin_right = 540.0
-margin_bottom = 390.0
+margin_bottom = 440.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
-margin_left = 146.0
-margin_right = 346.0
-margin_bottom = 31.0
+margin_left = 129.0
+margin_right = 357.0
+margin_bottom = 36.0
 text = "Player Health:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
-margin_left = 350.0
-margin_right = 394.0
-margin_bottom = 31.0
+margin_left = 361.0
+margin_right = 410.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 31 )
 
 [node name="HBoxContainer10" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 398.0
+margin_top = 448.0
 margin_right = 540.0
-margin_bottom = 429.0
+margin_bottom = 484.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
-margin_left = 153.0
-margin_right = 338.0
-margin_bottom = 31.0
+margin_left = 138.0
+margin_right = 349.0
+margin_bottom = 36.0
 text = "Player Team:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
-margin_left = 342.0
-margin_right = 386.0
-margin_bottom = 31.0
+margin_left = 353.0
+margin_right = 402.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 32 )
 
 [node name="HBoxContainer11" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 437.0
+margin_top = 492.0
 margin_right = 540.0
-margin_bottom = 468.0
+margin_bottom = 528.0
 alignment = 1
 
 [node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
-margin_left = 112.0
-margin_right = 379.0
-margin_bottom = 31.0
+margin_left = 90.0
+margin_right = 396.0
+margin_bottom = 36.0
 text = "Player Teammates:"
 
 [node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
-margin_left = 383.0
-margin_right = 427.0
-margin_bottom = 31.0
+margin_left = 400.0
+margin_right = 449.0
+margin_bottom = 36.0
 text = "01"
 script = SubResource( 33 )
 
 [node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 476.0
+margin_top = 536.0
 margin_right = 540.0
-margin_bottom = 515.0
+margin_bottom = 580.0
 text = "Test"
 script = SubResource( 34 )
 
@@ -1328,6 +1402,15 @@ pitch_scale = 1.7
 stream = ExtResource( 9 )
 pitch_scale = 0.17
 
+[node name="TangoDownSound" type="AudioStreamPlayer2D" parent="."]
+skew = 4.37114e-08
+stream = ExtResource( 15 )
+
+[node name="NiceSound" type="AudioStreamPlayer2D" parent="."]
+skew = 4.37114e-08
+stream = ExtResource( 14 )
+volume_db = 10.0
+
 [node name="HitIndicatorTimer" type="Timer" parent="."]
 
 [node name="TimeRemainingTimer" type="Timer" parent="."]
@@ -1339,6 +1422,10 @@ pitch_scale = 0.17
 [node name="ReloadTimer" type="Timer" parent="."]
 
 [node name="TickTocTimer" type="Timer" parent="."]
+
+[node name="EventRecordTimer" type="Timer" parent="."]
+wait_time = 259200.0
+one_shot = true
 
 [node name="1,-1-ConnectGun" parent="." instance=ExtResource( 13 )]
 

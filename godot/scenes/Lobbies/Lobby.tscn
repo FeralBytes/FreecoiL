@@ -797,7 +797,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-editable = false
 script = SubResource( 11 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
@@ -822,7 +821,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Off"
 align = 2
-editable = false
 script = SubResource( 12 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
@@ -847,7 +845,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "0 (No Teams)"
 align = 2
-editable = false
 script = SubResource( 13 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
@@ -872,7 +869,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-editable = false
 script = SubResource( 14 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
@@ -897,7 +893,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-editable = false
 script = SubResource( 15 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
@@ -922,7 +917,6 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-editable = false
 script = SubResource( 16 )
 
 [node name="Header2" parent="0,-1-Game Settings" instance=ExtResource( 3 )]

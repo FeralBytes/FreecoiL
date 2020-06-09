@@ -132,19 +132,34 @@ func test_can_join_team_2():
     # transitions to the InGame definitely means that it is working.
     
 func test_can_start_a_match():
-    while Settings.Session.get_data("game_started") == false:
+    while Settings.Session.get_data("game_started") == 1:
         yield(get_tree(), 'idle_frame')
     pending()
     
 func test_can_be_respawned():
     while Settings.Session.get_data("game_player_alive") != true:
         yield(get_tree(), 'idle_frame')
-    yield(yield_for(1), YIELD)
-    _obj.current_scene.respawn_start(32)
-    yield(get_tree(), 'idle_frame')
-    while Settings.Session.get_data("game_player_alive") == false:
+    while Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
         yield(get_tree(), 'idle_frame')
+    yield(get_tree().create_timer(1.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    yield(get_tree(), 'idle_frame')
+    FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
+    yield(get_tree().create_timer(0.1), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    yield(get_tree().create_timer(1.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    yield(get_tree().create_timer(1.0), "timeout")
+    Settings.Session.set_data("game_player_health", 1)
+    yield(get_tree(), 'idle_frame')
+    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0)
+    yield(get_tree().create_timer(1.0), "timeout")
+    
 
 func test_yield_to_show_result():
-    yield(yield_for(5), YIELD)
+    yield(yield_for(15), YIELD)
+    print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
+    print("Player 1 (Server) Game History:")
+    print(_obj.current_scene.game_history)
+    yield(get_tree().create_timer(1.0), "timeout")
     pending()

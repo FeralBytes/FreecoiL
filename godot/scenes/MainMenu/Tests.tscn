@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -45,15 +45,15 @@ script/source = "extends Button
 func _ready():
     add_to_group(\"FreecoiL\")
     if FreecoiLInterface.recoil_enabled:
-        text = \"Recoil Enabled: Press to Disable Recoil.\"
+        text = \"Recoil Enabled: Press to Disable.\"
     else:
-        text = \"Recoil Disabled: Press to Enable Recoil.\"
+        text = \"Recoil Disabled: Press to Enable.\"
 
 func fi_recoil_enabled_changed():
     if FreecoiLInterface.recoil_enabled:
-        text = \"Recoil Enabled: Press to Disable Recoil.\"
+        text = \"Recoil Enabled: Press to Disable.\"
     else:
-        text = \"Recoil Disabled: Press to Enable Recoil.\"
+        text = \"Recoil Disabled: Press to Enable.\"
 
 
 func _on_Button2_pressed():
@@ -116,6 +116,29 @@ func _on_OptionButton_pressed():
     get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
 "
 
+[sub_resource type="GDScript" id=5]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button4_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
+"
+
 [node name="Tests" type="Control"]
 margin_right = 540.0
 margin_bottom = 960.0
@@ -126,45 +149,45 @@ __meta__ = {
 }
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-margin_top = 120.0
+margin_top = 100.0
 margin_right = 540.0
-margin_bottom = 580.0
+margin_bottom = 560.0
 rect_min_size = Vector2( 540, 460 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
-margin_top = 139.0
+margin_top = 108.0
 margin_right = 540.0
-margin_bottom = 321.0
+margin_bottom = 352.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 36.0
 text = "Tests"
 align = 1
 
 [node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
-margin_top = 45.0
+margin_top = 44.0
 margin_right = 540.0
-margin_bottom = 84.0
+margin_bottom = 88.0
 text = "Connect to Gun"
 script = SubResource( 1 )
 
 [node name="Button2" type="Button" parent="CenterContainer/VBoxContainer"]
-margin_top = 94.0
+margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 133.0
+margin_bottom = 140.0
 text = "Enable Recoil"
 script = SubResource( 2 )
 
 [node name="Button3" type="Button" parent="CenterContainer/VBoxContainer"]
-margin_top = 143.0
+margin_top = 148.0
 margin_right = 540.0
-margin_bottom = 182.0
-text = "Enable/Disable Debug Visual Output"
+margin_bottom = 192.0
+text = "Enable/Disable Debug Output"
 script = SubResource( 3 )
 
 [node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
@@ -175,6 +198,13 @@ margin_bottom = 231.0
 align = 1
 script = SubResource( 4 )
 
+[node name="Button4" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 200.0
+margin_right = 540.0
+margin_bottom = 244.0
+text = "Test"
+script = SubResource( 5 )
+
 [node name="Header2" parent="." instance=ExtResource( 2 )]
 my_menu = "-1,0"
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
@@ -182,3 +212,4 @@ my_menu = "-1,0"
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Button3" to="CenterContainer/VBoxContainer/Button3" method="_on_Button3_pressed" flags=3]
 [connection signal="item_selected" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button4" to="CenterContainer/VBoxContainer/Button4" method="_on_Button4_pressed" flags=3]

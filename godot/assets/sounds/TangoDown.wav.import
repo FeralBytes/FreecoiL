@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/TangoDown.wav-4e97eaed8dc7d82a690399360318665f.sample"
+
+[deps]
+
+source_file="res://assets/sounds/TangoDown.wav"
+dest_files=[ "res://.import/TangoDown.wav-4e97eaed8dc7d82a690399360318665f.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

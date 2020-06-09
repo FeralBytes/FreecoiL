@@ -77,7 +77,8 @@ build_apk:
     - unzip -q -d ~/.local/share/godot GodotExportTemplates.tpz
     - ls -a ~/.local/share/godot
     - chmod +x $GODOT_EXC
-    - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+    # Start trying to download Android SDK and tools for compiliation. 
+    - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
     - unzip -d android-sdk-linux android-sdk.zip
     - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
     - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null

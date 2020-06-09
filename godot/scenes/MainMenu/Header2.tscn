@@ -177,8 +177,9 @@ func _on_Preferences_pressed():
 
 
 func _on_Exit_pressed():
-    get_tree().quit()
+    print(\"Settings.__signals_used = \" + str(Settings.__signals_used))
     hide_settings_menu_popup()
+    get_tree().quit()
 
 
 func _on_Recoil_pressed():
@@ -262,12 +263,6 @@ margin_right = 400.0
 margin_bottom = 120.0
 text = "Toggle Recoil"
 
-[node name="Exit" type="Button" parent="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer"]
-margin_top = 150.0
-margin_right = 400.0
-margin_bottom = 170.0
-text = "Exit App"
-
 [node name="Control" type="Control" parent="HBoxContainer"]
 margin_left = 84.0
 margin_right = 129.0
@@ -317,7 +312,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-dev21 "
+text = " Ver: 0.3.0-dev22 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -326,6 +321,5 @@ __meta__ = {
 [connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/MainMenu" to="." method="_on_MainMenu_pressed" flags=3]
 [connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Preferences" to="." method="_on_Preferences_pressed" flags=3]
 [connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Recoil" to="." method="_on_Recoil_pressed" flags=3]
-[connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Exit" to="." method="_on_Exit_pressed" flags=3]
 [connection signal="pressed" from="HBoxContainer/RecoilBtn" to="." method="_on_RecoilBtn_pressed" flags=3]
 [connection signal="pressed" from="HBoxContainer/GunBtn" to="." method="_on_GunBtn_pressed" flags=3]

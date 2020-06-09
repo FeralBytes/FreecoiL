@@ -86,15 +86,21 @@ func test_can_join_team_1():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("player_team"), 1)
     var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
+    yield(get_tree(), 'idle_frame')
     btn = tmp.get_child(0).get_child(1)
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
 
 func test_can_start_a_match():
-    while Settings.Session.get_data("game_started") != true:
+    while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     pending()
 
 func test_yield_to_show_result():
-    yield(yield_for(20), YIELD)
+    yield(yield_for(22), YIELD)
+    print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
+    print("Player 2 (Client) Game History:")
+    print(_obj.current_scene.game_history)
+    print(_obj.current_scene.rxd_events)
+    yield(get_tree().create_timer(1.0), "timeout")
     pending()
