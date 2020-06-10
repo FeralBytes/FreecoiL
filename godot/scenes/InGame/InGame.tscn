@@ -509,7 +509,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=36]
+[sub_resource type="GDScript" id=35]
 script/source = "extends Label
 
 
@@ -530,7 +530,7 @@ func update_val():
         
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=36]
 script/source = "extends Button
 
 
@@ -1424,14 +1424,14 @@ margin_left = 415.0
 margin_right = 464.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 36 )
+script = SubResource( 35 )
 
 [node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 580.0
 margin_right = 540.0
 margin_bottom = 624.0
 text = "Test"
-script = SubResource( 35 )
+script = SubResource( 36 )
 
 [node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )

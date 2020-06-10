@@ -183,7 +183,7 @@ func _process(__):
     else:
         if easy_day:
             if Settings.Session.get_data("mup_id") == "1":
-                if sync_counter == 120:
+                if sync_counter == 480:
                     rpc("server_has_this_many", acknowledged_events.size())
                     sync_counter = 0
                 else:
@@ -207,33 +207,29 @@ func record_game_event(type, additional={}):
 func send_game_event_to_server(event):
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
         if Settings.Session.get_data("connection_status") == "connected":
-            rpc("send_game_event_to_server_remote", event)
+            rpc_id(1, "send_game_event_to_server_remote", event)
         events_not_acknowledged.append(event)
             
 remotesync func send_game_event_to_server_remote(event):
     var rpc_sender_id = get_tree().get_rpc_sender_id()
-    Settings.Log("RPC: 'record_game_event_remote( " + str(event) + " )' from sender_id = " + str(rpc_sender_id))
+    Settings.Log("Server: RPC: 'send_game_event_to_server_remote( " + str(event) + " )' from sender_id = " + str(rpc_sender_id))
     var mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
     if event["rec_by"] == mup:  # Server Validation, prevents spoofing.
         if get_tree().has_network_peer():
             if get_tree().is_network_server():
                 # If we are going to record the server recieved time do it in a seperate array, not on the events.
                 #event["server_rec_time"] = EventRecordTimer.time_left
-                rxd_events.append(event)
-                acknowledged_events.append(event["event_id"])
-                if rpc_sender_id != 1:
-                    rpc_id(rpc_sender_id, "server_acks_event_remote", event["event_id"])
-                else:
-                    call_deferred("server_acks_event_remote", event["event_id"])
+                #rxd_events.append(event)
+                #acknowledged_events.append(event["event_id"])
+                rpc("server_acks_event_remote", event)
         
 
-remote func server_acks_event_remote(event_id):
-    for event in events_not_acknowledged:
-        if event["event_id"] == event_id:
+remotesync func server_acks_event_remote(event):
+    rxd_events.append(event)
+    acknowledged_events.append(event["event_id"])
+    for local_event in events_not_acknowledged:
+        if local_event["event_id"] == event["event_id"]:
             events_not_acknowledged.erase(event)
-            if Settings.Session.get_data("mup_id") != "1":
-                rxd_events.append(event)
-                acknowledged_events.append(event["event_id"])
             break
             
 func near_time(input):
