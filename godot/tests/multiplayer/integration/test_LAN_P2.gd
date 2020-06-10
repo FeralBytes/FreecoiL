@@ -97,10 +97,13 @@ func test_can_start_a_match():
     pending()
 
 func test_yield_to_show_result():
-    yield(yield_for(22), YIELD)
+    yield(yield_for(23), YIELD)
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
     print("Player 2 (Client) Game History:")
+    print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
-    print(_obj.current_scene.rxd_events)
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     yield(get_tree().create_timer(1.0), "timeout")
     pending()

@@ -33,7 +33,7 @@ var websockets_test_client_disconnected = false
 var testing = false
 var netsync_start_time = null
 
-onready var NetSyncTimer = get_node("NetSyncTimer")
+onready var AutoReconnectTimer = get_node("AutoReconnectTimer")
     
 func invert_mups_to_peers(mups_to_peers):
     if get_tree().get_network_peer() == null:
@@ -73,8 +73,8 @@ func _ready():
     invert_mups_to_peers(Settings.Network.get_data("mups_to_peers"))
     Settings.Network.register_data("mups_ready", {})
     Settings.Network.register_data("peers_minimum", Settings.MIN_PLAYERS)
-    # peer_status can be one of ["connected", "disconnected", "connecting", "reconnecting", "reconnected", "identifying"]
-    Settings.Network.register_data("mups_status", {"1": "connected"})
+    # peer_status can be one of ["do_not_connect", "connected", "disconnected", "connecting", "reconnecting", "reconnected", "identifying"]
+    Settings.Network.register_data("mups_status", {"1": "do_not_connect"})
     #Settings.Session.connect(Settings.Session.monitor_data("server_possible_ips"), self, "setup_server_part2")
     Settings.Network.connect(Settings.Network.monitor_data("mups_to_peers"), self, "invert_mups_to_peers")
     Settings.Network.connect(Settings.Network.monitor_data("mups_ready"), self, "check_if_all_mups_ready")
@@ -83,9 +83,15 @@ func _ready():
     Settings.InGame.set_data("player_name_by_id", {})
     Settings.InGame.set_data("player_team_by_id", {})
     Settings.InGame.set_data("game_teams_by_team_num_by_id", [])
+    Settings.Session.set_data("all_ready", false)
+    Settings.Session.set_data("server_invite", false)
+    Settings.Session.set_data("connection_status", "do_not_connect")
+    Settings.Session.set_data("mups_reconnected", [])
     rng.randomize()
     host_udp_broadcast_uid = rng.randi()
     Settings.Log("Network: UDP: UDP broadcast uid = " + str(host_udp_broadcast_uid))
+    Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "auto_reconnect")
+    AutoReconnectTimer.connect("timeout", self, "auto_reconnect_by_timer")
     set_process(false)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -118,8 +124,8 @@ func reset_networking():
 
 #### SCENETREE SERVER NETWORKING FUNCTIONS
 func _client_connected(godot_peer_id):  # Client Equals Another Player
-    Settings.Log("Network: Server: Peer Connected with peer id: " + str(godot_peer_id), "info")
     if get_tree().is_network_server():
+        Settings.Log("Network: Server: Peer Connected with peer id: " + str(godot_peer_id), "info")
         if godot_peer_id in Settings.Network.get_data("mups_to_peers").values():
             var peers_to_mups = Settings.Network.get_data("peers_to_mups")
             var mups_status = Settings.Network.get_data("mups_status")
@@ -127,8 +133,8 @@ func _client_connected(godot_peer_id):  # Client Equals Another Player
             Settings.Network.set_data("mups_status", mups_status)
     
 func _client_disconnected(godot_peer_id):  # Client Equals Another Player
-    Settings.Log("Peer Disconnected with peer id: " + str(godot_peer_id))
     if get_tree().is_network_server():
+        Settings.Log("Network: Server: Peer Disconnected with peer id: " + str(godot_peer_id))
         if godot_peer_id in Settings.Network.get_data("mups_to_peers").values():
             var peers_to_mups = Settings.Network.get_data("peers_to_mups")
             var mups_status = Settings.Network.get_data("mups_status")
@@ -143,11 +149,11 @@ func assign_unique_id():
     unique_persistant_id += 1
     return str(unique_persistant_id)
     
-remote func identify(pup_id, godot_peer_id):
+remote func identify(prev_mup_id, godot_peer_id):
     var real_rpc_id = get_tree().get_rpc_sender_id()
     if real_rpc_id != godot_peer_id:
         # Spoofing or Bad Client
-        Settings.Log("Bad Remote Client is Spoofing. Real rpc_id: " + str(real_rpc_id) + " Spoofed rpc_id: " + str(godot_peer_id))
+        Settings.Log("Network: Server: Error: Remote Client is Spoofing. Real rpc_id: " + str(real_rpc_id) + " Spoofed rpc_id: " + str(godot_peer_id))
         Server.disconnect_peer(real_rpc_id, true)
         return
     else:
@@ -155,20 +161,21 @@ remote func identify(pup_id, godot_peer_id):
             var mups_status = Settings.Network.get_data("mups_status")
             var peers_to_mups = Settings.Network.get_data("peers_to_mups")
             var mups_to_peers = Settings.Network.get_data("mups_to_peers")
-            if pup_id == null:
+            if prev_mup_id == null:
                 var new_up_id = assign_unique_id()
                 mups_to_peers[new_up_id] = godot_peer_id
                 Settings.Network.set_data("mups_to_peers", mups_to_peers)
                 rpc_id(godot_peer_id, "set_mup_id", new_up_id)
                 mups_status[new_up_id] = "connected"
             else:
-                if Settings.Network.get_data("mups_to_peers").has(pup_id):
-                    if Settings.Network.get_data("mups_to_peers")[pup_id] == godot_peer_id:
+                if Settings.Network.get_data("mups_to_peers").has(prev_mup_id):
+                    if Settings.Network.get_data("mups_to_peers")[prev_mup_id] == godot_peer_id:
                         Settings.Log("Player already identified with the same rpc_id.")
                         mups_status[peers_to_mups[godot_peer_id]] = "reconnected"
                     else:
-                        mups_to_peers[pup_id] = godot_peer_id
+                        mups_to_peers[prev_mup_id] = godot_peer_id
                         Settings.Network.set_data("mups_to_peers", mups_to_peers)
+                        peers_to_mups = Settings.Network.get_data("peers_to_mups")
                         mups_status[peers_to_mups[godot_peer_id]] = "reconnected"
                 else:
                     Settings.Log("Error: player_unique_persistant_id, does not exist yet in peers dict. Bad Client?")
@@ -177,6 +184,10 @@ remote func identify(pup_id, godot_peer_id):
             Settings.Network.sync_peer(godot_peer_id)
             Settings.InGame.sync_peer(godot_peer_id)
             Settings.Network.set_data("mups_status", mups_status)
+            if prev_mup_id != null:
+                var mups_reconnected = Settings.Session.get_data("mups_reconnected").duplicate()
+                mups_reconnected.append(prev_mup_id)
+                Settings.Session.set_data("mups_reconnected", mups_reconnected)
 
 func setup_server_part1():
     reset_networking()
@@ -214,6 +225,7 @@ func setup_server_part2():
     Server.set_bind_ip(Settings.Session.get_data("server_ip"))
     Server.create_server(Settings.Session.get_data("server_port"), Settings.MAX_PLAYERS + Settings.MAX_OBSERVERS)
     get_tree().set_network_peer(Server)
+    Settings.Network.set_data("mups_status", {"1": "connected"})
     Settings.Session.set_data("connection_status", "connected")
     host_udp_broadcast = true
     search_for_peers()
@@ -243,8 +255,6 @@ remote func remote_tell_server_i_am_ready(ready_or_not):
         Settings.Network.set_data("mups_ready", mups_ready)
 
 func check_if_all_mups_ready(mups_ready):
-    if testing:
-        test_all_mups_were_ready = true
     if get_tree().is_network_server():
         var all_ready = true
         if mups_ready.size() == Settings.Network.get_data("mups_to_peers").size() and mups_ready.size() >= Settings.MIN_PLAYERS:
@@ -258,10 +268,13 @@ func check_if_all_mups_ready(mups_ready):
             
 func unready_all_mups():
     if get_tree().is_network_server():
+        Settings.Session.set_data("all_ready", false, false, false)
         var mups_ready = Settings.Network.get_data("mups_ready").duplicate()  # Reuse
         for mups_id in mups_ready:
             mups_ready[mups_id] = false
         Settings.Network.set_data("mups_ready", mups_ready)
+        
+
 
 #### SCENETREE CLIENT NETWORKING FUNCTIONS
 func _connected_ok():
@@ -271,17 +284,24 @@ func _connected_ok():
     if Settings.Session.get_data("player_team") == null:
         Settings.Session.set_data("player_team", 0)
     set_player_team()
+    Settings.Session.set_data("connection_status", "connected")
     
 func _connection_failed():
     Settings.Log("Network: Client: Connection failed.")
     get_tree().set_network_peer(null)
+    Settings.Session.set_data("connection_status", "disconnected")
+    # Attempt to reconnect.
     
 func _server_disconnected():
     Settings.Log("Network: Client: Connection terminated by the server.")
     get_tree().set_network_peer(null)
+    Settings.Session.set_data("connection_status", "disconnected")
     
 func setup_as_client():
-    Settings.Session.set_data("connection_status", "connecting")
+    if Settings.Session.get_data("connection_status") == "disconnected":
+        Settings.Session.set_data("connection_status", "reconnecting")
+    else:
+        Settings.Session.set_data("connection_status", "connecting")
     Settings.Log("Network: Client: Setting up as a client with server address of " + Settings.Session.get_data("server_ip") + ":" + str(Settings.Session.get_data("server_port")))
     Client = NetworkedMultiplayerENet.new()
     Client.create_client(Settings.Session.get_data("server_ip"), Settings.Session.get_data("server_port"))
@@ -351,6 +371,29 @@ remote func set_player_team_remote(new_team):
         game_teams_by_team_num_by_id[new_team].append(mups)
         Settings.InGame.set_data("game_teams_by_team_num_by_id", game_teams_by_team_num_by_id)
 
+func client_disconnect():
+    Client.close_connection()
+    get_tree().set_network_peer(null)
+    Settings.Session.set_data("connection_status", "do_not_connect")
+    
+func auto_reconnect(connection_status):
+    if connection_status == "disconnected":
+        if Settings.Session.get_data("mup_id") != "1":  # Make sure we are not the server.
+            call_deferred("setup_as_client")
+            AutoReconnectTimer.start()
+        else:
+            pass  # Not yet handling the server issue.
+
+func auto_reconnect_by_timer():
+    var connection_status = Settings.Session.get_data("connection_status")
+    if connection_status == "disconnected":
+        if Settings.Session.get_data("mup_id") != "1":  # Make sure we are not the server.
+            call_deferred("setup_as_client")
+            AutoReconnectTimer.start()
+        else:
+            pass  # Not yet handling the server issue.
+            
+
 #### UDP BroadCast For LAN
 func search_for_peers():
     Settings.Log("Network: UDP: Search for Peers: Setting up new PacketPeerUDP.")
@@ -410,7 +453,9 @@ func _udp_broadcast_rxd():
                         Settings.Session.set_data("server_port", udp_var[2])
                         get_tree().call_group("Network", "stop_udp_peer_search")
                         get_tree().call_group("Network", "setup_as_client")
-                        get_tree().call_group("Container", "load_lobby")              
+                        get_tree().call_group("Container", "load_lobby") 
+                        if testing:
+                            udp_test_from_peer = udp_var[3]             
         # Remove peers that have not broadcast lately. > 3 seconds.
         for udp_peer in udp_peer_dict:
             if OS.get_system_time_secs() - udp_peer_dict[udp_peer] > 3:
@@ -419,7 +464,8 @@ func _udp_broadcast_rxd():
             
 func _hosting_so_toss_udp_broadcast():
     search_udp_broadcast = false
-    network_loops.remove("_udp_broadcast_tx")
+    if "_udp_broadcast_tx" in network_loops:
+        network_loops.remove("_udp_broadcast_tx")
     if pp_udp != null:
         while pp_udp.get_available_packet_count() > 0:
             var udp_var = pp_udp.get_var()

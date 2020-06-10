@@ -134,7 +134,6 @@ func test_can_join_team_2():
 func test_can_start_a_match():
     while Settings.Session.get_data("game_started") == 1:
         yield(get_tree(), 'idle_frame')
-    pending()
     
 func test_can_be_respawned():
     while Settings.Session.get_data("game_player_alive") != true:
@@ -158,8 +157,22 @@ func test_can_be_respawned():
 
 func test_yield_to_show_result():
     yield(yield_for(15), YIELD)
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
     print("Player 1 (Server) Game History:")
+    print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
+    yield(get_tree(), 'idle_frame')
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print("Settings.Session:")
+    print(Settings.Session.__settings)
+    print("Settings.Network:")
+    print(Settings.Network.__settings)
+    print("Settings.InGame:")
+    print(Settings.InGame.__settings)
+    print("Settings.Preferences:")
+    print(Settings.Preferences.__settings)
+    print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     yield(get_tree().create_timer(1.0), "timeout")
     pending()

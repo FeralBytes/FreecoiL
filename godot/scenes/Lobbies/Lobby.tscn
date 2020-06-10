@@ -22,7 +22,6 @@ func _ready():
 func set_player_laser_ids(all_ready):
     if all_ready:
         if get_tree().is_network_server():
-            Settings.Session.set_data(\"all_ready\", false, false, false)
             var player_laser_by_id = {}
             var player_score_by_id = {}
             var player_deaths_by_id = {}
@@ -498,40 +497,38 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
-margin_left = 2.0
-margin_top = 4.0
-margin_right = 542.0
-margin_bottom = 855.0
+margin_right = 540.0
+margin_bottom = 876.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="LobbyDropDown" type="OptionButton" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 text = "Game Lobby"
 align = 1
 script = SubResource( 2 )
 
 [node name="Label2" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
-margin_top = 47.0
+margin_top = 52.0
 margin_right = 540.0
-margin_bottom = 78.0
+margin_bottom = 88.0
 text = "The host is  setting up the game."
 align = 1
 script = SubResource( 3 )
 
 [node name="Teams" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
-margin_top = 86.0
+margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 117.0
+margin_bottom = 132.0
 text = "Teams are turned \"OFF\"."
 align = 1
 script = SubResource( 4 )
 
 [node name="JoinTeam" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
-margin_top = 125.0
+margin_top = 140.0
 margin_right = 540.0
-margin_bottom = 164.0
+margin_bottom = 184.0
 script = SubResource( 5 )
 
 [node name="Label" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
@@ -543,16 +540,16 @@ text = "Network Match Lobby"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
-margin_top = 172.0
+margin_top = 192.0
 margin_right = 540.0
-margin_bottom = 851.0
+margin_bottom = 876.0
 custom_constants/separation = 12
 alignment = 1
 
 [node name="LeftBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 43.0
-margin_bottom = 679.0
+margin_bottom = 684.0
 theme = ExtResource( 4 )
 custom_fonts/font = SubResource( 6 )
 text = "<"
@@ -560,45 +557,45 @@ text = "<"
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 55.0
 margin_right = 485.0
-margin_bottom = 679.0
+margin_bottom = 684.0
 rect_min_size = Vector2( 430, 0 )
 alignment = 1
 
 [node name="Team" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 430.0
-margin_bottom = 31.0
+margin_bottom = 36.0
 text = "Rogue Players (No Team)"
 align = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
-margin_top = 39.0
+margin_top = 44.0
 margin_right = 430.0
-margin_bottom = 679.0
+margin_bottom = 684.0
 rect_min_size = Vector2( 430, 640 )
 scroll_horizontal_enabled = false
 
 [node name="TeamContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
 margin_right = 430.0
-margin_bottom = 108.0
+margin_bottom = 118.0
 rect_min_size = Vector2( 430, 0 )
 custom_constants/separation = 30
 script = SubResource( 7 )
 
 [node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
 margin_right = 430.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 text = "Joe"
 
 [node name="Button2" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
-margin_top = 69.0
+margin_top = 74.0
 margin_right = 430.0
-margin_bottom = 108.0
+margin_bottom = 118.0
 text = "Joe"
 
 [node name="RightBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 497.0
 margin_right = 536.0
-margin_bottom = 679.0
+margin_bottom = 684.0
 theme = ExtResource( 5 )
 custom_fonts/font = SubResource( 8 )
 text = ">"
@@ -627,39 +624,38 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
-margin_left = 2.0
-margin_top = 24.0
-margin_right = 542.0
-margin_bottom = 835.0
+margin_top = 12.0
+margin_right = 540.0
+margin_bottom = 848.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="LobbyDropDown" type="OptionButton" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 align = 1
 script = SubResource( 2 )
 
 [node name="Label2" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
-margin_top = 47.0
+margin_top = 52.0
 margin_right = 540.0
-margin_bottom = 78.0
+margin_bottom = 88.0
 text = "The host is setting up the game."
 align = 1
 script = SubResource( 3 )
 
 [node name="Teams" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
-margin_top = 86.0
+margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 117.0
+margin_bottom = 132.0
 text = "Teams are turned \"OFF\"."
 align = 1
 script = SubResource( 4 )
 
 [node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
-margin_top = 125.0
+margin_top = 140.0
 margin_right = 540.0
-margin_bottom = 164.0
+margin_bottom = 184.0
 script = SubResource( 5 )
 
 [node name="Label" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
@@ -671,16 +667,16 @@ text = "Network Match Lobby"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
-margin_top = 172.0
+margin_top = 192.0
 margin_right = 540.0
-margin_bottom = 811.0
+margin_bottom = 836.0
 custom_constants/separation = 12
 alignment = 1
 
 [node name="LeftBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 4.0
 margin_right = 43.0
-margin_bottom = 639.0
+margin_bottom = 644.0
 custom_styles/normal = SubResource( 9 )
 custom_fonts/font = SubResource( 6 )
 text = "<"
@@ -688,38 +684,38 @@ text = "<"
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 55.0
 margin_right = 485.0
-margin_bottom = 639.0
+margin_bottom = 644.0
 rect_min_size = Vector2( 430, 0 )
 alignment = 1
 
 [node name="Team" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
 margin_right = 430.0
-margin_bottom = 31.0
+margin_bottom = 36.0
 text = "Rogue Players (No Team)!"
 align = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
-margin_top = 39.0
+margin_top = 44.0
 margin_right = 430.0
-margin_bottom = 639.0
+margin_bottom = 644.0
 rect_min_size = Vector2( 430, 600 )
 scroll_horizontal_enabled = false
 
 [node name="TeamContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
 margin_right = 430.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 rect_min_size = Vector2( 430, 0 )
 script = SubResource( 7 )
 
 [node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
 margin_right = 430.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 text = "Joe"
 
 [node name="RightBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 497.0
 margin_right = 536.0
-margin_bottom = 639.0
+margin_bottom = 644.0
 custom_styles/normal = SubResource( 10 )
 custom_fonts/font = SubResource( 8 )
 text = ">"
@@ -749,42 +745,42 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer"]
-margin_top = 207.0
+margin_top = 187.0
 margin_right = 540.0
-margin_bottom = 653.0
+margin_bottom = 673.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="LobbyDropDown" type="OptionButton" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 39.0
+margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 align = 1
 script = SubResource( 2 )
 
 [node name="Label2" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
-margin_top = 47.0
+margin_top = 52.0
 margin_right = 540.0
-margin_bottom = 78.0
+margin_bottom = 88.0
 text = "The host is setting up the game."
 align = 1
 script = SubResource( 3 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
-margin_top = 86.0
+margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 446.0
+margin_bottom = 486.0
 rect_min_size = Vector2( 540, 0 )
 custom_constants/separation = 30
 
 [node name="HBoxContainer" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "Scenario type:"
 clip_text = true
@@ -792,7 +788,7 @@ clip_text = true
 [node name="Scenario" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
@@ -800,15 +796,15 @@ align = 2
 script = SubResource( 11 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
-margin_top = 65.0
+margin_top = 70.0
 margin_right = 540.0
-margin_bottom = 100.0
+margin_bottom = 110.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "Teams are turned:"
 clip_text = true
@@ -816,7 +812,7 @@ clip_text = true
 [node name="Teams" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Off"
@@ -824,15 +820,15 @@ align = 2
 script = SubResource( 12 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
-margin_top = 130.0
+margin_top = 140.0
 margin_right = 540.0
-margin_bottom = 165.0
+margin_bottom = 180.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "Number of Teams:"
 clip_text = true
@@ -840,7 +836,7 @@ clip_text = true
 [node name="NumOfTeams" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "0 (No Teams)"
@@ -848,15 +844,15 @@ align = 2
 script = SubResource( 13 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
-margin_top = 195.0
+margin_top = 210.0
 margin_right = 540.0
-margin_bottom = 230.0
+margin_bottom = 250.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer4"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "The match is played:"
 clip_text = true
@@ -864,7 +860,7 @@ clip_text = true
 [node name="InOrOut" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer4"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
@@ -872,15 +868,15 @@ align = 2
 script = SubResource( 14 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
-margin_top = 260.0
+margin_top = 280.0
 margin_right = 540.0
-margin_bottom = 295.0
+margin_bottom = 320.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer5"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "Game ending limit:"
 clip_text = true
@@ -888,7 +884,7 @@ clip_text = true
 [node name="GameEnding" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer5"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
@@ -896,15 +892,15 @@ align = 2
 script = SubResource( 15 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
-margin_top = 325.0
+margin_top = 350.0
 margin_right = 540.0
-margin_bottom = 360.0
+margin_bottom = 390.0
 alignment = 1
 
 [node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer6"]
 margin_top = 2.0
 margin_right = 300.0
-margin_bottom = 33.0
+margin_bottom = 38.0
 rect_min_size = Vector2( 300, 0 )
 text = "Respawn delay:"
 clip_text = true
@@ -912,7 +908,7 @@ clip_text = true
 [node name="RespawnDelay" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer6"]
 margin_left = 304.0
 margin_right = 539.0
-margin_bottom = 35.0
+margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
@@ -944,29 +940,29 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,0-Name Conflict/CenterContainer"]
-margin_top = 337.0
+margin_top = 325.0
 margin_right = 540.0
-margin_bottom = 522.0
+margin_bottom = 535.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label2" type="Label" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 99.0
+margin_bottom = 114.0
 text = "You have a Callsign conflict with another player, and the other player was in the lobby first."
 align = 1
 autowrap = true
 
 [node name="Label" type="Label" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
-margin_top = 107.0
+margin_top = 122.0
 margin_right = 540.0
-margin_bottom = 138.0
+margin_bottom = 158.0
 text = "Please change your callsign."
 align = 1
 
 [node name="LineEdit" type="LineEdit" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
-margin_top = 146.0
+margin_top = 166.0
 margin_right = 540.0
-margin_bottom = 185.0
+margin_bottom = 210.0
 
 [node name="Header2" parent="1,0-Name Conflict" instance=ExtResource( 3 )]
 my_menu = "1,0"

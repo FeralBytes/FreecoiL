@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=2]
+[gd_scene load_steps=52 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -210,6 +210,8 @@ func _ready():
 func update_time_remaining(new_val):
     var time_minutes = int(new_val / 60)
     var time_seconds_left = new_val - (time_minutes * 60)
+    time_minutes = \"%02d\" % time_minutes
+    time_seconds_left = \"%02d\" % time_seconds_left
     text = \"Time Remaining: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
@@ -279,7 +281,7 @@ func update_time_remaining(new_val):
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Label
 
 
@@ -297,7 +299,7 @@ func update_val(new_val):
     pass
 "
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=23]
 script/source = "extends Button
 
 
@@ -320,7 +322,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
-[sub_resource type="GDScript" id=23]
+[sub_resource type="GDScript" id=24]
 script/source = "extends Label
 
 
@@ -337,7 +339,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=24]
+[sub_resource type="GDScript" id=25]
 script/source = "extends Label
 
 
@@ -354,7 +356,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=26]
 script/source = "extends Label
 
 
@@ -371,7 +373,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=26]
+[sub_resource type="GDScript" id=27]
 script/source = "extends Label
 
 
@@ -388,7 +390,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=27]
+[sub_resource type="GDScript" id=28]
 script/source = "extends Label
 
 
@@ -405,7 +407,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=29]
 script/source = "extends Label
 
 
@@ -422,7 +424,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=29]
+[sub_resource type="GDScript" id=30]
 script/source = "extends Label
 
 
@@ -439,7 +441,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Label
 
 
@@ -456,7 +458,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=31]
+[sub_resource type="GDScript" id=32]
 script/source = "extends Label
 
 
@@ -473,7 +475,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=32]
+[sub_resource type="GDScript" id=33]
 script/source = "extends Label
 
 
@@ -490,7 +492,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=33]
+[sub_resource type="GDScript" id=34]
 script/source = "extends Label
 
 
@@ -507,7 +509,28 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=36]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+onready var InGame = get_parent().get_parent().get_parent().get_parent().get_parent()
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    call_deferred(\"update_val\")
+
+
+func update_val():
+    while true:
+        yield(get_tree().create_timer(1.0), \"timeout\")
+        text = str(InGame.game_history.size())
+        
+"
+
+[sub_resource type="GDScript" id=35]
 script/source = "extends Button
 
 
@@ -1138,7 +1161,7 @@ custom_styles/normal = SubResource( 18 )
 custom_fonts/font = SubResource( 19 )
 text = "Death Limit Reached."
 align = 1
-script = SubResource( 35 )
+script = SubResource( 22 )
 
 [node name="Header2" parent="2,0-Eliminated" instance=ExtResource( 2 )]
 my_menu = "1,0"
@@ -1164,16 +1187,16 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,1-TestOutput/CenterContainer"]
-margin_top = 190.0
+margin_top = 168.0
 margin_right = 540.0
-margin_bottom = 770.0
+margin_bottom = 792.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Button" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 44.0
 text = "Back To In Game"
-script = SubResource( 22 )
+script = SubResource( 23 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 52.0
@@ -1192,7 +1215,7 @@ margin_left = 328.0
 margin_right = 377.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 23 )
+script = SubResource( 24 )
 
 [node name="HBoxContainer9" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -1211,7 +1234,7 @@ margin_left = 355.0
 margin_right = 404.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 24 )
+script = SubResource( 25 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 140.0
@@ -1230,7 +1253,7 @@ margin_left = 356.0
 margin_right = 405.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 25 )
+script = SubResource( 26 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 184.0
@@ -1249,7 +1272,7 @@ margin_left = 381.0
 margin_right = 430.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 26 )
+script = SubResource( 27 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 228.0
@@ -1268,7 +1291,7 @@ margin_left = 346.0
 margin_right = 395.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 27 )
+script = SubResource( 28 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 272.0
@@ -1287,7 +1310,7 @@ margin_left = 400.0
 margin_right = 449.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 28 )
+script = SubResource( 29 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 316.0
@@ -1306,7 +1329,7 @@ margin_left = 426.0
 margin_right = 475.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 29 )
+script = SubResource( 30 )
 
 [node name="HBoxContainer7" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 360.0
@@ -1325,7 +1348,7 @@ margin_left = 369.0
 margin_right = 418.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 30 )
+script = SubResource( 31 )
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 404.0
@@ -1344,7 +1367,7 @@ margin_left = 361.0
 margin_right = 410.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 31 )
+script = SubResource( 32 )
 
 [node name="HBoxContainer10" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 448.0
@@ -1363,7 +1386,7 @@ margin_left = 353.0
 margin_right = 402.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 32 )
+script = SubResource( 33 )
 
 [node name="HBoxContainer11" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 492.0
@@ -1382,14 +1405,33 @@ margin_left = 400.0
 margin_right = 449.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 33 )
+script = SubResource( 34 )
 
-[node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+[node name="HBoxContainer12" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 536.0
 margin_right = 540.0
-margin_bottom = 580.0
+margin_bottom = 572.0
+alignment = 1
+
+[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer12"]
+margin_left = 75.0
+margin_right = 411.0
+margin_bottom = 36.0
+text = "Size of Game History:"
+
+[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer12"]
+margin_left = 415.0
+margin_right = 464.0
+margin_bottom = 36.0
+text = "01"
+script = SubResource( 36 )
+
+[node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
+margin_top = 580.0
+margin_right = 540.0
+margin_bottom = 624.0
 text = "Test"
-script = SubResource( 34 )
+script = SubResource( 35 )
 
 [node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )
@@ -1405,11 +1447,12 @@ pitch_scale = 0.17
 [node name="TangoDownSound" type="AudioStreamPlayer2D" parent="."]
 skew = 4.37114e-08
 stream = ExtResource( 15 )
+volume_db = 10.0
 
 [node name="NiceSound" type="AudioStreamPlayer2D" parent="."]
 skew = 4.37114e-08
 stream = ExtResource( 14 )
-volume_db = 10.0
+volume_db = 5.0
 
 [node name="HitIndicatorTimer" type="Timer" parent="."]
 

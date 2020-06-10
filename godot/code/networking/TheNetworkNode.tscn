@@ -5,5 +5,5 @@
 [node name="TheNetworkNode" type="Node"]
 script = ExtResource( 1 )
 
-[node name="NetSyncTimer" type="Timer" parent="."]
-wait_time = 259200.0
+[node name="AutoReconnectTimer" type="Timer" parent="."]
+wait_time = 5.0

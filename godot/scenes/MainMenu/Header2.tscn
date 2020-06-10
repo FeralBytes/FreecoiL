@@ -312,7 +312,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-dev22 "
+text = " Ver: 0.3.0-dev23 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false

@@ -6,8 +6,10 @@ var events_not_acknowledged = []
 var game_history = []
 var rxd_events = []
 var acknowledged_events = []
+var peers_in_catch_up = []
 var event_counter = 0
-var event_template = {"server_rec_time": null, "client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
+var sync_counter = 0
+var event_template = {"client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -37,6 +39,7 @@ func invert_mups_to_lasers(mups_to_lasers):
 func _ready():
     if get_tree().is_network_server():
         Settings.Session.connect(Settings.Session.monitor_data("all_ready"), self, "start_game_start_delay")
+        Settings.Session.connect(Settings.Session.monitor_data("mups_reconnected"), self, "on_mup_reconnected")
         invert_mups_to_lasers(Settings.InGame.get_data("player_laser_by_id"))
     add_to_group("FreecoiL")
     get_tree().call_group("Container", "next_menu", "0,-1")
@@ -130,33 +133,35 @@ func end_game(reason):
 ###############################################################################
 
 func _process(__):
+    var easy_day = false
     if events_not_sent.size() > 0:
         send_game_event_to_server(events_not_sent.pop_front())
+    else:
+        easy_day = true
     if rxd_events.size() > 0:
+        easy_day = false
         var event_to_sort = rxd_events.pop_front()
-        if Settings.Session.get_data("mup_id") == "1":  # mup_id of 1 = server.
-            event_to_sort["server_rec_time"] = EventRecordTimer.time_left
         if game_history.size() > 0:
-            for index in range(game_history.size() - 1, -1, -1):
-                var event = game_history[index]
-                if event_to_sort["client_time"] < event["client_time"]:
-                    game_history.insert(index + 1, event_to_sort)
-                    break
-                elif event_to_sort["client_time"] == event["client_time"]:
-                    if event_to_sort["event_id"] > event["event_id"]:
+            if not game_history.has(event_to_sort):
+                for index in range(game_history.size() - 1, -1, -1):
+                    var event = game_history[index]
+                    if event_to_sort["client_time"] < event["client_time"]:
                         game_history.insert(index + 1, event_to_sort)
                         break
-                    else:
-                        game_history.insert(index, event_to_sort)
-                        break
+                    elif event_to_sort["client_time"] == event["client_time"]:
+                        if event_to_sort["event_id"] > event["event_id"]:
+                            game_history.insert(index + 1, event_to_sort)
+                            break
+                        else:
+                            game_history.insert(index, event_to_sort)
+                            break
         else:
-            event_to_sort["server_rec_time"] = EventRecordTimer.time_left
             game_history.append(event_to_sort)
         # Process Alerts
         if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): # We already alert off our own events in real time.
             if near_time(event_to_sort["client_time"]):
                 if event_to_sort["type"] == "fired":
-                    GunShotSound.volume_db = -20
+                    GunShotSound.volume_db = -25
                     GunShotSound.play()
                 elif event_to_sort["type"] == "misfired":
                     EmptyShotSound.volume_db = -20
@@ -167,12 +172,22 @@ func _process(__):
                     ReloadSound.play()
                 elif event_to_sort["type"] == "died":
                     if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
-                        Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
                         TangoDownSound.play()
                 elif event_to_sort["type"] == "hit":
                     if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
                         if not NiceSound.playing:
                             NiceSound.play()
+            if event_to_sort["type"] == "died":
+                if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                    Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
+    else:
+        if easy_day:
+            if Settings.Session.get_data("mup_id") == "1":
+                if sync_counter == 120:
+                    rpc("server_has_this_many", acknowledged_events.size())
+                    sync_counter = 0
+                else:
+                    sync_counter += 1
 
 func setup_recording_vars():
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
@@ -180,7 +195,7 @@ func setup_recording_vars():
 
 func record_game_event(type, additional={}):
     var new_event = event_template.duplicate(true)
-    #{"server_rec_time": null, "client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
+    #{"client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
     new_event["client_time"] = EventRecordTimer.time_left
     new_event["event_id"] = event_counter
     event_counter += 1
@@ -191,31 +206,73 @@ func record_game_event(type, additional={}):
 
 func send_game_event_to_server(event):
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
-        rpc("send_game_event_to_server_remote", event)
+        if Settings.Session.get_data("connection_status") == "connected":
+            rpc("send_game_event_to_server_remote", event)
         events_not_acknowledged.append(event)
             
 remotesync func send_game_event_to_server_remote(event):
     var rpc_sender_id = get_tree().get_rpc_sender_id()
-    Settings.Log("RPC: 'record_game_event_remote()' to " + str(event) + " from sender_id = " + str(rpc_sender_id))
+    Settings.Log("RPC: 'record_game_event_remote( " + str(event) + " )' from sender_id = " + str(rpc_sender_id))
     var mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
     if event["rec_by"] == mup:  # Server Validation, prevents spoofing.
-        rxd_events.append(event)
         if get_tree().has_network_peer():
             if get_tree().is_network_server():
+                # If we are going to record the server recieved time do it in a seperate array, not on the events.
+                #event["server_rec_time"] = EventRecordTimer.time_left
+                rxd_events.append(event)
+                acknowledged_events.append(event["event_id"])
                 if rpc_sender_id != 1:
                     rpc_id(rpc_sender_id, "server_acks_event_remote", event["event_id"])
                 else:
                     call_deferred("server_acks_event_remote", event["event_id"])
-                acknowledged_events.append(event["event_id"])
+        
 
 remote func server_acks_event_remote(event_id):
     for event in events_not_acknowledged:
         if event["event_id"] == event_id:
             events_not_acknowledged.erase(event)
+            if Settings.Session.get_data("mup_id") != "1":
+                rxd_events.append(event)
+                acknowledged_events.append(event["event_id"])
+            break
             
 func near_time(input):
     return abs(EventRecordTimer.time_left - input) <= 1  # 2 is the currrent delta(min/max) variance allowed.
 
+func on_mup_reconnected(mups_reconnected):
+    var mup_id = mups_reconnected.pop_front()
+    Settings.Session.set_data("mups_reconnected", mups_reconnected, false, false)
+    rpc_id(Settings.Network.get_data("mups_to_peers")[mup_id], "send_unacknowledged_events")
+
+remote func send_unacknowledged_events():
+    var rpc_sender_id = get_tree().get_rpc_sender_id()
+    Settings.Log("Client: RPC: 'send_unacknowledged_events( )' from sender_id = " + str(rpc_sender_id))
+    events_not_sent = events_not_acknowledged + events_not_sent
+    events_not_acknowledged.clear()
+    rpc_id(1, "i_have", acknowledged_events)
+    
+remote func i_have(acknowledged_events):
+    var rpc_sender_id = get_tree().get_rpc_sender_id()
+    if rpc_sender_id in peers_in_catch_up:
+        return
+    peers_in_catch_up.append(rpc_sender_id)
+    Settings.Log("Server: RPC: 'i_have( " + str(acknowledged_events.size()) + " )' from sender_id = " + str(rpc_sender_id))  # acknowledged_events can be huge.
+    for event in game_history:
+        if not acknowledged_events.has(event["event_id"]):
+            rpc_id(rpc_sender_id, "you_are_missing_this", event)
+            yield(get_tree(), 'idle_frame')
+    peers_in_catch_up.erase(rpc_sender_id)
+
+remote func server_has_this_many(size_of_events):
+    if acknowledged_events.size() != size_of_events:
+        var rpc_sender_id = get_tree().get_rpc_sender_id()
+        Settings.Log("Client: RPC: 'server_has_this_many( " + str(size_of_events) + 
+            " )' I only have ( " + str(acknowledged_events.size()) + " ) from sender_id = " + str(rpc_sender_id))
+        rpc_id(1, "i_have", acknowledged_events)
+        
+remote func you_are_missing_this(event):
+    rxd_events.append(event)
+    acknowledged_events.append(event["event_id"])
 ###############################################################################
 # TIMER Functions
 ###############################################################################
@@ -267,26 +324,28 @@ func eliminated(laser_id):
     get_tree().call_group("Container", "next_menu", "2,0")
 
 func respawn_start(laser_id):
-    FreecoiLInterface.reload_start()
-    Settings.Session.set_data("game_player_alive", false)
-    RespawnTimer.start()
-    Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
-    record_game_event("died", {"laser_id": laser_id})
-    if laser_id != 0:
-        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
-        var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
-        Settings.Session.set_data("game_player_last_killed_by", shooter_name)
-    else:
-        Settings.Session.set_data("game_player_last_killed_by", "ID 0")
-    Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
-    get_tree().call_group("Container", "next_menu", "1,0")
+    if Settings.Session.get_data("game_started") == 1:
+        FreecoiLInterface.reload_start()
+        Settings.Session.set_data("game_player_alive", false)
+        RespawnTimer.start()
+        Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
+        record_game_event("died", {"laser_id": laser_id})
+        if laser_id != 0:
+            var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+            var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
+            Settings.Session.set_data("game_player_last_killed_by", shooter_name)
+        else:
+            Settings.Session.set_data("game_player_last_killed_by", "ID 0")
+        Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
+        get_tree().call_group("Container", "next_menu", "1,0")
     
 func respawn_finish():
-    set_player_respawn_vars()
-    Settings.Session.set_data("game_player_alive", true)
-    record_game_event("alive")
-    reload_start()
-    get_tree().call_group("Container", "next_menu", "0,0")
+    if Settings.Session.get_data("game_started") == 1:
+        set_player_respawn_vars()
+        Settings.Session.set_data("game_player_alive", true)
+        record_game_event("alive")
+        reload_start()
+        get_tree().call_group("Container", "next_menu", "0,0")
 
 func delayed_vibrate():
     FreecoiLInterface.vibrate(200)
