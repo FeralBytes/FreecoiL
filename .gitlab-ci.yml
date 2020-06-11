@@ -19,7 +19,7 @@ before_script:
   - dpkg-reconfigure --frontend=noninteractive locales
   - update-locale LANG=en_US.UTF-8
   - export LANG=en_US.UTF-8
-  - apt-get install -y python3 gradle wget tar unzip lib32stdc++6 lib32z1
+  - apt-get install -y yes python3 gradle wget tar unzip lib32stdc++6 lib32z1
   - mkdir -p ~/.config/godot/projects
   - mkdir -p ~/.godot
   - mkdir -p ~/.local/share/godot
