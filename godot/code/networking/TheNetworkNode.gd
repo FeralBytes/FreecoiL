@@ -329,9 +329,9 @@ remote func set_player_name_remote(new_name):
         else:
             rpc_sender_id = get_tree().get_rpc_sender_id()
         Settings.Log("RPC: 'set_player_name_remote()' to " + str(new_name) + " from sender_id = " + str(rpc_sender_id))
-        var player_name_by_id = Settings.InGame.get_data("player_name_by_id")
-        var mups = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
-        player_name_by_id[mups] = new_name
+        var player_name_by_id = Settings.InGame.get_data("player_name_by_id").duplicate()
+        var mup_id = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
+        player_name_by_id[mup_id] = new_name
         Settings.InGame.set_data("player_name_by_id", player_name_by_id)
 
 func set_player_team():

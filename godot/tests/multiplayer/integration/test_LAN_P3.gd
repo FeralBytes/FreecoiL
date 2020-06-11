@@ -4,7 +4,7 @@ var Obj
 var _obj
 var _map_maker
 var time_started
-var new_player_name = "Player 2"
+var new_player_name = "Player 3"
 
 onready var OvertimeTimer = Timer.new()
 
@@ -51,33 +51,33 @@ func after_all():
     var str_elapsed = "%02d : %02d" % [minutes, seconds]
     print("Elapsed Time = ", str_elapsed)
 
-func test_p2_loads_to_main_menu():
+func test_p3_loads_to_main_menu():
     while _obj.current_scene.name != "MainMenu":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "MainMenu")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
         
-func test_p2_can_change_player_name():
+func test_p3_can_change_player_name():
     var line_edit = _obj.get_node("Scene1/MainMenu/2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName")
     line_edit.text = new_player_name
     line_edit.emit_signal("text_entered", new_player_name)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Preferences.get_data("player_name"), new_player_name)
         
-func test_p2_can_click_start_a_networked_game():
+func test_p3_can_click_start_a_networked_game():
     var btn = _obj.get_node("Scene1/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,1")
 
-func test_p2_can_click_client():
+func test_p3_can_click_client():
     var btn = _obj.get_node("Scene1/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,1")
 
-func test_p2_can_join_team_1():
+func test_p3_can_join_team_1():
     while _obj.current_scene.name != "Lobbies":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "Lobbies")
@@ -104,12 +104,12 @@ func test_p2_can_join_team_1():
         btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
 
-func test_p2_can_start_a_match():
+func test_p3_can_start_a_match():
     while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     pending()
 
-func test_p2_yield_to_show_result():
+func test_p3_yield_to_show_result():
     yield(yield_for(23), YIELD)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))

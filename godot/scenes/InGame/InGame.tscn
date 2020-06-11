@@ -43,7 +43,8 @@ func _ready():
 
 func update_time_remaining(new_val):
     var time_minutes = int(new_val / 60)
-    var time_seconds_left = new_val - (time_minutes * 60)
+    var time_seconds_left = \"%02d\" % (new_val - (time_minutes * 60))
+    time_minutes = \"%02d\" % time_minutes
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
@@ -277,7 +278,8 @@ func _ready():
 
 func update_time_remaining(new_val):
     var time_minutes = int(new_val / 60)
-    var time_seconds_left = new_val - (time_minutes * 60)
+    var time_seconds_left = \"%02d\" % (new_val - (time_minutes * 60))
+    time_minutes = \"%02d\" % time_minutes
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
@@ -636,12 +638,12 @@ margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
 custom_fonts/font = SubResource( 3 )
-text = "in: 00 seconds."
+text = "in: 00:00"
 align = 1
 script = SubResource( 4 )
 
 [node name="Header2" parent="-1,-1-Start Game Delay" instance=ExtResource( 2 )]
-my_menu = "1,-1"
+my_menu = "-1,-1"
 on_mainmenu_scene = false
 allow_preferences = false
 
@@ -1086,7 +1088,7 @@ margin_right = 540.0
 margin_bottom = 336.0
 custom_styles/normal = SubResource( 18 )
 custom_fonts/font = SubResource( 19 )
-text = "in: 00"
+text = "in: 00:00"
 align = 1
 script = SubResource( 21 )
 
@@ -1164,7 +1166,7 @@ align = 1
 script = SubResource( 22 )
 
 [node name="Header2" parent="2,0-Eliminated" instance=ExtResource( 2 )]
-my_menu = "1,0"
+my_menu = "2,0"
 on_mainmenu_scene = false
 allow_preferences = false
 

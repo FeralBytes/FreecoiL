@@ -40,6 +40,8 @@ func _init():
                     _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P1', '.gd')
                 elif arguments["player"] == "2":
                     _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P2', '.gd')
+                elif arguments["player"] == "3":
+                    _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P3', '.gd')
             else:
                 pass
     else:  # Multiplayer Tests are special and must be run with more than one App instance.
