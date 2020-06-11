@@ -114,6 +114,7 @@ func test_p2_yield_to_show_result():
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Player 2 (Client) Game History:")
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)

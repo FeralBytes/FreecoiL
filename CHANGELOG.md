@@ -5,6 +5,17 @@
 ### Fixed
 ### Removed
 
+## [0.3.0] - In Development
+### Added
+- Added icons and improved the menu to make the different status more obvious to the user.
+### Changed
+- Changed the settings to an improved module that utilizes signals and can sync across the network.
+- Improved the lobby a lot!
+- Changed the menu and gun connection icons.
+### Fixed
+- Fixed entering the game without a gun conencted causing a crash and or crashing mid game if a gun disconnects.
+### Removed
+
 ## [0.2.0-rc1] - 2018-11-30
 ### Added
 - Added 2 Player Integration testing.

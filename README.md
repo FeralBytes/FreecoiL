@@ -2,7 +2,8 @@
 
 ## [Download Links - Get the Game](https://gitlab.com/FeralBytes/FreecoiL/snippets/1781429)
 
-## Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/milestones/2).
+## Please See [Our Current Milestone Here](https://gitlab.com/FeralBytes/FreecoiL/-/milestones/2).
+[For the most up to date development information contact the lead developer on Discord.](https://discordapp.com/invite/tn4hThV).
 
 ### [Our Documentation](https://freecoil.readthedocs.io/en/latest/) is on ReadTheDocs.
 
@@ -38,7 +39,7 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 
 ## How to Get Involved
 
-[Contact the Lead Developer on Discord (I Fixed the Broken Link, Sorry.)](https://discordapp.com/invite/tn4hThV).
+[Contact the Lead Developer on Discord.](https://discordapp.com/invite/tn4hThV).
 ```eval_rst
 .. mermaid::
 
@@ -62,17 +63,7 @@ Once Ready you will be able to Download from GOOGLE PLAY STORE[1], coming soon! 
 ```
 * <del>Version 0.1.0 on 2018-10-23</del>
 * <del>Version 0.2.0 on 2018-11-25</del>
-* Version 0.2.0-rc1 on 2018-11-30 An APK will be published on GitLab for users to test. Also to generate interest in contributing back to the project.
-* Version 0.3.0 on 2018-12-16
-* Version 0.4.0 on 2019-01-07
-* Version 0.5.0 on 2019-01-27
-* Version 0.6.0 on 2019-02-17
-* Version 0.7.0 on 2019-03-10
-* Version 0.8.0 on 2019-03-31
-* Allow Alpha access on GOOGLE PLAY STORE[1] 2019-04-02.
-* Version 0.9.0 on 2019-04-23
-* Allow Beta access on GOOGLE PLAY STORE[1] 2019-04-25.
-* Version 1.0.0 on 2019-05-16 - Official 1.0.0 release most Beta bugs should be fixed.
+* Version 0.3.0 In Development.
 
 ### Why FreecoiL?
 
