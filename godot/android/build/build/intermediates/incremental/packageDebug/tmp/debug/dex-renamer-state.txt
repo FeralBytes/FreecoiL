@@ -1,0 +1,7 @@
+#Wed Jun 10 01:43:20 AKDT 2020
+base.1=/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/dex/debug/mergeProjectDexDebug/out/classes.dex
+path.1=classes.dex
+base.0=/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/dex/debug/mergeExtDexDebug/out/classes.dex
+renamed.1=classes2.dex
+renamed.0=classes.dex
+path.0=classes.dex
