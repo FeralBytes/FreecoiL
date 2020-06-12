@@ -59,6 +59,6 @@ build_apk:
     - godot --path godot --export-debug "Android" export/android/${APP_NAME}-debug.apk >&-
   artifacts:
     name: ${APP_NAME}-debug
-    -paths:
+    paths:
       - export/android/${APP_NAME}-debug.apk
     expire_in: 1 week
