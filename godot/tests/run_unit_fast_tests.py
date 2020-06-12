@@ -8,7 +8,7 @@ import sys
 if getpass.getuser() == "wolfrage":
     app_path = pathlib.Path("~/Apps/Godot/Godot_v3.2.2-beta3_x11.64").expanduser()
 else:
-    app_path = pathlib.Path("godot").expanduser()
+    app_path = cwd.joinpath("/usr/local/bin/godot")
 cwd = pathlib.Path.cwd()
 proj_path = cwd.joinpath("..")
 returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=unit", "speed=fast"])
