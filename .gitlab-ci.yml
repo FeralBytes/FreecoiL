@@ -30,6 +30,8 @@ unit_tests:
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
+    - ls -a ~/.local/share/godot/templates/
+    - ls -a ~/android
     - python3 $DOCKER_HOME/godot/tests/run_unit_tests.py
 
 integration_tests:
