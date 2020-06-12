@@ -12,7 +12,7 @@ if getpass.getuser() == "wolfrage":
     app_path = pathlib.Path("~/Apps/Godot/Godot_v" + GODOT_VERSION + "_x11.64").expanduser()
     proj_path = cwd.joinpath("..")
 else:
-    app_path = cwd.joinpath("godot_editor/Godot_v" + GODOT_VERSION + "_linux_headless.64")
+    app_path = cwd.joinpath("godot")
     proj_path = cwd.joinpath("godot")
 
 returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=integration"])
