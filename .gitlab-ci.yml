@@ -9,6 +9,7 @@ variables:
 
 before_script:
   - export DOCKER_HOME=$PWD
+  - apt-get update
   - apt-get install -y python3
   - mkdir -p ~/.config/godot/projects
   - mkdir -p ~/.godot
