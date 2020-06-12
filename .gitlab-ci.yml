@@ -11,6 +11,7 @@ variables:
 
 before_script:
   - pwd
+  - which yes
   - export DOCKER_HOME=$PWD
   - export GODOT_VERSION=3.2.2-beta4
   # Locale must be set or else it will cause additional errors for Godot 
