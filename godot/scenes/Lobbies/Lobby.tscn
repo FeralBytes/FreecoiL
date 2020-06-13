@@ -145,6 +145,7 @@ onready var Team = get_parent().get_node(\"HBoxContainer/VBoxContainer/Team\")
 func _ready():
     Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"check_if_team_assigned\")
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"check_if_team_assigned\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"check_if_team_assigned\")
     check_if_team_assigned(null)
     
 func check_if_team_assigned(__):
@@ -215,38 +216,40 @@ func update_team_list(__):
         var mups_ready = Settings.Network.get_data(\"mups_ready\")
         if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) - 1 >= Settings.Session.get_data(\"ui_team_being_viewed\"):
             for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
-                var player_name = Settings.InGame.get_data(\"player_name_by_id\")[entry]
-                var new_player_btn = Button.new()
-                new_player_btn.text = player_name
-                new_player_btn.rect_min_size.x = 250
-                new_player_btn.clip_text = true
-                new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
-                var ready_btn = Button.new()
-                if Settings.Session.get_data(\"mup_id\") != entry:
-                    ready_btn.disabled = true
-                if mups_ready.has(entry):
-                    if mups_ready[entry] == true:
-                        ready_btn.text = \"Ready\"
-                        ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
-                    else:
-                        if Settings.InGame.get_data(\"game_teams\") and Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
-                            ready_btn.text = \"Pick a Team\"
-                            ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+                var player_names = Settings.InGame.get_data(\"player_name_by_id\")
+                if entry in player_names:
+                    var player_name = player_names[entry]
+                    var new_player_btn = Button.new()
+                    new_player_btn.text = player_name
+                    new_player_btn.rect_min_size.x = 250
+                    new_player_btn.clip_text = true
+                    new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
+                    var ready_btn = Button.new()
+                    if Settings.Session.get_data(\"mup_id\") != entry:
+                        ready_btn.disabled = true
+                    if mups_ready.has(entry):
+                        if mups_ready[entry] == true:
+                            ready_btn.text = \"Ready\"
+                            ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
                         else:
-                            ready_btn.text = \"Not Ready\"
-                        ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
-                else:
-                    ready_btn.text = \"Not Ready\"
-                    ready_btn.modulate = Color(\"ff0505\")
-                ready_btn.rect_min_size.x = 160
-                ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
-                var hbox_container = HBoxContainer.new()
-                hbox_container.add_constant_override(\"separation\", 10)
-                hbox_container.alignment = BoxContainer.ALIGN_CENTER
-                hbox_container.rect_min_size.x = 430
-                hbox_container.add_child(new_player_btn)
-                hbox_container.add_child(ready_btn)
-                add_child(hbox_container)
+                            if Settings.InGame.get_data(\"game_teams\") and Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+                                ready_btn.text = \"Pick a Team\"
+                                ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+                            else:
+                                ready_btn.text = \"Not Ready\"
+                            ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+                    else:
+                        ready_btn.text = \"Not Ready\"
+                        ready_btn.modulate = Color(\"ff0505\")
+                    ready_btn.rect_min_size.x = 160
+                    ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
+                    var hbox_container = HBoxContainer.new()
+                    hbox_container.add_constant_override(\"separation\", 10)
+                    hbox_container.alignment = BoxContainer.ALIGN_CENTER
+                    hbox_container.rect_min_size.x = 430
+                    hbox_container.add_child(new_player_btn)
+                    hbox_container.add_child(ready_btn)
+                    add_child(hbox_container)
 
 func mups_not_ready(btn, mups_ready):
     btn.modulate = Color(\"ff0505\")
@@ -497,7 +500,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
-margin_right = 540.0
+margin_left = 2.0
+margin_right = 542.0
 margin_bottom = 876.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -624,8 +628,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
+margin_left = 2.0
 margin_top = 12.0
-margin_right = 540.0
+margin_right = 542.0
 margin_bottom = 848.0
 rect_min_size = Vector2( 540, 0 )
 
