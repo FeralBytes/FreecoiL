@@ -16,7 +16,7 @@ before_script:
   - mkdir -p ~/.local/share/godot
   - mkdir -p ~/.config/godot
   - mkdir -p ~/.cache
-  - cp $DOCKER_HOME/.gitlab/ci_scripts/editor_settings-3.tres ~/.config/godot/editor_settings-3.tres
+  - cp $DOCKER_HOME/.gitlab/ci_scripts/editor_settings-3.tres /root/.config/godot/editor_settings-3.tres
 
 stages:
   - unit_test
@@ -51,17 +51,17 @@ build_apk:
   stage: build_for_android
   script:
     # This is simply (semi-manual :-)) double-check if editor settings are OK for debug export
-    - grep android ~/.config/godot/editor_settings-3.tres
+    - grep android /root/.config/godot/editor_settings-3.tres
     - ls -l /usr/lib/jvm/java-8-openjdk-amd64/bin/jarsigner
     - ls -l /root/android/debug.keystore
     - ls -l /root/android/platform-tools/adb
-    - ls -a /root/.local/share/godot/templates/3.2.2.beta4
+    - ls -l /root/.local/share/godot/templates/3.2.2.beta4
     # Create directory for artifacts
     - mkdir -v -p export/android
     - awk '/const VERSION = "/{print $NF}' godot/code/Settings.gd
     - godot --path godot/project.godot --export-debug "Android" ../export/android/${APP_NAME}-debug.apk
     - ls export/android/${APP_NAME}-debug.apk # ls
-    - ls -a export/android/
+    - ls -l export/android/
   artifacts:
     name: ${APP_NAME}-debug
     paths:
