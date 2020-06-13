@@ -309,7 +309,8 @@ func setup_as_client():
     
 remote func set_mup_id(new_id):
     if not get_tree().is_network_server():
-        Settings.Log("RPC: 'set_my_unique_persistant_id' to " + str(new_id) + ". sender_id = " + str(get_tree().get_rpc_sender_id()), "info")
+        Settings.Log("RPC: 'set_my_unique_persistant_id' to " + str(new_id) + ". sender_id = " + 
+            str(get_tree().get_rpc_sender_id()), "info")
         if get_tree().get_rpc_sender_id() == 1:
             Settings.Session.set_data("mup_id", new_id)
 
@@ -371,9 +372,13 @@ remote func set_player_team_remote(new_team):
         game_teams_by_team_num_by_id[new_team].append(mups)
         Settings.InGame.set_data("game_teams_by_team_num_by_id", game_teams_by_team_num_by_id)
 
-func client_disconnect():
-    Client.close_connection()
-    get_tree().set_network_peer(null)
+func client_disconnect(quiet=false):
+    if quiet:
+        get_tree().set_network_peer(null)
+        Client = null
+    else:
+        Client.close_connection()
+        get_tree().set_network_peer(null)
     Settings.Session.set_data("connection_status", "do_not_connect")
     
 func auto_reconnect(connection_status):

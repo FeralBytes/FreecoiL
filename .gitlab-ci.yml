@@ -30,11 +30,6 @@ unit_tests:
   variables:
     DEBIAN_FRONTEND: noninteractive
   script:
-    - ls -a ~/.local/share/godot/templates/
-    - ls -a ~/android
-    - ls -lrt -d -1 "$PWD"/{*,.*}  
-    - who
-    - python3 -c 'import os; print(os.path.expanduser("~"))'
     - python3 $DOCKER_HOME/godot/tests/run_unit_tests.py
 
 integration_tests:
@@ -62,7 +57,8 @@ build_apk:
     - ls -l /root/android/platform-tools/adb
     # Create directory for artifacts
     - mkdir -v -p export/android
-    - godot --path godot --export-debug "Android" export/android/${APP_NAME}-debug.apk >&-
+    - awk '/const VERSION = "/{print $NF}' godot/code/Settings.gd
+    - godot --path godot --export-debug "Android" export/android/${APP_NAME}-debug.apk
   artifacts:
     name: ${APP_NAME}-debug
     paths:

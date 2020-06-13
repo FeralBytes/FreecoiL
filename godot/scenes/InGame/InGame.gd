@@ -5,11 +5,11 @@ var events_not_sent = []
 var events_not_acknowledged = []
 var game_history = []
 var rxd_events = []
-var acknowledged_events = []
 var peers_in_catch_up = []
 var event_counter = 0
-var sync_counter = 0
 var event_template = {"client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
+var server_unackn_events_by_mup = {}
+var catch_up_active = false
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -133,11 +133,10 @@ func end_game(reason):
 ###############################################################################
 
 func _process(__):
-    var easy_day = false
+    var easy_day = true
     if events_not_sent.size() > 0:
         send_game_event_to_server(events_not_sent.pop_front())
-    else:
-        easy_day = true
+        easy_day = false
     if rxd_events.size() > 0:
         easy_day = false
         var event_to_sort = rxd_events.pop_front()
@@ -152,46 +151,50 @@ func _process(__):
                         if event_to_sort["event_id"] > event["event_id"]:
                             game_history.insert(index + 1, event_to_sort)
                             break
-                        else:
-                            game_history.insert(index, event_to_sort)
+                        elif event_to_sort["event_id"] == event["event_id"]:
+                            print("WTF duplicate")
+                            print(event_to_sort)
                             break
+                        else:
+                            pass  # Sort Further down the list.
         else:
             game_history.append(event_to_sort)
         # Process Alerts
-        if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): # We already alert off our own events in real time.
-            if near_time(event_to_sort["client_time"]):
-                if event_to_sort["type"] == "fired":
-                    GunShotSound.volume_db = -25
-                    GunShotSound.play()
-                elif event_to_sort["type"] == "misfired":
-                    EmptyShotSound.volume_db = -20
-                    EmptyShotSound.play()
-                elif event_to_sort["type"] == "reloading":
-                    ReloadSound.volume_db = -20
-                    ReloadSound.pitch_scale = 0.45 / event_to_sort["additional"]["reload_speed"]
-                    ReloadSound.play()
-                elif event_to_sort["type"] == "died":
+        if game_history.has(event_to_sort):
+            if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): # We already alert off our own events in real time.
+                if near_time(event_to_sort["client_time"]):
+                    if event_to_sort["type"] == "fired":
+                        GunShotSound.volume_db = -25
+                        GunShotSound.play()
+                    elif event_to_sort["type"] == "misfired":
+                        EmptyShotSound.volume_db = -20
+                        EmptyShotSound.play()
+                    elif event_to_sort["type"] == "reloading":
+                        ReloadSound.volume_db = -20
+                        ReloadSound.pitch_scale = 0.45 / event_to_sort["additional"]["reload_speed"]
+                        ReloadSound.play()
+                    elif event_to_sort["type"] == "died":
+                        if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                            TangoDownSound.play()
+                    elif event_to_sort["type"] == "hit":
+                        if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                            if not NiceSound.playing:
+                                NiceSound.play()
+                if event_to_sort["type"] == "died":
                     if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
-                        TangoDownSound.play()
-                elif event_to_sort["type"] == "hit":
-                    if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
-                        if not NiceSound.playing:
-                            NiceSound.play()
-            if event_to_sort["type"] == "died":
-                if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
-                    Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
+                        Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
     else:
         if easy_day:
-            if Settings.Session.get_data("mup_id") == "1":
-                if sync_counter == 480:
-                    rpc("server_has_this_many", acknowledged_events.size())
-                    sync_counter = 0
-                else:
-                    sync_counter += 1
+            if catch_up_active == false:
+                catch_up_clients()
 
 func setup_recording_vars():
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
         event_counter = int(Settings.Session.get_data("mup_id")) * 10000
+        if Settings.Session.get_data("mup_id") == "1":
+            for mup in Settings.Network.get_data("mups_to_peers"):
+                server_unackn_events_by_mup[mup] = []
+            
 
 func record_game_event(type, additional={}):
     var new_event = event_template.duplicate(true)
@@ -207,68 +210,85 @@ func record_game_event(type, additional={}):
 func send_game_event_to_server(event):
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
         if Settings.Session.get_data("connection_status") == "connected":
-            rpc_id(1, "send_game_event_to_server_remote", event)
+            if Settings.Session.get_data("mup_id") == "1":
+                call_deferred("server_rx_game_event_remote", event)
+            else:
+                rpc_id(1, "server_rx_game_event_remote", event)
         events_not_acknowledged.append(event)
+        rxd_events.append(event)
             
-remotesync func send_game_event_to_server_remote(event):
+remote func server_rx_game_event_remote(event):
     var rpc_sender_id = get_tree().get_rpc_sender_id()
-    Settings.Log("Server: RPC: 'send_game_event_to_server_remote( " + str(event) + " )' from sender_id = " + str(rpc_sender_id))
-    var mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
-    if event["rec_by"] == mup:  # Server Validation, prevents spoofing.
-        if get_tree().has_network_peer():
-            if get_tree().is_network_server():
-                # If we are going to record the server recieved time do it in a seperate array, not on the events.
-                #event["server_rec_time"] = EventRecordTimer.time_left
-                #rxd_events.append(event)
-                #acknowledged_events.append(event["event_id"])
-                rpc("server_acks_event_remote", event)
+    if rpc_sender_id == 0:
+        rpc_sender_id = 1
+    Settings.Log("Server: RPC: 'server_rx_game_event_remote( " + str(event) + " )' from sender_id = " + str(rpc_sender_id))
+    var sender_mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
+    # If we are going to record the server recieved time do it in a seperate array, not on the events.
+    #event["server_rec_time"] = EventRecordTimer.time_left
+    rxd_events.append(event)
+    for mup in server_unackn_events_by_mup:
+        if mup != "1":
+            if mup != sender_mup:
+                server_unackn_events_by_mup[mup].append(event)
+    rpc("forwarded_event_remote", event)
         
 
-remotesync func server_acks_event_remote(event):
+remote func forwarded_event_remote(event):
+    Settings.Log("Client: RPC: MUPID:" + str(Settings.Session.get_data("mup_id")) + 
+        " 'forwarded_event_remote( )' event= " + str(event))
     rxd_events.append(event)
-    acknowledged_events.append(event["event_id"])
     for local_event in events_not_acknowledged:
         if local_event["event_id"] == event["event_id"]:
             events_not_acknowledged.erase(event)
+            break
+    rpc_id(1, "ack_event_remote", event["event_id"])
+            
+remote func ack_event_remote(event_id):
+    Settings.Log("Server: RPC: MUPID:" + str(Settings.Session.get_data("mup_id")) + 
+        " 'ack_event_remote( )' event= " + str(event_id))
+    var sender_mup = Settings.Network.get_data("peers_to_mups")[get_tree().get_rpc_sender_id()]
+    for event in server_unackn_events_by_mup[sender_mup]:
+        if event["event_id"] == event_id:
+            server_unackn_events_by_mup[sender_mup].erase(event)
             break
             
 func near_time(input):
     return abs(EventRecordTimer.time_left - input) <= 1  # 2 is the currrent delta(min/max) variance allowed.
 
+func catch_up_clients():
+    catch_up_active = true
+    for mup_id in server_unackn_events_by_mup:
+        if server_unackn_events_by_mup[mup_id].size() > 0:
+            if Settings.Network.get_data("mups_status")[mup_id] == "reconnected":
+                var peer_id = Settings.Network.get_data("mups_to_peers")[mup_id]
+                for event in server_unackn_events_by_mup[mup_id]:
+                    if peer_id in get_tree().get_network_connected_peers():
+                        rpc_id(peer_id, "you_are_missing_this", event)
+                        yield(get_tree(), 'idle_frame')
+                    else:
+                        var mups_status = Settings.Network.get_data("mups_status").duplicate()
+                        mups_status[mup_id] = "disconnected"
+                        Settings.Network.set_data("mups_status", mups_status)
+                        break
+    catch_up_active = false
+
 func on_mup_reconnected(mups_reconnected):
     var mup_id = mups_reconnected.pop_front()
+    var peer_id = Settings.Network.get_data("mups_to_peers")[mup_id]
     Settings.Session.set_data("mups_reconnected", mups_reconnected, false, false)
-    rpc_id(Settings.Network.get_data("mups_to_peers")[mup_id], "send_unacknowledged_events")
+    rpc_id(peer_id, "send_unacknowledged_events_remote")
 
-remote func send_unacknowledged_events():
+remote func send_unacknowledged_events_remote():
     var rpc_sender_id = get_tree().get_rpc_sender_id()
-    Settings.Log("Client: RPC: 'send_unacknowledged_events( )' from sender_id = " + str(rpc_sender_id))
+    Settings.Log("Client: RPC: MUPID:" + str(Settings.Session.get_data("mup_id")) + 
+        " 'send_unacknowledged_events( )' from sender_id = " + str(rpc_sender_id))
     events_not_sent = events_not_acknowledged + events_not_sent
     events_not_acknowledged.clear()
-    rpc_id(1, "i_have", acknowledged_events)
-    
-remote func i_have(acknowledged_events):
-    var rpc_sender_id = get_tree().get_rpc_sender_id()
-    if rpc_sender_id in peers_in_catch_up:
-        return
-    peers_in_catch_up.append(rpc_sender_id)
-    Settings.Log("Server: RPC: 'i_have( " + str(acknowledged_events.size()) + " )' from sender_id = " + str(rpc_sender_id))  # acknowledged_events can be huge.
-    for event in game_history:
-        if not acknowledged_events.has(event["event_id"]):
-            rpc_id(rpc_sender_id, "you_are_missing_this", event)
-            yield(get_tree(), 'idle_frame')
-    peers_in_catch_up.erase(rpc_sender_id)
-
-remote func server_has_this_many(size_of_events):
-    if acknowledged_events.size() != size_of_events:
-        var rpc_sender_id = get_tree().get_rpc_sender_id()
-        Settings.Log("Client: RPC: 'server_has_this_many( " + str(size_of_events) + 
-            " )' I only have ( " + str(acknowledged_events.size()) + " ) from sender_id = " + str(rpc_sender_id))
-        rpc_id(1, "i_have", acknowledged_events)
         
 remote func you_are_missing_this(event):
+    Settings.Log("Server: RPC: 'you_are_missing_this( " + str(event) + " )' from sender_id = 1")
     rxd_events.append(event)
-    acknowledged_events.append(event["event_id"])
+    rpc_id(1, "ack_event_remote", event["event_id"])
 ###############################################################################
 # TIMER Functions
 ###############################################################################

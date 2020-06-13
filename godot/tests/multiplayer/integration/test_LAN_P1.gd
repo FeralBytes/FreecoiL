@@ -151,7 +151,7 @@ func test_p1_can_be_respawned():
         yield(get_tree(), 'idle_frame')
     while Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
         yield(get_tree(), 'idle_frame')
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(3.0), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
     yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
@@ -167,11 +167,12 @@ func test_p1_can_be_respawned():
     
 
 func test_p1_yield_to_show_result():
-    yield(yield_for(15), YIELD)
+    yield(yield_for(30), YIELD)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    print(_obj.current_scene.server_unackn_events_by_mup)
     print("Player 1 (Server) Game History:")
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
@@ -189,5 +190,5 @@ func test_p1_yield_to_show_result():
     print("Settings.Preferences:")
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+    assert_eq(_obj.current_scene.game_history.size(), 23)
     yield(get_tree().create_timer(1.0), "timeout")
-    pending()

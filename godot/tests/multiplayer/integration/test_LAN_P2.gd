@@ -89,6 +89,7 @@ func test_p2_can_join_team_1():
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
+    yield(get_tree(), 'idle_frame')
     btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
@@ -107,7 +108,29 @@ func test_p2_can_join_team_1():
 func test_p2_can_start_a_match():
     while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
-    pending()
+    assert_eq(Settings.Session.get_data("game_started"), 1)
+    
+    
+func test_p2_can_disconnect_from_game():
+    get_tree().call_group("Network", "client_disconnect", true)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("connection_status"), "do_not_connect")
+    
+func test_p2_can_log_offline_events():
+    yield(get_tree().create_timer(1.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    yield(get_tree().create_timer(8.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
+    yield(get_tree().create_timer(0.1), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    yield(get_tree().create_timer(2.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    yield(get_tree().create_timer(2.0), "timeout")
+    
+func test_p2_can_reconnect_to_game():
+    Settings.Session.set_data("connection_status", "disconnected")
+    yield(get_tree(), 'idle_frame')
+    get_tree().call_group("auto_reconnect", "disconnected")
 
 func test_p2_yield_to_show_result():
     yield(yield_for(23), YIELD)
@@ -119,5 +142,6 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    assert_eq(_obj.current_scene.game_history.size(), 23)
+    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
     yield(get_tree().create_timer(1.0), "timeout")
-    pending()

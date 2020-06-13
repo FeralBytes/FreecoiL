@@ -41,6 +41,7 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_is_connected\"), self, \"update_gun\")
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_recoil\"), self, \"update_recoil\")
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_battery_lvl\"), self, \"update_battery\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"connection_status\"), self, \"update_wifi\")
     SettingsMenu.color = Color(Settings.Session.get_data(\"ThemeMenuBackground\"))
     MenuBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeFontColor\"))
 
@@ -57,7 +58,7 @@ func update_buttons():
     update_gun()
     update_battery()
     update_recoil()
-    update_wifi()
+    update_wifi(Settings.Session.get_data(\"connection_status\"))
     update_gps()
 
 func update_menu():
@@ -97,8 +98,14 @@ func update_recoil(recoil=-1):
     
 func update_wifi(wifi_conn=0):
     if menu_is_visible:
-        if wifi_conn == 0:
+        if wifi_conn == \"do_not_connect\":
             WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+        elif wifi_conn == \"disconnected\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+        elif wifi_conn == \"connecting\" or wifi_conn == \"reconnecting\" or wifi_conn == \"identifying\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+        elif wifi_conn == \"connected\" or wifi_conn == \"reconnected\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
     
 func update_battery(battery_lvl=-1):
     # We fudge the percentages here, because recoil guns aren't useable below a certian chage level.
