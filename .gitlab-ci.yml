@@ -14,7 +14,6 @@ before_script:
   - mkdir -p ~/.config/godot/projects
   - mkdir -p ~/.godot
   - mkdir -p ~/.local/share/godot
-  - mkdir -p ~/.config/godot
   - mkdir -p ~/.cache
   - cp $DOCKER_HOME/.gitlab/ci_scripts/editor_settings-3.tres /root/.config/godot/editor_settings-3.tres
 
@@ -59,7 +58,7 @@ build_apk:
     # Create directory for artifacts
     - mkdir -v -p export/android
     - awk '/const VERSION = "/{print $NF}' godot/code/Settings.gd
-    - godot --path godot/project.godot --export-debug "Android" ../export/android/${APP_NAME}-debug.apk
+    - godot --path godot --export-debug "Android" ../export/android/${APP_NAME}-debug.apk
     - ls export/android/${APP_NAME}-debug.apk # ls
     - ls -l export/android/
   artifacts:
