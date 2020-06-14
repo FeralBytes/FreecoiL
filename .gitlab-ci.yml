@@ -57,7 +57,7 @@ build_apk:
     - ls -l /root/android/platform-tools/adb
     - ls -l /root/.local/share/godot/templates/3.2.2.beta4
     # Add the right build tools
-    - yes | ~/android/tools/bin/sdkmanager "build-tools;28.0.3"
+    #- yes | ~/android/tools/bin/sdkmanager "build-tools;29.0.3"
     # Create directory for artifacts
     - mkdir -v -p export/android
     - awk '/const VERSION = "/{print $NF}' godot/code/Settings.gd
