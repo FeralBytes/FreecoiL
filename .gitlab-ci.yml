@@ -68,7 +68,7 @@ build_apk:
     # Create directory for artifacts
     - mkdir -v -p export/android
     # Export APP_VERSION
-    - export $APP_VERSION=$(python3 .gitlab/ci_scripts/extract_version.py)
+    - export APP_VERSION=$(python3 .gitlab/ci_scripts/extract_version.py)
     - godot --path godot --export-debug "Android" /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-Ver:${APP_VERSION}-debug.apk
     #- ls export/android/${APP_NAME}-debug.apk # ls
     - ls -l export/android/
