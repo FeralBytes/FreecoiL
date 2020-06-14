@@ -31,13 +31,13 @@ from recommonmark.transform import AutoStructify
 # -- Project information -----------------------------------------------------
 
 project = 'FreecoiL'
-copyright = '2018, Jordan Farrell'
+copyright = '2020, Jordan Farrell'
 author = 'FreecoiL Developers'
 
 import re
 release_ver_regex = re.compile(r'(?:(?:\d+|[a-z])[.-]){2,}(?:\d+|((a(lpha)?|b(eta)?|c|r(c|ev)?|pre(view)|dev?)\d*)?)')
 short_ver_regex = re.compile(r'(?:(?:\d+|[a-z])[.-]){2,}(?:\d+)')
-with open('../../godot/code/SetConf.gd', 'r') as f:
+with open('../../godot/code/Settings.gd', 'r') as f:
     file_contents = f.read()
 # The full version, including alpha/beta/rc tags
 release = release_ver_regex.search(file_contents).group()

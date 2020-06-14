@@ -50,6 +50,8 @@ multiplayer_integration_tests:
 build_apk:
   stage: build_for_android
   script:
+    # Fix Export Presets for the gitlab CI.
+    - cp $DOCKER_HOME/.gitlab/ci_scripts/export_presets.cfg $DOCKER_HOME/godot/export_presets.cfg
     # This is simply (semi-manual :-)) double-check if editor settings are OK for debug export
     - grep android /root/.config/godot/editor_settings-3.tres
     - ls -l /usr/lib/jvm/java-8-openjdk-amd64/bin/jarsigner
@@ -65,12 +67,13 @@ build_apk:
     - ls -l /root/android/build-tools
     # Create directory for artifacts
     - mkdir -v -p export/android
-    - awk '/const VERSION = "/{print $NF}' godot/code/Settings.gd
-    - godot --path godot --export-debug "Android" /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-debug.apk
+    # Export APP_VERSION
+    - export $APP_VERSION=$(python3 .gitlab/ci_scripts/extract_version.py)
+    - godot --path godot --export-debug "Android" /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-Ver:${APP_VERSION}-debug.apk
     #- ls export/android/${APP_NAME}-debug.apk # ls
     - ls -l export/android/
   artifacts:
-    name: ${APP_NAME}-debug
+    name: ${APP_NAME}-Ver:${APP_VERSION}-debug
     paths:
-      - /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-debug.apk
+      - /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-Ver:${APP_VERSION}-debug.apk
     expire_in: 1 week
