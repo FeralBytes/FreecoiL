@@ -11,7 +11,7 @@ before_script:
   - export DOCKER_HOME=$PWD
   - pwd
   - apt-get update
-  - apt-get install -y python3 gradel
+  - apt-get install -y python3 gradle
   - mkdir -p ~/.config/godot/projects
   - mkdir -p ~/.godot
   - mkdir -p ~/.local/share/godot
