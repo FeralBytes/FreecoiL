@@ -75,5 +75,5 @@ build_apk:
   artifacts:
     name: ${APP_NAME}-debug
     paths:
-      - *.apk
+      - ./*.apk
     expire_in: 1 week
