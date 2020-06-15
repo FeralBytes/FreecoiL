@@ -73,7 +73,7 @@ build_apk:
     #- ls export/android/${APP_NAME}-debug.apk # ls
     - ls -l export/android/
   artifacts:
-    name: ${APP_NAME}-Ver:${APP_VERSION}-debug
+    name: ${APP_NAME}-debug
     paths:
-      - /builds/FeralBytes/FreecoiL/export/android/${APP_NAME}-Ver:${APP_VERSION}-debug.apk
+      - /builds/FeralBytes/FreecoiL/export/android/*.apk
     expire_in: 1 week
