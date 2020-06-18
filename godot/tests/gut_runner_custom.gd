@@ -35,13 +35,20 @@ func _init():
             else:
                 pass
         elif arguments["type"] == "multiplayer_integration":
-            if arguments["match"] == "LAN":
+            if arguments["match"] == "lan_time":
                 if arguments["player"] == "1":
-                    _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P1', '.gd')
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_time_limit', 'test_LAN_P1', '.gd')
                 elif arguments["player"] == "2":
-                    _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P2', '.gd')
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_time_limit', 'test_LAN_P2', '.gd')
                 elif arguments["player"] == "3":
-                    _tester.add_directory('res://tests/multiplayer/integration', 'test_LAN_P3', '.gd')
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_time_limit', 'test_LAN_P3', '.gd')
+            elif arguments["match"] == "lan_death":
+                if arguments["player"] == "1":
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_death_limit', 'test_LAN_P1', '.gd')
+                elif arguments["player"] == "2":
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_death_limit', 'test_LAN_P2', '.gd')
+                elif arguments["player"] == "3":
+                    _tester.add_directory('res://tests/multiplayer/integration/1v2_death_limit', 'test_LAN_P3', '.gd')
             else:
                 pass
     else:  # Multiplayer Tests are special and must be run with more than one App instance.

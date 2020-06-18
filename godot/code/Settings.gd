@@ -15,7 +15,7 @@ const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signal.
 
 var DEBUG_GUI = false
-var DEBUG_LEVEL = 1
+var DEBUG_LEVEL = 3
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable

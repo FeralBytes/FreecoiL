@@ -25,6 +25,7 @@ func set_player_laser_ids(all_ready):
             var player_laser_by_id = {}
             var player_score_by_id = {}
             var player_deaths_by_id = {}
+            var player_status_by_id = {}
             var mups_ready = Settings.Network.get_data(\"mups_ready\").duplicate()  # Reuse
             if Settings.InGame.get_data(\"game_teams\"):
                 var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
@@ -37,17 +38,20 @@ func set_player_laser_ids(all_ready):
                     player_laser_by_id[mups_id] = ((player_team - 1) * players_per_team) + player_team_index_pos + 1
                     player_score_by_id[mups_id] = 0
                     player_deaths_by_id[mups_id] = 0
+                    player_status_by_id[mups_id] = \"dead\"
             else:
                 for mups_id in mups_ready:
                     player_laser_by_id[mups_id] = mups_id
                     player_score_by_id[mups_id] = 0
                     player_deaths_by_id[mups_id] = 0
+                    player_status_by_id[mups_id] = \"dead\"
             Settings.InGame.set_data(\"player_laser_by_id\", player_laser_by_id)
             Settings.InGame.set_data(\"game_history\", [])
             Settings.InGame.set_data(\"game_actions_count\", 0)
             Settings.InGame.set_data(\"game_team_scores\", [0, 0])
             Settings.InGame.set_data(\"player_kills_by_id\", player_score_by_id)
             Settings.InGame.set_data(\"player_deaths_by_id\", player_deaths_by_id)
+            Settings.InGame.set_data(\"player_status_by_id\", player_status_by_id)
             get_tree().call_group(\"Network\", \"unready_all_mups\")
             get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/InGame/InGame.tscn\")
 "

@@ -295,8 +295,6 @@ func _laser_telem_batteryLvl(batteryLvl):
     _on_laser_gun_still_connected()
     
 func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2):
-    print("shotById1 = ", shotById1, "   shotCounter1 = ", shotCounter1)
-    print("shotById2 = ", shotById2, "   shotCounter2 = ", shotCounter2)
     if shotCounter1 != shot_counter_1:
         shot_counter_1 = shotCounter1
         shot_by_id_1 = shotById1

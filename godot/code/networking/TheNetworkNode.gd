@@ -131,6 +131,7 @@ func _client_connected(godot_peer_id):  # Client Equals Another Player
             var mups_status = Settings.Network.get_data("mups_status")
             mups_status[peers_to_mups[godot_peer_id]] = "identifying"
             Settings.Network.set_data("mups_status", mups_status)
+        Settings.Session.set_data("connection_status", "connected")
     
 func _client_disconnected(godot_peer_id):  # Client Equals Another Player
     if get_tree().is_network_server():
@@ -140,6 +141,16 @@ func _client_disconnected(godot_peer_id):  # Client Equals Another Player
             var mups_status = Settings.Network.get_data("mups_status")
             mups_status[peers_to_mups[godot_peer_id]] = "disconnected"
             Settings.Network.set_data("mups_status", mups_status)
+            var all_mups_disconnected = true
+            for mup in mups_status:
+                if mup != "1":
+                    if mups_status[mup] == "connected":
+                        all_mups_disconnected = false
+                    elif mups_status[mup] == "reconnected":
+                        all_mups_disconnected = false
+            if all_mups_disconnected:
+                Settings.Session.set_data("connection_status", "disconnected")
+                
 
 func assign_unique_id():
     # Rationale: Although Godot does something like this, it misses our use case.
@@ -226,7 +237,7 @@ func setup_server_part2():
     Server.create_server(Settings.Session.get_data("server_port"), Settings.MAX_PLAYERS + Settings.MAX_OBSERVERS)
     get_tree().set_network_peer(Server)
     Settings.Network.set_data("mups_status", {"1": "connected"})
-    Settings.Session.set_data("connection_status", "connected")
+    Settings.Session.set_data("connection_status", "connecting")
     host_udp_broadcast = true
     search_for_peers()
     Settings.InGame.set_data("player_name_by_id", {"1": Settings.Preferences.get_data("player_name")})
@@ -368,7 +379,6 @@ remote func set_player_team_remote(new_team):
             if mups in game_teams_by_team_num_by_id[previous_team]:
                 game_teams_by_team_num_by_id[previous_team].erase(mups)
         # Third add them to the new team.
-        print("game_teams_by_team_num_by_id = " + str(game_teams_by_team_num_by_id))
         game_teams_by_team_num_by_id[new_team].append(mups)
         Settings.InGame.set_data("game_teams_by_team_num_by_id", game_teams_by_team_num_by_id)
 

@@ -4,7 +4,7 @@ var Obj
 var _obj
 var _map_maker
 var time_started
-var new_player_name = "Player 3"
+var new_player_name = "Player 2"
 
 onready var OvertimeTimer = Timer.new()
 
@@ -51,34 +51,33 @@ func after_all():
     var str_elapsed = "%02d : %02d" % [minutes, seconds]
     print("Elapsed Time = ", str_elapsed)
 
-func test_p3_loads_to_main_menu():
+func test_p2_loads_to_main_menu():
     while _obj.current_scene.name != "MainMenu":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "MainMenu")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
         
-func test_p3_can_change_player_name():
+func test_p2_can_change_player_name():
     var line_edit = _obj.get_node("Scene1/MainMenu/2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName")
     line_edit.text = new_player_name
     line_edit.emit_signal("text_entered", new_player_name)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Preferences.get_data("player_name"), new_player_name)
         
-func test_p3_can_click_start_a_networked_game():
+func test_p2_can_click_start_a_networked_game():
     var btn = _obj.get_node("Scene1/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,1")
 
-func test_p3_can_click_client():
+func test_p2_can_click_client():
     var btn = _obj.get_node("Scene1/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
-    yield(yield_for(1.5), YIELD)  # Prevents a race between  Player 2 and Player 3.
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,1")
 
-func test_p3_can_join_team_1():
+func test_p2_can_join_team_1():
     while _obj.current_scene.name != "Lobbies":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "Lobbies")
@@ -106,43 +105,45 @@ func test_p3_can_join_team_1():
         btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
 
-func test_p3_can_start_a_match():
+func test_p2_can_start_a_match():
     while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("game_started"), 1)
     
     
-func test_p3_can_disconnect_from_game():
-    yield(get_tree().create_timer(3.5), "timeout")
+func test_p2_can_disconnect_from_game():
     get_tree().call_group("Network", "client_disconnect", true)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("connection_status"), "do_not_connect")
     
-func test_p3_can_log_offline_events():
+func test_p2_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
     yield(get_tree().create_timer(8.0), "timeout")
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(2.0), "timeout")
     FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(2.0), "timeout")
     
-func test_p3_can_reconnect_to_game():
+func test_p2_can_reconnect_to_game():
     Settings.Session.set_data("connection_status", "disconnected")
     yield(get_tree(), 'idle_frame')
     get_tree().call_group("auto_reconnect", "disconnected")
 
-func test_p3_yield_to_show_result():
-    yield(yield_for(23), YIELD)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+func test_p2_yield_to_show_result():
+    yield(yield_for(4), YIELD)
+    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
+    yield(yield_for(19), YIELD)
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    print("Player 3 (Client) Game History:")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("Player 2 (Client) Game History:")
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    assert_eq(_obj.current_scene.game_history.size(), 23)
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    assert_eq(_obj.current_scene.game_history.size(), 34)
+    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
     yield(get_tree().create_timer(1.0), "timeout")

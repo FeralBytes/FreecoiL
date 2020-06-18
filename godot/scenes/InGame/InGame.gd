@@ -10,6 +10,7 @@ var event_counter = 0
 var event_template = {"client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
 var server_unackn_events_by_mup = {}
 var catch_up_active = false
+var last_connection_status = null
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -46,6 +47,7 @@ func _ready():
     FreecoiLInterface.set_laser_id(Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
     # Make Connections
     Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
+    Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "connection_status_event")
     set_player_start_game_vars()
     get_tree().call_group("Network", "tell_server_i_am_ready", true)
 
@@ -53,9 +55,19 @@ func _ready():
 func set_player_start_game_vars():
     set_player_respawn_vars()
     setup_recording_vars()
+    if Settings.InGame.get_data("game_teams"):
+        var game_teams_by_team_num_by_id = Settings.InGame.get_data("game_teams_by_team_num_by_id")
+        var game_team_status_by_num = {}
+        for team_num in range(0, game_teams_by_team_num_by_id.size()):
+            if team_num == 0:
+                pass
+            else:
+                game_team_status_by_num[team_num] = "playing"
+        Settings.InGame.set_data("game_team_status_by_num", game_team_status_by_num)
     Settings.Session.set_data("game_player_alive", false)
     Settings.Session.set_data("game_tick_toc_start_delay", Settings.InGame.get_data("game_start_delay"))
-    Settings.Session.set_data("game_tick_toc_time_remaining", Settings.InGame.get_data("game_time_limit"))
+    if Settings.InGame.get_data("game_limit_mode") == "time":
+        Settings.Session.set_data("game_tick_toc_time_remaining", Settings.InGame.get_data("game_time_limit"))
     Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
     Settings.Session.set_data("game_tick_toc_time_elapsed", 0)
     Settings.Session.set_data("game_started", 0)  # Quad State: 0=Not Stated, 1=Started, 2=Paused, 3=Game Over
@@ -71,9 +83,10 @@ func set_player_start_game_vars():
     ReloadTimer.wait_time = Settings.Session.get_data("game_weapon_reload_speed")
     ReloadTimer.connect("timeout", self, "reload_finish")
     ReloadTimer.one_shot = true
-    TimeRemainingTimer.connect("timeout", self, "end_game", ["time"])
-    TimeRemainingTimer.wait_time = Settings.InGame.get_data("game_time_limit")
-    TimeRemainingTimer.one_shot = true
+    if Settings.InGame.get_data("game_limit_mode") == "time":
+        TimeRemainingTimer.connect("timeout", self, "end_game", ["time"])
+        TimeRemainingTimer.wait_time = Settings.InGame.get_data("game_time_limit")
+        TimeRemainingTimer.one_shot = true
     HitIndicatorTimer.wait_time = Settings.Preferences.get_data("player_hit_indicator_duration")
     HitIndicatorTimer.one_shot = true
     HitIndicatorTimer.connect("timeout", self, "hit_indicator_stop")
@@ -124,9 +137,14 @@ func end_game(reason):
     Settings.Session.set_data("game_started", 3)
     Settings.Session.set_data("game_player_alive", false)
     FreecoiLInterface.reload_start()
+    record_game_event("end_game", {"reason": reason})
     get_tree().call_group("Container", "next_menu", "0,1")
     if reason == "time":
         EndReason.text = "Out of Time"
+    elif reason == "elimination":
+        EndReason.text = "Out of Lives"
+    elif reason == "team_elimination":
+        EndReason.text = "Only One Team Left Standing"
 
 ###############################################################################
 # Game Event Recording Functions
@@ -152,8 +170,7 @@ func _process(__):
                             game_history.insert(index + 1, event_to_sort)
                             break
                         elif event_to_sort["event_id"] == event["event_id"]:
-                            print("WTF duplicate")
-                            print(event_to_sort)
+                            # Duplication happens, but not as bad as the old system. We may need to return to prevent the processing below.
                             break
                         else:
                             pass  # Sort Further down the list.
@@ -183,6 +200,36 @@ func _process(__):
                 if event_to_sort["type"] == "died":
                     if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
                         Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
+                if event_to_sort["type"] == "eliminated":
+                    if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
+                        Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)
+                if event_to_sort["type"] == "end_game":
+                    if Settings.Session.get_data("game_started") != 3:
+                        end_game(event_to_sort["additional"]["reason"])
+            if event_to_sort["type"] == "eliminated":
+                if Settings.Session.get_data("mup_id") == "1":  # Server
+                    var player_team_by_id = Settings.InGame.get_data("player_team_by_id")
+                    var elim_player_team = player_team_by_id[event_to_sort["rec_by"]]
+                    var player_status_by_id = Settings.InGame.get_data("player_status_by_id")
+                    player_status_by_id[event_to_sort["rec_by"]] = "eliminated"
+                    Settings.InGame.set_data("player_status_by_id", player_status_by_id)
+                    # TODO: Catch if whole team is eliminated. And that there is only 1 remaining team.
+                    var team_is_eliminated = true
+                    for player in player_team_by_id:
+                        if player_team_by_id[player] == elim_player_team:
+                            if player_status_by_id[player] != "eliminated":
+                                team_is_eliminated = false
+                    if team_is_eliminated:
+                        var team_status_by_num = Settings.InGame.get_data("game_team_status_by_num")
+                        team_status_by_num[elim_player_team] = "eliminated"
+                        Settings.InGame.set_data("game_team_status_by_num", team_status_by_num)
+                        print(Settings.InGame.get_data("game_team_status_by_num"))
+                        var teams_remaining = 0
+                        for team in team_status_by_num:
+                            if team_status_by_num[team] == "playing":
+                                teams_remaining += 1
+                        if teams_remaining <= 1:
+                            call_deferred("end_game", "team_elimination")
     else:
         if easy_day:
             if catch_up_active == false:
@@ -199,7 +246,8 @@ func setup_recording_vars():
 func record_game_event(type, additional={}):
     var new_event = event_template.duplicate(true)
     #{"client_time": null, "event_id": null, "type": null, "rec_by": null, "additional": {}}
-    new_event["client_time"] = EventRecordTimer.time_left
+    # int() Prevents floating point percision errors when passed across the network.
+    new_event["client_time"] = int(EventRecordTimer.time_left)
     new_event["event_id"] = event_counter
     event_counter += 1
     new_event["type"] = type
@@ -209,10 +257,10 @@ func record_game_event(type, additional={}):
 
 func send_game_event_to_server(event):
     if Settings.Session.get_data("mup_id") != null:  # else: No Network game.
-        if Settings.Session.get_data("connection_status") == "connected":
-            if Settings.Session.get_data("mup_id") == "1":
-                call_deferred("server_rx_game_event_remote", event)
-            else:
+        if Settings.Session.get_data("mup_id") == "1":
+            call_deferred("server_rx_game_event_remote", event)
+        else:
+            if Settings.Session.get_data("connection_status") == "connected":
                 rpc_id(1, "server_rx_game_event_remote", event)
         events_not_acknowledged.append(event)
         rxd_events.append(event)
@@ -225,7 +273,8 @@ remote func server_rx_game_event_remote(event):
     var sender_mup = Settings.Network.get_data("peers_to_mups")[rpc_sender_id]
     # If we are going to record the server recieved time do it in a seperate array, not on the events.
     #event["server_rec_time"] = EventRecordTimer.time_left
-    rxd_events.append(event)
+    if event["rec_by"] != "1":
+        rxd_events.append(event)
     for mup in server_unackn_events_by_mup:
         if mup != "1":
             if mup != sender_mup:
@@ -289,13 +338,19 @@ remote func you_are_missing_this(event):
     Settings.Log("Server: RPC: 'you_are_missing_this( " + str(event) + " )' from sender_id = 1")
     rxd_events.append(event)
     rpc_id(1, "ack_event_remote", event["event_id"])
+    
+func connection_status_event(new_status):
+    if last_connection_status != new_status:
+        last_connection_status = new_status
+        record_game_event("connection", {"status": new_status})
 ###############################################################################
 # TIMER Functions
 ###############################################################################
 
 func tick_toc():
     if Settings.Session.get_data("game_started") == 1:
-        Settings.Session.set_data("game_tick_toc_time_remaining", Settings.Session.get_data("game_tick_toc_time_remaining") - 1)
+        if Settings.InGame.get_data("game_limit_mode") == "time":
+            Settings.Session.set_data("game_tick_toc_time_remaining", Settings.Session.get_data("game_tick_toc_time_remaining") - 1)
         Settings.Session.set_data("game_tick_toc_time_elapsed", Settings.Session.get_data("game_tick_toc_time_elapsed") + 1)
         if not Settings.Session.get_data("game_player_alive"):
             Settings.Session.set_data("game_tick_toc_respawn", Settings.Session.get_data("game_tick_toc_respawn") - 1)
@@ -329,7 +384,7 @@ func reload_finish():
 func eliminated(laser_id):
     FreecoiLInterface.reload_start()
     Settings.Session.set_data("game_player_alive", false)
-    record_game_event("died", {"laser_id": laser_id})
+    record_game_event("eliminated", {"laser_id": laser_id})
     if laser_id != 0:
         var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
         var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]

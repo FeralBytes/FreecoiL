@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=2]
+[gd_scene load_steps=32 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -335,9 +335,81 @@ func _on_Button_pressed():
     var num_of_teams = get_parent().get_node(\"PlusMinusWidget\").current_val
     Settings.InGame.set_data(\"game_number_of_teams\", num_of_teams)
     get_tree().call_group(\"Container\", \"next_menu\", \"2,3\")
+
+
+func _on_HSlider_value_changed(value):
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+
+
+func _on_PlusMinusWidget_PMWidChanged(new_value):
+    get_parent().get_node(\"HSlider\").value = new_value
 "
 
 [sub_resource type="GDScript" id=16]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    var num_of_deaths = get_parent().get_node(\"PlusMinusWidget\").current_val
+    Settings.InGame.set_data(\"game_death_limit\", num_of_deaths)
+    get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
+
+
+func _on_PlusMinusWidget_PMWidChanged(new_value):
+    get_parent().get_node(\"HSlider\").value = new_value
+
+
+func _on_HSlider_value_changed(value):
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+"
+
+[sub_resource type="GDScript" id=17]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    var amount_of_time = get_parent().get_node(\"PlusMinusWidget\").current_val * 60
+    Settings.InGame.set_data(\"game_time_limit\", amount_of_time)
+    get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
+
+
+func _on_PlusMinusWidget_PMWidChanged(new_value):
+    get_parent().get_node(\"HSlider\").value = new_value
+
+
+func _on_HSlider_value_changed(value):
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+"
+
+[sub_resource type="GDScript" id=18]
 script/source = "extends Button
 
 
@@ -361,7 +433,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Button
 
 
@@ -385,7 +457,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Button
 
 
@@ -406,10 +478,10 @@ func _ready():
 
 func _on_Button_pressed():
     Settings.InGame.set_data(\"game_limit_mode\", \"deaths\")
-    get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"3,4\")
 "
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=21]
 script/source = "extends Button
 
 
@@ -430,10 +502,10 @@ func _ready():
 
 func _on_Button2_pressed():
     Settings.InGame.set_data(\"game_limit_mode\", \"time\")
-    get_tree().call_group(\"Container\", \"next_menu\", \"4,3\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"3,5\")
 "
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Button
 
 
@@ -458,7 +530,6 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"game_respawn_delay\", respawn_delay)
     # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
     Settings.InGame.set_data(\"game_start_delay\", 5)
-    Settings.InGame.set_data(\"game_time_limit\", 600)
     Settings.InGame.set_data(\"game_weapon_types\",{\"M9\": {\"magazine_size\": 15, \"damage\": 1, 
         \"shot_modes\": [\"semi-automatic\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
     Settings.InGame.set_data(\"game_start_weapon_type\", \"M9\")
@@ -466,9 +537,17 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"game_start_ammo\", {\"M9\": 300})
     Settings.InGame.set_data(\"game_friendly_fire\", false)
     get_tree().call_group(\"Container\", \"load_lobby\") 
+
+
+func _on_PlusMinusWidget_PMWidChanged(new_value):
+    get_parent().get_node(\"HSlider\").value = new_value
+
+
+func _on_HSlider_value_changed(value):
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
 "
 
-[sub_resource type="GDScript" id=21]
+[sub_resource type="GDScript" id=23]
 script/source = "extends OptionButton
 
 
@@ -499,7 +578,7 @@ func _on_OptionButton_item_selected(index):
     get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
 "
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=24]
 script/source = "extends RichTextLabel
 
 
@@ -1030,9 +1109,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,3-Custom Setup 2/CenterContainer"]
-margin_top = 175.0
+margin_top = 152.0
 margin_right = 540.0
-margin_bottom = 384.0
+margin_bottom = 407.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
@@ -1052,7 +1131,7 @@ align = 1
 [node name="VBoxContainer" type="VBoxContainer" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer"]
 margin_top = 88.0
 margin_right = 540.0
-margin_bottom = 209.0
+margin_bottom = 255.0
 rect_min_size = Vector2( 540, 0 )
 custom_constants/separation = 30
 
@@ -1064,17 +1143,183 @@ allow_zero = false
 apply_minimum_value = true
 minimum_value = 2
 apply_maximum_value = true
-maximum_value = 4
+maximum_value = 31
 
-[node name="Button" type="Button" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer"]
+[node name="HSlider" type="HSlider" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 77.0
 margin_right = 540.0
-margin_bottom = 121.0
+margin_bottom = 93.0
+min_value = 2.0
+max_value = 31.0
+value = 2.0
+rounded = true
+tick_count = 29
+ticks_on_borders = true
+
+[node name="Button" type="Button" parent="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 123.0
+margin_right = 540.0
+margin_bottom = 167.0
 text = "Submit"
 script = SubResource( 15 )
 
 [node name="Header2" parent="1,3-Custom Setup 2" instance=ExtResource( 7 )]
 my_menu = "1,3"
+
+[node name="3,4-Custom Setup 4,1" type="ReferenceRect" parent="."]
+margin_left = 1620.0
+margin_top = 3840.0
+margin_right = 2160.0
+margin_bottom = 4800.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="3,4-Custom Setup 4,1"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 680.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="3,4-Custom Setup 4,1/CenterContainer"]
+margin_top = 152.0
+margin_right = 540.0
+margin_bottom = 407.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Custom Match Setup"
+align = 1
+autowrap = true
+
+[node name="Label2" type="Label" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "How Many Deaths?"
+align = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 255.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="PlusMinusWidget" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_right = 540.0
+margin_bottom = 47.0
+current_val = 2
+allow_zero = false
+apply_minimum_value = true
+minimum_value = 1
+apply_maximum_value = true
+maximum_value = 999
+
+[node name="HSlider" type="HSlider" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 77.0
+margin_right = 540.0
+margin_bottom = 93.0
+min_value = 1.0
+max_value = 999.0
+value = 2.0
+rounded = true
+tick_count = 20
+ticks_on_borders = true
+
+[node name="Button" type="Button" parent="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 123.0
+margin_right = 540.0
+margin_bottom = 167.0
+text = "Submit"
+script = SubResource( 16 )
+
+[node name="Header2" parent="3,4-Custom Setup 4,1" instance=ExtResource( 7 )]
+my_menu = "3,4"
+
+[node name="3,5-Custom Setup 4,2" type="ReferenceRect" parent="."]
+margin_left = 1620.0
+margin_top = 4800.0
+margin_right = 2160.0
+margin_bottom = 5760.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="3,5-Custom Setup 4,2"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 680.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="3,5-Custom Setup 4,2/CenterContainer"]
+margin_top = 152.0
+margin_right = 540.0
+margin_bottom = 407.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Custom Match Setup"
+align = 1
+autowrap = true
+
+[node name="Label2" type="Label" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "How Much Play Time In Minutes?"
+align = 1
+autowrap = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 255.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="PlusMinusWidget" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
+margin_right = 540.0
+margin_bottom = 47.0
+current_val = 15
+allow_zero = false
+apply_minimum_value = true
+minimum_value = 1
+apply_maximum_value = true
+maximum_value = 1440
+
+[node name="HSlider" type="HSlider" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 77.0
+margin_right = 540.0
+margin_bottom = 93.0
+min_value = 1.0
+max_value = 1440.0
+value = 15.0
+rounded = true
+tick_count = 20
+ticks_on_borders = true
+
+[node name="Button" type="Button" parent="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 123.0
+margin_right = 540.0
+margin_bottom = 167.0
+text = "Submit"
+script = SubResource( 17 )
+
+[node name="Header2" parent="3,5-Custom Setup 4,2" instance=ExtResource( 7 )]
+my_menu = "3,5"
 
 [node name="2,3-Custom Setup 3" type="ReferenceRect" parent="."]
 margin_left = 1080.0
@@ -1126,14 +1371,14 @@ margin_left = 94.0
 margin_right = 230.0
 margin_bottom = 44.0
 text = "Indoors"
-script = SubResource( 16 )
+script = SubResource( 18 )
 
 [node name="Button2" type="Button" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 290.0
 margin_right = 446.0
 margin_bottom = 44.0
 text = "Outdoors"
-script = SubResource( 17 )
+script = SubResource( 19 )
 
 [node name="Header2" parent="2,3-Custom Setup 3" instance=ExtResource( 7 )]
 my_menu = "2,3"
@@ -1189,14 +1434,14 @@ margin_right = 247.0
 margin_bottom = 44.0
 custom_constants/hseparation = 60
 text = "Death Limit"
-script = SubResource( 18 )
+script = SubResource( 20 )
 
 [node name="Button2" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 307.0
 margin_right = 474.0
 margin_bottom = 44.0
 text = "Time Limit"
-script = SubResource( 19 )
+script = SubResource( 21 )
 
 [node name="Header2" parent="3,3-Custom Setup 4" instance=ExtResource( 7 )]
 my_menu = "3,3"
@@ -1221,9 +1466,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="4,3-Custom Setup 5/CenterContainer"]
-margin_top = 156.0
+margin_top = 133.0
 margin_right = 540.0
-margin_bottom = 404.0
+margin_bottom = 427.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
@@ -1243,7 +1488,7 @@ autowrap = true
 [node name="VBoxContainer" type="VBoxContainer" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer"]
 margin_top = 127.0
 margin_right = 540.0
-margin_bottom = 248.0
+margin_bottom = 294.0
 custom_constants/separation = 30
 
 [node name="PlusMinusWidget" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer" instance=ExtResource( 4 )]
@@ -1251,13 +1496,25 @@ margin_right = 540.0
 margin_bottom = 47.0
 current_val = 15
 apply_minimum_value = true
+apply_maximum_value = true
+maximum_value = 999
 
-[node name="Button" type="Button" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer"]
+[node name="HSlider" type="HSlider" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 77.0
 margin_right = 540.0
-margin_bottom = 121.0
+margin_bottom = 93.0
+max_value = 999.0
+value = 15.0
+rounded = true
+tick_count = 20
+ticks_on_borders = true
+
+[node name="Button" type="Button" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 123.0
+margin_right = 540.0
+margin_bottom = 167.0
 text = "Submit"
-script = SubResource( 20 )
+script = SubResource( 22 )
 
 [node name="Header2" parent="4,3-Custom Setup 5" instance=ExtResource( 7 )]
 my_menu = "4,3"
@@ -1323,7 +1580,7 @@ margin_top = 127.0
 margin_right = 540.0
 margin_bottom = 171.0
 align = 1
-script = SubResource( 21 )
+script = SubResource( 23 )
 
 [node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_top = 179.0
@@ -1341,7 +1598,7 @@ rect_min_size = Vector2( 540, 40 )
 bbcode_enabled = true
 bbcode_text = "[center][url=https://discordapp.com/invite/tn4hThV]FreecoiL Discord Link[/url][/center]"
 text = "FreecoiL Discord Link"
-script = SubResource( 22 )
+script = SubResource( 24 )
 
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
@@ -1356,11 +1613,21 @@ my_menu = "-1,-1"
 [connection signal="pressed" from="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" to="1,1-Networked Game 2/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button" to="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="PMWidChanged" from="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget" to="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
+[connection signal="value_changed" from="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/HSlider" to="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_HSlider_value_changed" flags=3]
 [connection signal="pressed" from="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" to="1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="PMWidChanged" from="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget" to="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
+[connection signal="value_changed" from="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/HSlider" to="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_HSlider_value_changed" flags=3]
+[connection signal="pressed" from="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button" to="3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="PMWidChanged" from="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget" to="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
+[connection signal="value_changed" from="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/HSlider" to="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_HSlider_value_changed" flags=3]
+[connection signal="pressed" from="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/Button" to="3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button" to="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" to="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="PMWidChanged" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
+[connection signal="value_changed" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/HSlider" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_HSlider_value_changed" flags=3]
 [connection signal="pressed" from="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" to="4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]

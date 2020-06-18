@@ -8,17 +8,30 @@ import sys
 
 GODOT_VERSION = "3.2.2-beta4"
 
-def player1(app_path, proj_path):
-    returncode = subprocess.call([app_path, "--position", "10,10","-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=LAN", "player=1"])
+def player1_time_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "10,10","-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_time", "player=1"])
     return returncode
 
 
-def player2(app_path, proj_path):
-    returncode = subprocess.call([app_path, "--position", "560,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=LAN", "player=2"])
+def player2_time_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "560,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_time", "player=2"])
     return returncode
 
-def player3(app_path, proj_path):
-    returncode = subprocess.call([app_path, "--position", "1120,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=LAN", "player=3"])
+def player3_time_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "1120,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_time", "player=3"])
+    return returncode
+
+def player1_death_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "10,10","-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_death", "player=1"])
+    return returncode
+
+
+def player2_death_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "560,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_death", "player=2"])
+    return returncode
+
+def player3_death_limit(app_path, proj_path):
+    returncode = subprocess.call([app_path, "--position", "1120,10", "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=multiplayer_integration", "match=lan_death", "player=3"])
     return returncode
 
 cwd = pathlib.Path.cwd()
@@ -31,20 +44,36 @@ else:
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
 
-returncode1 = executor.submit(player1, app_path, proj_path)
-returncode2 = executor.submit(player2, app_path, proj_path)
-returncode3 = executor.submit(player3, app_path, proj_path)
+returncode1 = executor.submit(player1_time_limit, app_path, proj_path)
+returncode2 = executor.submit(player2_time_limit, app_path, proj_path)
+returncode3 = executor.submit(player3_time_limit, app_path, proj_path)
 executor.shutdown(wait=True)
 print("#############################################################################")
-print("Player 1 App Instance (Server) returned an exit code of ", returncode1.result())
-print("Player 2 App Instance (Client) returned an exit code of ", returncode2.result())
-print("Player 3 App Instance (Client) returned an exit code of ", returncode3.result())
+print("Player 1 Time Limit App Instance (Server) returned an exit code of ", returncode1.result())
+print("Player 2 Time Limit App Instance (Client) returned an exit code of ", returncode2.result())
+print("Player 3 Time Limit App Instance (Client) returned an exit code of ", returncode3.result())
 print("#############################################################################")
 
 if returncode1.result() == 0 and returncode2.result() == 0 and returncode3.result() == 0:
-    print("Returning 0 exit code from Python. Success!")
-    sys.exit(0)
+    print("Success! Continuing with tests.")
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
+    returncode1 = executor.submit(player1_death_limit, app_path, proj_path)
+    returncode2 = executor.submit(player2_death_limit, app_path, proj_path)
+    returncode3 = executor.submit(player3_death_limit, app_path, proj_path)
+    executor.shutdown(wait=True)
+    print("#############################################################################")
+    print("Player 1 Death Limit App Instance (Server) returned an exit code of ", returncode1.result())
+    print("Player 2 Death Limit App Instance (Client) returned an exit code of ", returncode2.result())
+    print("Player 3 Death Limit App Instance (Client) returned an exit code of ", returncode3.result())
+    print("#############################################################################")
+    if returncode1.result() == 0 and returncode2.result() == 0 and returncode3.result() == 0:
+        print("Success!")
+        sys.exit(0)
+    else:
+        print("Returning 1 exit code from Python. Failure!")
+        sys.exit(1)
 else:
     print("Returning 1 exit code from Python. Failure!")
     sys.exit(1)
+
 
