@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://assets/themes/default/default_Alternate_Table_Label.theme" type="Theme" id=1]
+
+[node name="Label4" type="Label"]
+margin_left = 250.0
+margin_top = 79.0
+margin_right = 430.0
+margin_bottom = 115.0
+rect_min_size = Vector2( 180, 0 )
+size_flags_vertical = 1
+theme = ExtResource( 1 )
+text = "0:39"
+align = 1
+valign = 1
+autowrap = true

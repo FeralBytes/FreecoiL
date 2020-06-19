@@ -1,0 +1,10 @@
+[gd_scene format=2]
+
+[node name="Label" type="Label"]
+margin_right = 246.0
+margin_bottom = 75.0
+rect_min_size = Vector2( 246, 0 )
+size_flags_vertical = 1
+text = "Name"
+valign = 1
+autowrap = true

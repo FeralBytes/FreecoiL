@@ -55,6 +55,7 @@ func _ready():
 func set_player_start_game_vars():
     set_player_respawn_vars()
     setup_recording_vars()
+    Settings.Session.set_data("game_player_alive", false)
     if Settings.InGame.get_data("game_teams"):
         var game_teams_by_team_num_by_id = Settings.InGame.get_data("game_teams_by_team_num_by_id")
         var game_team_status_by_num = {}
@@ -64,7 +65,6 @@ func set_player_start_game_vars():
             else:
                 game_team_status_by_num[team_num] = "playing"
         Settings.InGame.set_data("game_team_status_by_num", game_team_status_by_num)
-    Settings.Session.set_data("game_player_alive", false)
     Settings.Session.set_data("game_tick_toc_start_delay", Settings.InGame.get_data("game_start_delay"))
     if Settings.InGame.get_data("game_limit_mode") == "time":
         Settings.Session.set_data("game_tick_toc_time_remaining", Settings.InGame.get_data("game_time_limit"))
@@ -72,7 +72,8 @@ func set_player_start_game_vars():
     Settings.Session.set_data("game_tick_toc_time_elapsed", 0)
     Settings.Session.set_data("game_started", 0)  # Quad State: 0=Not Stated, 1=Started, 2=Paused, 3=Game Over
     Settings.Session.set_data("game_player_team", Settings.InGame.get_data("player_team_by_id")[Settings.Session.get_data("mup_id")])
-    Settings.Session.set_data("game_player_teammates", Settings.InGame.get_data("game_teams_by_team_num_by_id")[Settings.Session.get_data("game_player_team")])
+    Settings.Session.set_data("game_player_teammates", 
+        Settings.InGame.get_data("game_teams_by_team_num_by_id")[Settings.Session.get_data("game_player_team")])
     Settings.Session.set_data("game_player_last_killed_by", "")
     Settings.Session.set_data("game_player_deaths", 0)
     Settings.Session.set_data("game_player_kills", 0)
@@ -206,8 +207,8 @@ func _process(__):
                 if event_to_sort["type"] == "end_game":
                     if Settings.Session.get_data("game_started") != 3:
                         end_game(event_to_sort["additional"]["reason"])
-            if event_to_sort["type"] == "eliminated":
-                if Settings.Session.get_data("mup_id") == "1":  # Server
+            if Settings.Session.get_data("mup_id") == "1":  # Server
+                if event_to_sort["type"] == "eliminated":
                     var player_team_by_id = Settings.InGame.get_data("player_team_by_id")
                     var elim_player_team = player_team_by_id[event_to_sort["rec_by"]]
                     var player_status_by_id = Settings.InGame.get_data("player_status_by_id")
@@ -230,6 +231,28 @@ func _process(__):
                                 teams_remaining += 1
                         if teams_remaining <= 1:
                             call_deferred("end_game", "team_elimination")
+                elif event_to_sort["type"] == "died":
+                    var laser_id = event_to_sort["additional"]["laser_id"]
+                    var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+                    var victim_mup = event_to_sort["rec_by"]
+                    var player_kills_by_id = Settings.InGame.get_data("player_kills_by_id")
+                    var player_deaths_by_id = Settings.InGame.get_data("player_deaths_by_id")
+                    player_kills_by_id[shooter_mup] = player_kills_by_id[shooter_mup] + 1
+                    Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
+                    player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
+                    Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
+                elif event_to_sort["type"] == "eliminated":
+                    var laser_id = event_to_sort["additional"]["laser_id"]
+                    var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+                    var victim_mup = event_to_sort["rec_by"]
+                    var player_kills_by_id = Settings.InGame.get_data("player_kills_by_id")
+                    var player_deaths_by_id = Settings.InGame.get_data("player_deaths_by_id")
+                    player_kills_by_id[shooter_mup] = player_kills_by_id[shooter_mup] + 1
+                    Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
+                    player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
+                    Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
+                elif event_to_sort["type"] == "hit":
+                    pass
     else:
         if easy_day:
             if catch_up_active == false:
@@ -367,7 +390,8 @@ func reload_start():
     ReloadSound.volume_db = 0
     ReloadSound.pitch_scale = 0.45 / Settings.Session.get_data("game_weapon_reload_speed")
     ReloadSound.play()
-    record_game_event("reloading", {"gun": Settings.Session.get_data("game_weapon_type"), "reload_speed": Settings.Session.get_data("game_weapon_reload_speed")})
+    record_game_event("reloading", {"gun": Settings.Session.get_data("game_weapon_type"), 
+        "reload_speed": Settings.Session.get_data("game_weapon_reload_speed")})
     
 func reload_finish():
     var remove_magazine_ammo = 0

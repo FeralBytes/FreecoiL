@@ -213,5 +213,6 @@ func test_p1_yield_to_show_result():
     print("Settings.Preferences:")
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    assert_eq(_obj.current_scene.game_history.size(), 34)
+    var unack_events_size = _obj.current_scene.server_unackn_events_by_mup["2"].size()
+    assert_eq(_obj.current_scene.game_history.size(), 34 + unack_events_size)
     yield(get_tree().create_timer(1.0), "timeout")

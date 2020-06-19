@@ -99,6 +99,8 @@ func _ready():
     set_item_metadata(0, null)
     add_item(\"Load 'Lobby' For Testing\")
     set_item_metadata(1, \"res://scenes/Lobbies/Lobby.tscn\")
+    add_item(\"Load 'InGame' For Testing\")
+    set_item_metadata(2, \"res://scenes/InGame/InGame.tscn\")
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -109,6 +111,25 @@ func _ready():
 func _on_OptionButton_item_selected(index):
     var resource_path = get_item_metadata(index)
     if resource_path != null:
+        if resource_path == \"res://scenes/InGame/InGame.tscn\":
+            Settings.Session.set_data(\"mup_id\", \"1\")
+            Settings.InGame.set_data(\"player_laser_by_id\", {\"1\": 1})
+            Settings.InGame.set_data(\"player_name_by_id\", {\"1\": \"Tester\"})
+            Settings.InGame.set_data(\"game_start_delay\", 5)
+            Settings.InGame.set_data(\"game_limit_mode\", \"time\")
+            Settings.InGame.set_data(\"game_time_limit\", 120)
+            Settings.InGame.set_data(\"game_indoor_mode\", true)
+            Settings.InGame.set_data(\"game_teams\", true)
+            Settings.InGame.set_data(\"game_number_of_teams\", 2)
+            Settings.InGame.set_data(\"player_team_by_id\", {\"1\": 1})
+            Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [[], [\"1\"], [\"2\"]])
+            Settings.InGame.set_data(\"game_weapon_types\",{\"M9\": {\"magazine_size\": 15, \"damage\": 1, 
+                \"shot_modes\": [\"semi-automatic\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
+            Settings.InGame.set_data(\"game_start_weapon_type\", \"M9\")
+            Settings.InGame.set_data(\"game_start_health\", 30)
+            Settings.InGame.set_data(\"game_start_ammo\", {\"M9\": 300})
+            Settings.InGame.set_data(\"game_friendly_fire\", false)
+            Settings.InGame.set_data(\"game_respawn_delay\", 5)
         get_tree().call_group(\"Container\", \"goto_scene\", resource_path)
 
 
@@ -192,9 +213,9 @@ script = SubResource( 3 )
 
 [node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
 visible = false
-margin_top = 192.0
+margin_top = 200.0
 margin_right = 540.0
-margin_bottom = 231.0
+margin_bottom = 244.0
 align = 1
 script = SubResource( 4 )
 

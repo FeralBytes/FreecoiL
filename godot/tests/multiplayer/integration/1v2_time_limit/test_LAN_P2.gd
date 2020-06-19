@@ -144,4 +144,5 @@ func test_p2_yield_to_show_result():
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     assert_eq(_obj.current_scene.game_history.size(), 33)
     assert_eq(Settings.Session.get_data("game_player_kills"), 1)
+    
     yield(get_tree().create_timer(1.0), "timeout")

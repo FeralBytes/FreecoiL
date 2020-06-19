@@ -7,6 +7,7 @@
 
 * App Background = "Rich Black FOGRA 39":"000000"
 * Label Background = "International Orange Golden Gate Bridge":"bb4430"
+* Table Alternate Background = "Liver Organ":"722A1D"
 * Font Color = "Medium Champagne":"f3dfa2"
 * Font Color Pressed = "International Orange Golden Gate Bridge":"bb4430"
 * Button Background = "Old Burgundy":"4f3130"

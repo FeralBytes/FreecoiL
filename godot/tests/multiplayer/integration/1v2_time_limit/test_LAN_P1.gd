@@ -205,4 +205,5 @@ func test_p1_yield_to_show_result():
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     assert_eq(_obj.current_scene.game_history.size(), 33)
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 1)
     yield(get_tree().create_timer(1.0), "timeout")
