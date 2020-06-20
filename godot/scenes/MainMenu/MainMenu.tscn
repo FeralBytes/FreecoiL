@@ -101,7 +101,6 @@ func _ready():
 
 func force_player_name(__):
     if Settings.Preferences.get_data(\"player_name\") == null:
-        print(\"Player Name  == Null? \" + str(Settings.Preferences.get_data(\"player_name\")))
         Settings.Preferences.set_data(\"player_name\", \"No Name\")
         if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")

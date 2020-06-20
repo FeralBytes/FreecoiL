@@ -11,6 +11,7 @@ var event_template = {"client_time": null, "event_id": null, "type": null, "rec_
 var server_unackn_events_by_mup = {}
 var catch_up_active = false
 var last_connection_status = null
+var rng = RandomNumberGenerator.new()
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -48,6 +49,7 @@ func _ready():
     # Make Connections
     Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
     Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "connection_status_event")
+    rng.randomize()
     set_player_start_game_vars()
     get_tree().call_group("Network", "tell_server_i_am_ready", true)
 
@@ -197,7 +199,9 @@ func _process(__):
                     elif event_to_sort["type"] == "hit":
                         if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
                             if not NiceSound.playing:
-                                NiceSound.play()
+                                var rand_tmp = rng.randi_range(1, 4)
+                                if rand_tmp == 4:
+                                    NiceSound.play()
                 if event_to_sort["type"] == "died":
                     if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
                         Settings.Session.set_data("game_player_kills", Settings.Session.get_data("game_player_kills") + 1)

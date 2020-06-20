@@ -313,7 +313,8 @@ func setup_as_client():
         Settings.Session.set_data("connection_status", "reconnecting")
     else:
         Settings.Session.set_data("connection_status", "connecting")
-    Settings.Log("Network: Client: Setting up as a client with server address of " + Settings.Session.get_data("server_ip") + ":" + str(Settings.Session.get_data("server_port")))
+    Settings.Log("Network: Client: Setting up as a client with server address of " + 
+        Settings.Session.get_data("server_ip") + ":" + str(Settings.Session.get_data("server_port")))
     Client = NetworkedMultiplayerENet.new()
     Client.create_client(Settings.Session.get_data("server_ip"), Settings.Session.get_data("server_port"))
     get_tree().set_network_peer(Client)
@@ -436,7 +437,8 @@ func _udp_broadcast_tx():
 
 func __udp_broadcast_tx():
     udp_test_broadcast_tx_count += 1
-    pp_udp.put_var([Settings.UDP_BROADCAST_GREETING, Settings.Session.get_data("server_ip"), Settings.Session.get_data("server_port"), host_udp_broadcast_uid])
+    pp_udp.put_var([Settings.UDP_BROADCAST_GREETING, Settings.Session.get_data("server_ip"), 
+        Settings.Session.get_data("server_port"), host_udp_broadcast_uid])
     __udp_broadcast_tx_time_since = OS.get_ticks_msec()
     
 func _udp_broadcast_rxd():
@@ -452,18 +454,21 @@ func _udp_broadcast_rxd():
                 #Settings.Log("Network: UDP: Got broadcast from self.")
                 pass  # Throw it away.
             elif udp_var[0] == Settings.UDP_BROADCAST_GREETING:
-                Settings.Log("Networking: UDP: Got UDP Peer Greeting broadcast from: " + udp_peer_ip +  " of " + str(udp_var))
+                Settings.Log("Networking: UDP: Got UDP Peer Greeting broadcast from: " + udp_peer_ip +  
+                    " of " + str(udp_var))
                 udp_peer_dict[udp_peer_ip] = OS.get_system_time_secs()
                 if testing:
                     udp_test_from_peer = udp_var[3]
             elif udp_var[0] == Settings.UDP_BROADCAST_HOST:
-                Settings.Log("Networking: UDP: Got UDP Server Greeting broadcast from: " + udp_peer_ip +  " of " + str(udp_var))
+                Settings.Log("Networking: UDP: Got UDP Server Greeting broadcast from: " + udp_peer_ip +  
+                    " of " + str(udp_var))
                 if not Settings.Session.get_data("server_invite"):
                     if udp_var[1] in Settings.Session.get_data("server_ignore_list"):
                         pass
                     else:
                         Settings.Session.set_data("server_invite", true)
-                        Settings.Log("Networking: UDP: Client found server's address = " + udp_var[1] + ":" + str(udp_var[2]))
+                        Settings.Log("Networking: UDP: Client found server's address = " + udp_var[1] + 
+                            ":" + str(udp_var[2]))
                         Settings.Session.set_data("server_ip", udp_var[1])
                         Settings.Session.set_data("server_port", udp_var[2])
                         get_tree().call_group("Network", "stop_udp_peer_search")
@@ -490,7 +495,8 @@ func _hosting_so_toss_udp_broadcast():
             else:
                 if typeof(udp_var) == TYPE_ARRAY:
                     if udp_var[0] == Settings.UDP_BROADCAST_HOST:
-                        Settings.Log("Network: UDP: Warning: Another server is hosting at " + udp_var[1] + ":" + str(udp_var[2]))
+                        Settings.Log("Network: UDP: Warning: Another server is hosting at " + udp_var[1] + 
+                            ":" + str(udp_var[2]))
                         Settings.Log("        Verified IP Address is: " + udp_peer_ip)
 
 func _hosting_send_udp_broadcast():
@@ -502,7 +508,8 @@ func _hosting_send_udp_broadcast():
         pass
 
 func __hosting_send_udp_broadcast():
-    pp_udp.put_var([Settings.UDP_BROADCAST_HOST, Settings.Session.get_data("server_ip"), Settings.Session.get_data("server_port"), host_udp_broadcast_uid])
+    pp_udp.put_var([Settings.UDP_BROADCAST_HOST, Settings.Session.get_data("server_ip"), 
+        Settings.Session.get_data("server_port"), host_udp_broadcast_uid])
     __udp_broadcast_hosting_tx_time_since = OS.get_ticks_msec()
     #Settings.Log("Network: UDP: Sent UDP Host Broadcast.")
  

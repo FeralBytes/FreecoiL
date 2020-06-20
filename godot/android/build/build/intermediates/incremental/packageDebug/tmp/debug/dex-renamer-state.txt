@@ -1,4 +1,4 @@
-#Fri Jun 19 12:50:05 AKDT 2020
+#Fri Jun 19 18:25:03 AKDT 2020
 base.1=/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/dex/debug/mergeProjectDexDebug/out/classes.dex
 path.1=classes.dex
 base.0=/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/dex/debug/mergeExtDexDebug/out/classes.dex

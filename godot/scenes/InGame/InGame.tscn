@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=2]
+[gd_scene load_steps=62 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -218,6 +218,29 @@ func update_time_remaining(new_val):
     text = \"Time Remaining: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
+[sub_resource type="GDScript" id=44]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button2_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
+"
+
 [sub_resource type="GDScript" id=17]
 script/source = "extends Button
 
@@ -239,6 +262,40 @@ func _ready():
 
 func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
+"
+
+[sub_resource type="GDScript" id=43]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Network.connect(Settings.Network.monitor_data(\"mups_status\"), self, \"update_text_based_on_network_peers\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"connection_status\"), self, \"update_text_based_on_network\")
+
+func update_text_based_on_network(network_status):
+   # \"do_not_connect\", \"connected\", \"disconnected\", \"connecting\", \"reconnecting\", \"reconnected\", \"identifying\"
+    if network_status == \"connected\":
+        text = \"Scoreboard\"
+    else:
+        text = \"Scoreboard (Missing Data)\"
+
+func update_text_based_on_network_peers(mups_network_status):
+    var all_mups_connected = true
+    print(mups_network_status)
+    for mup in mups_network_status:
+        if mups_network_status[mup] != \"connected\" and mups_network_status[mup] != \"reconnected\":
+            print(mups_network_status[mup])
+            all_mups_connected = false
+    if all_mups_connected:
+        text = \"Scoreboard\"
+    else:
+        text = \"Scoreboard (Missing Data)\"
 "
 
 [sub_resource type="GDScript" id=18]
@@ -391,7 +448,7 @@ func _on_OptionButton_pressed():
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=40]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Button
 
 onready var DropDown = get_parent().get_parent().get_node(\"OptionButton\")
@@ -406,11 +463,11 @@ func _on_LeftBumper_pressed():
     DropDown.selected = move_to
 "
 
-[sub_resource type="DynamicFont" id=20]
+[sub_resource type="DynamicFont" id=21]
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=41]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Button
 
 
@@ -426,14 +483,41 @@ func _on_RightBumper_pressed():
     DropDown.selected = move_to
 "
 
-[sub_resource type="StyleBoxFlat" id=21]
+[sub_resource type="GDScript" id=23]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_started\"),self, \"change_btn_text\")
+
+func change_btn_text(game_status):
+    if game_status == 1:
+        text = \"Return to Main Game Screen\"
+    else:
+        text = \"Return to the Main Menu\"
+
+
+func _on_Button_pressed():
+    if text == \"Return to Main Game Screen\":
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    else:
+        get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
+"
+
+[sub_resource type="StyleBoxFlat" id=24]
 bg_color = Color( 0.666667, 0.145098, 0, 1 )
 
-[sub_resource type="DynamicFont" id=22]
+[sub_resource type="DynamicFont" id=25]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=23]
+[sub_resource type="GDScript" id=26]
 script/source = "extends Label
 
 
@@ -450,7 +534,7 @@ func update_value(new_val):
     text = \"Killed by: \" + new_val
 "
 
-[sub_resource type="GDScript" id=24]
+[sub_resource type="GDScript" id=27]
 script/source = "extends Label
 
 
@@ -470,7 +554,7 @@ func update_time_remaining(new_val):
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=28]
 script/source = "extends Label
 
 
@@ -488,7 +572,7 @@ func update_val(new_val):
     pass
 "
 
-[sub_resource type="GDScript" id=26]
+[sub_resource type="GDScript" id=29]
 script/source = "extends Button
 
 
@@ -511,7 +595,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
-[sub_resource type="GDScript" id=27]
+[sub_resource type="GDScript" id=30]
 script/source = "extends Label
 
 
@@ -528,7 +612,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Label
 
 
@@ -545,7 +629,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=29]
+[sub_resource type="GDScript" id=32]
 script/source = "extends Label
 
 
@@ -562,7 +646,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=33]
 script/source = "extends Label
 
 
@@ -579,7 +663,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=31]
+[sub_resource type="GDScript" id=34]
 script/source = "extends Label
 
 
@@ -596,7 +680,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=32]
+[sub_resource type="GDScript" id=35]
 script/source = "extends Label
 
 
@@ -613,7 +697,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=33]
+[sub_resource type="GDScript" id=36]
 script/source = "extends Label
 
 
@@ -630,7 +714,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=37]
 script/source = "extends Label
 
 
@@ -647,7 +731,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=38]
 script/source = "extends Label
 
 
@@ -664,7 +748,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=36]
+[sub_resource type="GDScript" id=39]
 script/source = "extends Label
 
 
@@ -681,7 +765,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=37]
+[sub_resource type="GDScript" id=40]
 script/source = "extends Label
 
 
@@ -698,7 +782,7 @@ func update_value(new_val):
     text = str(new_val)
 "
 
-[sub_resource type="GDScript" id=38]
+[sub_resource type="GDScript" id=41]
 script/source = "extends Label
 
 
@@ -719,7 +803,7 @@ func update_val():
         
 "
 
-[sub_resource type="GDScript" id=39]
+[sub_resource type="GDScript" id=42]
 script/source = "extends Button
 
 
@@ -1153,9 +1237,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-End of Game/CenterContainer"]
-margin_top = 214.0
+margin_top = 188.0
 margin_right = 540.0
-margin_bottom = 346.0
+margin_bottom = 372.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
@@ -1172,16 +1256,16 @@ text = "Reason Statement."
 align = 1
 
 [node name="Button2" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
-visible = false
-margin_top = 90.0
-margin_right = 540.0
-margin_bottom = 129.0
-text = "View the Scores"
-
-[node name="Button" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
 margin_top = 88.0
 margin_right = 540.0
 margin_bottom = 132.0
+text = "View the Final Scores"
+script = SubResource( 44 )
+
+[node name="Button" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
+margin_top = 140.0
+margin_right = 540.0
+margin_bottom = 184.0
 text = "Return to the Main Menu"
 script = SubResource( 17 )
 
@@ -1208,8 +1292,10 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
-margin_right = 540.0
-margin_bottom = 856.0
+margin_left = 2.0
+margin_top = 4.0
+margin_right = 542.0
+margin_bottom = 852.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
@@ -1217,6 +1303,7 @@ margin_right = 540.0
 margin_bottom = 36.0
 text = "Scoreboard"
 align = 1
+script = SubResource( 43 )
 
 [node name="OptionButton" type="OptionButton" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
 margin_top = 44.0
@@ -1228,16 +1315,16 @@ script = SubResource( 18 )
 [node name="HBoxContainer" type="HBoxContainer" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
 margin_top = 96.0
 margin_right = 540.0
-margin_bottom = 856.0
+margin_bottom = 796.0
 custom_constants/separation = 12
 
 [node name="LeftBumper" type="Button" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_right = 39.0
-margin_bottom = 760.0
+margin_bottom = 700.0
 theme = ExtResource( 17 )
 custom_fonts/font = SubResource( 19 )
 text = "<"
-script = SubResource( 40 )
+script = SubResource( 20 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1245,8 +1332,8 @@ __meta__ = {
 [node name="ScrollContainer" type="ScrollContainer" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 51.0
 margin_right = 481.0
-margin_bottom = 760.0
-rect_min_size = Vector2( 0, 760 )
+margin_bottom = 700.0
+rect_min_size = Vector2( 0, 700 )
 scroll_horizontal_enabled = false
 
 [node name="TableHolder" type="GridContainer" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
@@ -1258,11 +1345,17 @@ columns = 2
 [node name="RightBumper" type="Button" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 493.0
 margin_right = 532.0
-margin_bottom = 760.0
+margin_bottom = 700.0
 theme = ExtResource( 16 )
-custom_fonts/font = SubResource( 20 )
+custom_fonts/font = SubResource( 21 )
 text = ">"
-script = SubResource( 41 )
+script = SubResource( 22 )
+
+[node name="Button" type="Button" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
+margin_top = 804.0
+margin_right = 540.0
+margin_bottom = 848.0
+script = SubResource( 23 )
 
 [node name="Header2" parent="-1,1-Scoreboard" instance=ExtResource( 2 )]
 my_menu = "-1,1"
@@ -1296,8 +1389,8 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "You have been Killed."
 align = 1
 
@@ -1305,11 +1398,11 @@ align = 1
 margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "Killed by: Player Name"
 align = 1
-script = SubResource( 23 )
+script = SubResource( 26 )
 
 [node name="HSeparator" type="HSeparator" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_top = 118.0
@@ -1321,8 +1414,8 @@ custom_constants/separation = 100
 margin_top = 226.0
 margin_right = 540.0
 margin_bottom = 277.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "You will respawn"
 align = 1
 
@@ -1330,11 +1423,11 @@ align = 1
 margin_top = 285.0
 margin_right = 540.0
 margin_bottom = 336.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "in: 00:00"
 align = 1
-script = SubResource( 24 )
+script = SubResource( 27 )
 
 [node name="Header2" parent="1,0-Respawn" instance=ExtResource( 2 )]
 my_menu = "1,0"
@@ -1368,8 +1461,8 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "You have been Killed."
 align = 1
 
@@ -1377,11 +1470,11 @@ align = 1
 margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "Killed by: Player Name"
 align = 1
-script = SubResource( 23 )
+script = SubResource( 26 )
 
 [node name="HSeparator" type="HSeparator" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
 margin_top = 118.0
@@ -1393,8 +1486,8 @@ custom_constants/separation = 100
 margin_top = 226.0
 margin_right = 540.0
 margin_bottom = 493.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "You have been eliminated from the game. Please wait for the other players to finish."
 align = 1
 autowrap = true
@@ -1403,11 +1496,11 @@ autowrap = true
 margin_top = 501.0
 margin_right = 540.0
 margin_bottom = 552.0
-custom_styles/normal = SubResource( 21 )
-custom_fonts/font = SubResource( 22 )
+custom_styles/normal = SubResource( 24 )
+custom_fonts/font = SubResource( 25 )
 text = "Death Limit Reached."
 align = 1
-script = SubResource( 25 )
+script = SubResource( 28 )
 
 [node name="Header2" parent="2,0-Eliminated" instance=ExtResource( 2 )]
 my_menu = "2,0"
@@ -1442,7 +1535,7 @@ rect_min_size = Vector2( 540, 0 )
 margin_right = 540.0
 margin_bottom = 44.0
 text = "Back To In Game"
-script = SubResource( 26 )
+script = SubResource( 29 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 52.0
@@ -1461,7 +1554,7 @@ margin_left = 328.0
 margin_right = 377.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 27 )
+script = SubResource( 30 )
 
 [node name="HBoxContainer9" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -1480,7 +1573,7 @@ margin_left = 355.0
 margin_right = 404.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 28 )
+script = SubResource( 31 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 140.0
@@ -1499,7 +1592,7 @@ margin_left = 356.0
 margin_right = 405.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 29 )
+script = SubResource( 32 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 184.0
@@ -1518,7 +1611,7 @@ margin_left = 381.0
 margin_right = 430.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 30 )
+script = SubResource( 33 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 228.0
@@ -1537,7 +1630,7 @@ margin_left = 346.0
 margin_right = 395.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 31 )
+script = SubResource( 34 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 272.0
@@ -1556,7 +1649,7 @@ margin_left = 400.0
 margin_right = 449.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 32 )
+script = SubResource( 35 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 316.0
@@ -1575,7 +1668,7 @@ margin_left = 426.0
 margin_right = 475.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 33 )
+script = SubResource( 36 )
 
 [node name="HBoxContainer7" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 360.0
@@ -1594,7 +1687,7 @@ margin_left = 369.0
 margin_right = 418.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 34 )
+script = SubResource( 37 )
 
 [node name="HBoxContainer8" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 404.0
@@ -1613,7 +1706,7 @@ margin_left = 361.0
 margin_right = 410.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 35 )
+script = SubResource( 38 )
 
 [node name="HBoxContainer10" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 448.0
@@ -1632,7 +1725,7 @@ margin_left = 353.0
 margin_right = 402.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 36 )
+script = SubResource( 39 )
 
 [node name="HBoxContainer11" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 492.0
@@ -1651,7 +1744,7 @@ margin_left = 400.0
 margin_right = 449.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 37 )
+script = SubResource( 40 )
 
 [node name="HBoxContainer12" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 536.0
@@ -1670,14 +1763,14 @@ margin_left = 415.0
 margin_right = 464.0
 margin_bottom = 36.0
 text = "01"
-script = SubResource( 38 )
+script = SubResource( 41 )
 
 [node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
 margin_top = 580.0
 margin_right = 540.0
 margin_bottom = 624.0
 text = "Test"
-script = SubResource( 39 )
+script = SubResource( 42 )
 
 [node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )
@@ -1723,11 +1816,13 @@ my_menu = "1,-1"
 on_mainmenu_scene = false
 allow_preferences = false
 [connection signal="pressed" from="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" to="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,1-End of Game/CenterContainer/VBoxContainer/Button2" to="0,1-End of Game/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="0,1-End of Game/CenterContainer/VBoxContainer/Button" to="0,1-End of Game/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="item_selected" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/LeftBumper" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/LeftBumper" method="_on_LeftBumper_pressed" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" method="_on_RightBumper_pressed" flags=3]
+[connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="timeout" from="TickTocTimer" to="." method="tick_toc" flags=3]
