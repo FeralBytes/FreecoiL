@@ -338,7 +338,7 @@ func _on_Button_pressed():
 
 
 func _on_HSlider_value_changed(value):
-    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 
 
 func _on_PlusMinusWidget_PMWidChanged(new_value):
@@ -373,7 +373,7 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
 
 
 func _on_HSlider_value_changed(value):
-    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
 [sub_resource type="GDScript" id=17]
@@ -406,7 +406,7 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
 
 
 func _on_HSlider_value_changed(value):
-    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
 [sub_resource type="GDScript" id=18]
@@ -544,7 +544,7 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
 
 
 func _on_HSlider_value_changed(value):
-    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value)
+    get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
 [sub_resource type="GDScript" id=23]

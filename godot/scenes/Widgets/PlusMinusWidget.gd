@@ -16,10 +16,13 @@ onready var Display = get_node("HBoxContainer/Display")
 func _ready():
     Display.text = "%03d" % current_val
 
-func set_current_val(val):
+func set_current_val(val, trigger=true):
     current_val = val
     if Display != null:
-        _on_val_changed()
+        if trigger:
+            _on_val_changed()
+        else:
+            Display.text = "%03d" % current_val
 
 func get_current_val():
     return current_val
