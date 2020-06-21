@@ -4,7 +4,7 @@ var Obj
 var _obj
 var _map_maker
 var time_started
-var new_player_name = "Player 3"
+var new_player_name = "Player 2"
 
 onready var OvertimeTimer = Timer.new()
 
@@ -51,91 +51,77 @@ func after_all():
     var str_elapsed = "%02d : %02d" % [minutes, seconds]
     print("Elapsed Time = ", str_elapsed)
 
-func test_p3_loads_to_main_menu():
+func test_p2_loads_to_main_menu():
     while _obj.current_scene.name != "MainMenu":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "MainMenu")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
         
-func test_p3_can_change_player_name():
+func test_p2_can_change_player_name():
     var line_edit = _obj.get_node("Scene1/MainMenu/2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName")
     line_edit.text = new_player_name
     line_edit.emit_signal("text_entered", new_player_name)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Preferences.get_data("player_name"), new_player_name)
         
-func test_p3_can_click_start_a_networked_game():
+func test_p2_can_click_start_a_networked_game():
     var btn = _obj.get_node("Scene1/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,1")
 
-func test_p3_can_click_client():
+func test_p2_can_click_client():
     var btn = _obj.get_node("Scene1/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
-    yield(yield_for(1.5), YIELD)  # Prevents a race between  Player 2 and Player 3.
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,1")
 
-func test_p3_can_join_team_1():
+func test_p2_can_press_ready():
     while _obj.current_scene.name != "Lobbies":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "Lobbies")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
-    while Settings.InGame.get_data("game_number_of_teams") != 2:
-        yield(get_tree(), 'idle_frame')
-    var btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
-    yield(get_tree(), 'idle_frame')
-    btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("player_team"), 1)
-    var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/" + 
-        "HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
+    assert_eq(Settings.Session.get_data("player_team"), 0)
+    var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
     yield(yield_for(0.5), YIELD)
-    var name = tmp.get_child(0).get_child(0)
-    btn = tmp.get_child(0).get_child(1)
+    var name = tmp.get_child(1).get_child(0)
+    var btn = tmp.get_child(1).get_child(1)
     if name.text == new_player_name:
         btn.emit_signal("pressed")
     else:
-        btn = tmp.get_child(1).get_child(1)
-        btn.emit_signal("pressed")
+        assert_eq(false, true)
     yield(get_tree(), 'idle_frame')
 
-func test_p3_can_start_a_match():
+func test_p2_can_start_a_match():
     while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("game_started"), 1)
     
     
-func test_p3_can_disconnect_from_game():
-    yield(get_tree().create_timer(3.5), "timeout")
+func test_p2_can_disconnect_from_game():
     get_tree().call_group("Network", "client_disconnect", true)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("connection_status"), "do_not_connect")
     
-func test_p3_can_log_offline_events():
+func test_p2_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
     yield(get_tree().create_timer(8.0), "timeout")
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(2.0), "timeout")
     FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(2.0), "timeout")
     
-func test_p3_can_reconnect_to_game():
+func test_p2_can_reconnect_to_game():
     Settings.Session.set_data("connection_status", "disconnected")
     yield(get_tree(), 'idle_frame')
     get_tree().call_group("auto_reconnect", "disconnected")
     
-func test_p3_game_history_size_is_correct_after_rejoin():
+func test_p2_game_history_size_is_correct_after_rejoin():
     var all_players_have_rejoined = false
     while all_players_have_rejoined == false:
         var mups_status = Settings.Network.get_data("mups_status")
@@ -149,36 +135,29 @@ func test_p3_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 34)
+    assert_eq(_obj.current_scene.game_history.size(), 31)
     yield(get_tree(), 'idle_frame')
     
-func test_p3_has_1_death_for_player_1():
+func test_p2_has_1_death_for_player_1():
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
     yield(get_tree(), 'idle_frame')
 
-func test_p3_has_1_kill_for_player_2():
+func test_p2_has_1_kill_for_player_2():
     assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
     yield(get_tree(), 'idle_frame')
 
-func test_p3_team_scores():
-    # Team 0 isn't really a team, it is used for FFA or maybe a rogue player mode in the future.
-    assert_eq(Settings.InGame.get_data("game_team_scores")[0], 0)
-    assert_eq(Settings.InGame.get_data("game_team_scores")[1], 100)
-    assert_eq(Settings.InGame.get_data("game_team_scores")[2], -1000)
-    yield(get_tree(), 'idle_frame')
-    
-func test_p3_current_menu_is_correct():
-    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
+func test_p2_session_game_player_kills_is_1():
+    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
     yield(get_tree(), 'idle_frame')
 
-func test_p3_yield_to_show_result():
+func test_p2_yield_to_show_result():
     yield(get_tree(), 'idle_frame')
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    print("Player 3 (Client) Game History:")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("Player 2 (Client) Game History:")
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
-    print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     yield(get_tree().create_timer(1.0), "timeout")

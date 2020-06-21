@@ -218,6 +218,15 @@ func _process(__):
                     var player_status_by_id = Settings.InGame.get_data("player_status_by_id")
                     player_status_by_id[event_to_sort["rec_by"]] = "eliminated"
                     Settings.InGame.set_data("player_status_by_id", player_status_by_id)
+                    var laser_id = event_to_sort["additional"]["laser_id"]
+                    var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+                    var victim_mup = event_to_sort["rec_by"]
+                    var player_kills_by_id = Settings.InGame.get_data("player_kills_by_id")
+                    var player_deaths_by_id = Settings.InGame.get_data("player_deaths_by_id")
+                    player_kills_by_id[shooter_mup] = player_kills_by_id[shooter_mup] + 1
+                    Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
+                    player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
+                    Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
                     # TODO: Catch if whole team is eliminated. And that there is only 1 remaining team.
                     var team_is_eliminated = true
                     for player in player_team_by_id:
@@ -225,10 +234,21 @@ func _process(__):
                             if player_status_by_id[player] != "eliminated":
                                 team_is_eliminated = false
                     if team_is_eliminated:
+                        var game_team_elimination_order = Settings.InGame.get_data("game_team_elimination_order")
+                        game_team_elimination_order.append(elim_player_team)
+                        Settings.InGame.set_data("game_team_elimination_order", game_team_elimination_order)
+                        var game_team_scores = Settings.InGame.get_data("game_team_scores")
+                        var elim_player_team_score = game_team_scores[elim_player_team]
+                        elim_player_team_score -= 1000
+                        var shooter_player_team = player_team_by_id[shooter_mup]
+                        var shooter_player_team_score = game_team_scores[shooter_player_team]
+                        shooter_player_team_score += 100
+                        game_team_scores[elim_player_team] = elim_player_team_score
+                        game_team_scores[shooter_player_team] = shooter_player_team_score
+                        Settings.InGame.set_data("game_team_scores", game_team_scores)
                         var team_status_by_num = Settings.InGame.get_data("game_team_status_by_num")
                         team_status_by_num[elim_player_team] = "eliminated"
                         Settings.InGame.set_data("game_team_status_by_num", team_status_by_num)
-                        print(Settings.InGame.get_data("game_team_status_by_num"))
                         var teams_remaining = 0
                         for team in team_status_by_num:
                             if team_status_by_num[team] == "playing":
@@ -245,16 +265,14 @@ func _process(__):
                     Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
                     player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
                     Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
-                elif event_to_sort["type"] == "eliminated":
-                    var laser_id = event_to_sort["additional"]["laser_id"]
-                    var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
-                    var victim_mup = event_to_sort["rec_by"]
-                    var player_kills_by_id = Settings.InGame.get_data("player_kills_by_id")
-                    var player_deaths_by_id = Settings.InGame.get_data("player_deaths_by_id")
-                    player_kills_by_id[shooter_mup] = player_kills_by_id[shooter_mup] + 1
-                    Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
-                    player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
-                    Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
+                    if Settings.InGame.get_data("game_teams"):
+                        var game_team_scores = Settings.InGame.get_data("game_team_scores")
+                        var player_team_by_id = Settings.InGame.get_data("player_team_by_id")
+                        var shooter_player_team = player_team_by_id[shooter_mup]
+                        var shooter_player_team_score = game_team_scores[shooter_player_team]
+                        shooter_player_team_score += 100
+                        game_team_scores[shooter_player_team] = shooter_player_team_score
+                        Settings.InGame.set_data("game_team_scores", game_team_scores)
                 elif event_to_sort["type"] == "hit":
                     pass
     else:
@@ -410,17 +428,18 @@ func reload_finish():
     FreecoiLInterface.reload_finish(Settings.Session.get_data("game_weapon_magazine_ammo"))
 
 func eliminated(laser_id):
-    FreecoiLInterface.reload_start()
-    Settings.Session.set_data("game_player_alive", false)
-    record_game_event("eliminated", {"laser_id": laser_id})
-    if laser_id != 0:
-        var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
-        var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
-        Settings.Session.set_data("game_player_last_killed_by", shooter_name)
-    else:
-        Settings.Session.set_data("game_player_last_killed_by", "ID 0")
-    Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
-    get_tree().call_group("Container", "next_menu", "2,0")
+    if Settings.Session.get_data("game_started") == 1:
+        FreecoiLInterface.reload_start()
+        Settings.Session.set_data("game_player_alive", false)
+        record_game_event("eliminated", {"laser_id": laser_id})
+        if laser_id != 0:
+            var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
+            var shooter_name = Settings.InGame.get_data("player_name_by_id")[shooter_mup]
+            Settings.Session.set_data("game_player_last_killed_by", shooter_name)
+        else:
+            Settings.Session.set_data("game_player_last_killed_by", "ID 0")
+        Settings.Session.set_data("game_player_deaths", Settings.Session.get_data("game_player_deaths") + 1)
+        get_tree().call_group("Container", "next_menu", "2,0")
 
 func respawn_start(laser_id):
     if Settings.Session.get_data("game_started") == 1:
@@ -486,6 +505,8 @@ func fi_got_shot(laser_id):
                 else:
                     if not (laser_id in Settings.Session.get_data("game_player_teammates")):
                         legit_hit = true
+            else:
+                legit_hit = true
     if legit_hit:
         record_game_event("hit", {"laser_id": laser_id})
         Settings.Session.set_data("game_player_health", Settings.Session.get_data("game_player_health") - 1)

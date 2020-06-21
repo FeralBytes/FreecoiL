@@ -78,33 +78,22 @@ func test_p3_can_click_client():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,1")
 
-func test_p3_can_join_team_1():
+func test_p3_can_press_ready():
     while _obj.current_scene.name != "Lobbies":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "Lobbies")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
-    while Settings.InGame.get_data("game_number_of_teams") != 2:
-        yield(get_tree(), 'idle_frame')
-    var btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
-    yield(get_tree(), 'idle_frame')
-    btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("player_team"), 1)
+    assert_eq(Settings.Session.get_data("player_team"), 0)
     var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/" + 
         "HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
     yield(yield_for(0.5), YIELD)
-    var name = tmp.get_child(0).get_child(0)
-    btn = tmp.get_child(0).get_child(1)
+    var name = tmp.get_child(2).get_child(0)
+    var btn = tmp.get_child(2).get_child(1)
     if name.text == new_player_name:
         btn.emit_signal("pressed")
     else:
-        btn = tmp.get_child(1).get_child(1)
-        btn.emit_signal("pressed")
+        assert_eq(false, true)
     yield(get_tree(), 'idle_frame')
 
 func test_p3_can_start_a_match():
@@ -149,7 +138,7 @@ func test_p3_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 34)
+    assert_eq(_obj.current_scene.game_history.size(), 31)
     yield(get_tree(), 'idle_frame')
     
 func test_p3_has_1_death_for_player_1():
@@ -158,17 +147,6 @@ func test_p3_has_1_death_for_player_1():
 
 func test_p3_has_1_kill_for_player_2():
     assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
-    yield(get_tree(), 'idle_frame')
-
-func test_p3_team_scores():
-    # Team 0 isn't really a team, it is used for FFA or maybe a rogue player mode in the future.
-    assert_eq(Settings.InGame.get_data("game_team_scores")[0], 0)
-    assert_eq(Settings.InGame.get_data("game_team_scores")[1], 100)
-    assert_eq(Settings.InGame.get_data("game_team_scores")[2], -1000)
-    yield(get_tree(), 'idle_frame')
-    
-func test_p3_current_menu_is_correct():
-    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
     yield(get_tree(), 'idle_frame')
 
 func test_p3_yield_to_show_result():

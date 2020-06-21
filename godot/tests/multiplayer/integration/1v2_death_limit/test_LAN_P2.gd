@@ -131,11 +131,49 @@ func test_p2_can_reconnect_to_game():
     Settings.Session.set_data("connection_status", "disconnected")
     yield(get_tree(), 'idle_frame')
     get_tree().call_group("auto_reconnect", "disconnected")
+    
+func test_p2_game_history_size_is_correct_after_rejoin():
+    var all_players_have_rejoined = false
+    while all_players_have_rejoined == false:
+        var mups_status = Settings.Network.get_data("mups_status")
+        var missing_a_player = false
+        for mup in mups_status:
+            if mups_status[mup] != "reconnected":
+                if mups_status[mup] != "connected":
+                    missing_a_player = true
+        if missing_a_player == false:
+            all_players_have_rejoined = true
+        yield(get_tree(), 'idle_frame')
+    # Give time to resync.
+    yield(get_tree().create_timer(2.0), "timeout")
+    assert_eq(_obj.current_scene.game_history.size(), 34)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p2_has_1_death_for_player_1():
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
+    yield(get_tree(), 'idle_frame')
+
+func test_p2_has_1_kill_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p2_team_scores():
+    # Team 0 isn't really a team, it is used for FFA or maybe a rogue player mode in the future.
+    assert_eq(Settings.InGame.get_data("game_team_scores")[0], 0)
+    assert_eq(Settings.InGame.get_data("game_team_scores")[1], 100)
+    assert_eq(Settings.InGame.get_data("game_team_scores")[2], -1000)
+    yield(get_tree(), 'idle_frame')
+
+func test_p2_current_menu_is_correct():
+    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
+    yield(get_tree(), 'idle_frame')
+
+func test_p2_session_game_player_kills_is_1():
+    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
+    yield(get_tree(), 'idle_frame')
 
 func test_p2_yield_to_show_result():
-    yield(yield_for(4), YIELD)
-    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
-    yield(yield_for(19), YIELD)
+    yield(get_tree(), 'idle_frame')
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
@@ -144,6 +182,4 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    assert_eq(_obj.current_scene.game_history.size(), 34)
-    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
     yield(get_tree().create_timer(1.0), "timeout")

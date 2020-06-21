@@ -186,7 +186,7 @@ func _bt_on():
         print('Bluetooth is NOT supported on this device.')
     
 func _fine_access_location_status():
-    print(OS.get_granted_permissions())
+    print("Granted Permissions: " + str(OS.get_granted_permissions()))
     #fine_access_location = FreecoiL.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
@@ -255,7 +255,10 @@ func _changed_laser_telem_playerId(playerId):
     playerId = null
 
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
-    Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
+    if Settings.Session.get_data("game_player_alive"):
+        Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
+    else:
+        reload_start()
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
     Settings.Session.set_data("fi_trigger_btn_pushed", triggerBtnCounter)

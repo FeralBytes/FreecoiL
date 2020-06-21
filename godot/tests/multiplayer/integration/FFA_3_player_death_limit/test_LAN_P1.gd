@@ -14,6 +14,7 @@ func _ready():
     OvertimeTimer.start()
     
 func overtime_exit():
+    print("Over time, now exiting!")
     get_tree().quit(1)
 
 func do_a_left_click(position:Vector2):
@@ -30,7 +31,6 @@ func do_a_left_click(position:Vector2):
 func before_all():
     time_started = OS.get_unix_time()
     Settings.Testing.register_data("testing", true, false)
-    var FailTimer = Timer.new()
     Obj = load("res://scenes/Container/Container.tscn")
     _obj = Obj.instance()
     add_child(_obj)
@@ -84,14 +84,8 @@ func test_p1_can_click_custom_match_setup():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,3")
 
-func test_p1_can_click_yes():
-    var btn = _obj.get_node("Scene1/MainMenu/0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("current_menu"), "1,3")
-    
-func test_p1_can_click_submit_team_num():
-    var btn = _obj.get_node("Scene1/MainMenu/1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button")
+func test_p1_can_click_no():
+    var btn = _obj.get_node("Scene1/MainMenu/0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,3")
@@ -102,17 +96,17 @@ func test_p1_can_click_outdoors():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "3,3")
     
-func test_p1_can_click_time_limit():
-    var btn = _obj.get_node("Scene1/MainMenu/3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button2")
+func test_p1_can_click_death_limit():
+    var btn = _obj.get_node("Scene1/MainMenu/3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.InGame.get_data("game_limit_mode"), "time")
-    assert_eq(Settings.Session.get_data("current_menu"), "3,5")
+    assert_eq(Settings.InGame.get_data("game_limit_mode"), "deaths")
+    assert_eq(Settings.Session.get_data("current_menu"), "3,4")
     
-func test_p1_can_set_time_limit():
-    var plus_minus_widget = _obj.get_node("Scene1/MainMenu/3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget")
+func test_p1_can_set_death_limit():
+    var plus_minus_widget = _obj.get_node("Scene1/MainMenu/3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget")
     plus_minus_widget.set_current_val(1)
-    var btn = _obj.get_node("Scene1/MainMenu/3,5-Custom Setup 4,2/CenterContainer/VBoxContainer/VBoxContainer/Button")
+    var btn = _obj.get_node("Scene1/MainMenu/3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "4,3")
@@ -123,7 +117,7 @@ func test_p1_can_click_submit_respawn_delay():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "3,1")
     
-func test_p1_can_join_team_2():
+func test_p1_can_press_ready():
     while _obj.current_scene.name != "Lobbies":
         yield(get_tree(), 'idle_frame')
     assert_eq(_obj.current_scene.name, "Lobbies")
@@ -133,20 +127,10 @@ func test_p1_can_join_team_2():
     while Settings.Network.get_data("mups_to_peers").size() != 3:
         yield(get_tree(), 'idle_frame')
     Settings.InGame.set_data("game_start_delay", 1)
-    var btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
-    btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
-    btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 2)
-    btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
-    btn.emit_signal("pressed")
-    yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("player_team"), 2)
+    assert_eq(Settings.Session.get_data("player_team"), 0)
     var tmp = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
-    btn = tmp.get_child(0).get_child(1)
+    var btn = tmp.get_child(0).get_child(1)
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     # mups being ready is too fast to catch, but the fact that it
@@ -156,14 +140,12 @@ func test_p1_can_start_a_match():
     while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     
-func test_p1_can_be_respawned():
+func test_p1_can_be_eliminated():
     while Settings.Session.get_data("game_player_alive") != true:
         yield(get_tree(), 'idle_frame')
     while Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
         yield(get_tree(), 'idle_frame')
     yield(get_tree().create_timer(3.0), "timeout")
-    var temp_time = Settings.Session.get_data("game_tick_toc_time_remaining")
-    assert_lt(Settings.Session.get_data("game_tick_toc_time_remaining"), 60)
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
     yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
@@ -175,8 +157,13 @@ func test_p1_can_be_respawned():
     Settings.Session.set_data("game_player_health", 1)
     yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0)
-    yield(get_tree().create_timer(1.0), "timeout")
-    assert_lt(Settings.Session.get_data("game_tick_toc_time_remaining"), temp_time)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("game_player_alive"), false)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("game_player_deaths"), 1)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.InGame.get_data("player_status_by_id")["1"], "eliminated")
+    yield(get_tree(), 'idle_frame')
     
 func test_p1_game_history_size_is_correct_after_rejoin():
     var all_players_have_rejoined = false
@@ -192,9 +179,23 @@ func test_p1_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
+    var unack_events_size = _obj.current_scene.server_unackn_events_by_mup["2"].size()
+    print("server_unackn_events_by_mup = " + str(_obj.current_scene.server_unackn_events_by_mup))
+    assert_eq(_obj.current_scene.game_history.size(), 31 + unack_events_size)
     yield(get_tree(), 'idle_frame')
     
+func test_p1_has_1_death_for_player_1():
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_has_1_kill_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_current_menu_is_correct():
+    assert_eq(Settings.Session.get_data("current_menu"), "2,0")
+    yield(get_tree(), 'idle_frame')
+
 func test_p1_yield_to_show_result():
     yield(get_tree(), 'idle_frame')
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
@@ -202,13 +203,14 @@ func test_p1_yield_to_show_result():
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print(_obj.current_scene.server_unackn_events_by_mup)
-    print("Player 1 (Server) 1v2 Time Limit: Game History:")
+    print("Player 1 (Server) Game History:")
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
     yield(get_tree(), 'idle_frame')
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print("server_unackn_events_by_mup:")
     print(_obj.current_scene.server_unackn_events_by_mup)
+    print(_obj.current_scene.server_unackn_events_by_mup["2"])
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print("Settings.Session:")
     print(Settings.Session.__settings)
@@ -222,5 +224,4 @@ func test_p1_yield_to_show_result():
     print("Settings.Preferences:")
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 1)
     yield(get_tree().create_timer(1.0), "timeout")

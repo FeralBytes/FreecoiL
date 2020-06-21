@@ -14,6 +14,7 @@ func _ready():
     OvertimeTimer.start()
     
 func overtime_exit():
+    print("Over time, now exiting!")
     get_tree().quit(1)
 
 func do_a_left_click(position:Vector2):
@@ -30,7 +31,6 @@ func do_a_left_click(position:Vector2):
 func before_all():
     time_started = OS.get_unix_time()
     Settings.Testing.register_data("testing", true, false)
-    var FailTimer = Timer.new()
     Obj = load("res://scenes/Container/Container.tscn")
     _obj = Obj.instance()
     add_child(_obj)
@@ -132,6 +132,7 @@ func test_p1_can_join_team_2():
     # We make sure the host waits for all of the bots to join.
     while Settings.Network.get_data("mups_to_peers").size() != 3:
         yield(get_tree(), 'idle_frame')
+    Settings.InGame.set_data("game_start_delay", 1)
     var btn = _obj.get_node("Scene0/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
@@ -152,7 +153,7 @@ func test_p1_can_join_team_2():
     # transitions to the InGame definitely means that it is working.
     
 func test_p1_can_start_a_match():
-    while Settings.Session.get_data("game_started") == 1:
+    while Settings.Session.get_data("game_started") != 1:
         yield(get_tree(), 'idle_frame')
     
 func test_p1_can_be_eliminated():
@@ -183,10 +184,46 @@ func test_p1_can_be_eliminated():
     assert_eq(Settings.Session.get_data("current_menu"), "0,1")
     yield(get_tree().create_timer(1.0), "timeout")
     
+func test_p1_game_history_size_is_correct_after_rejoin():
+    var all_players_have_rejoined = false
+    while all_players_have_rejoined == false:
+        var mups_status = Settings.Network.get_data("mups_status")
+        var missing_a_player = false
+        for mup in mups_status:
+            if mups_status[mup] != "reconnected":
+                if mups_status[mup] != "connected":
+                    missing_a_player = true
+        if missing_a_player == false:
+            all_players_have_rejoined = true
+        yield(get_tree(), 'idle_frame')
+    # Give time to resync.
+    yield(get_tree().create_timer(2.0), "timeout")
+    var unack_events_size = _obj.current_scene.server_unackn_events_by_mup["2"].size()
+    print("server_unackn_events_by_mup = " + str(_obj.current_scene.server_unackn_events_by_mup))
+    assert_eq(_obj.current_scene.game_history.size(), 34 + unack_events_size)
+    yield(get_tree(), 'idle_frame')
     
+func test_p1_has_1_death_for_player_1():
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_has_1_kill_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_team_scores():
+    # Team 0 isn't really a team, it is used for FFA or maybe a rogue player mode in the future.
+    assert_eq(Settings.InGame.get_data("game_team_scores")[0], 0)
+    assert_eq(Settings.InGame.get_data("game_team_scores")[1], 100)
+    assert_eq(Settings.InGame.get_data("game_team_scores")[2], -1000)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_current_menu_is_correct():
+    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
+    yield(get_tree(), 'idle_frame')
 
 func test_p1_yield_to_show_result():
-    yield(yield_for(30), YIELD)
+    yield(get_tree(), 'idle_frame')
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print("Signals Used = " + str(Settings.__signals_used))
     print("Memory Useage = " + str(OS.get_static_memory_peak_usage()))
@@ -213,6 +250,4 @@ func test_p1_yield_to_show_result():
     print("Settings.Preferences:")
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    var unack_events_size = _obj.current_scene.server_unackn_events_by_mup["2"].size()
-    assert_eq(_obj.current_scene.game_history.size(), 34 + unack_events_size)
     yield(get_tree().create_timer(1.0), "timeout")

@@ -597,7 +597,7 @@ func _ready():
 
 
 func _on_RichTextLabel_meta_clicked(meta):
-    OS.shell_open(meta)
+    var __ = OS.shell_open(meta)
 "
 
 [node name="MainMenu" type="Control"]

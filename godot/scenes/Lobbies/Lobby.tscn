@@ -37,9 +37,17 @@ func set_player_laser_ids(all_ready):
                     var player_team = player_team_by_id[mups_id]
                     var player_team_index_pos = game_teams_by_team_num_by_id[player_team].find(mups_id)
                     player_laser_by_id[mups_id] = ((player_team - 1) * players_per_team) + player_team_index_pos + 1
+                var game_team_scores = []
+                var team_name_by_num = []
+                for team_num in range (game_number_of_teams + 1):
+                    game_team_scores.append(0)
+                    team_name_by_num.append(team_num)
+                Settings.InGame.set_data(\"game_team_scores\", game_team_scores)
+                Settings.InGame.set_data(\"team_name_by_num\", team_name_by_num)
+                Settings.InGame.set_data(\"game_team_elimination_order\", [])
             else:
                 for mups_id in mups_ready:
-                    player_laser_by_id[mups_id] = mups_id
+                    player_laser_by_id[mups_id] = int(mups_id)
             for mups_id in mups_ready:
                 player_score_by_id[mups_id] = 0
                 player_deaths_by_id[mups_id] = 0
@@ -48,7 +56,6 @@ func set_player_laser_ids(all_ready):
             Settings.InGame.set_data(\"player_laser_by_id\", player_laser_by_id)
             Settings.InGame.set_data(\"game_history\", [])
             Settings.InGame.set_data(\"game_actions_count\", 0)
-            Settings.InGame.set_data(\"game_team_scores\", [0, 0])
             Settings.InGame.set_data(\"player_kills_by_id\", player_score_by_id)
             Settings.InGame.set_data(\"player_deaths_by_id\", player_deaths_by_id)
             Settings.InGame.set_data(\"player_assists_by_id\", player_assists_by_id)
@@ -154,9 +161,9 @@ func _ready():
     check_if_team_assigned(null)
     
 func check_if_team_assigned(__):
+    if Settings.Session.get_data(\"player_team\") == null:
+        Settings.Session.set_data(\"player_team\", 0)
     if Settings.InGame.get_data(\"game_teams\"):
-        if Settings.Session.get_data(\"player_team\") == null:
-            Settings.Session.set_data(\"player_team\", 0)
         if Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
             text = \"Pick a team other than Team 0.\"
             disabled = true
