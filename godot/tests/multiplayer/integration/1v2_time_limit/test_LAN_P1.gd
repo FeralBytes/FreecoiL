@@ -10,7 +10,7 @@ onready var OvertimeTimer = Timer.new()
 func _ready():
     add_child(OvertimeTimer)
     OvertimeTimer.connect("timeout", self, "overtime_exit")
-    OvertimeTimer.wait_time = 60
+    OvertimeTimer.wait_time = 120
     OvertimeTimer.start()
     
 func overtime_exit():
@@ -136,6 +136,9 @@ func test_p1_can_click_respawn_via_timer():
     assert_eq(Settings.Session.get_data("current_menu"), "4,4")
     
 func test_p1_can_click_submit_respawn_delay():
+    var plus_minus = _obj.get_node("Scene1/MainMenu/4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget")
+    plus_minus.current_val = 1
+    yield(get_tree(), 'idle_frame')
     var btn = _obj.get_node("Scene1/MainMenu/4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
@@ -210,10 +213,16 @@ func test_p1_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
-    yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.game_history.size(), 33)
+    yield(get_tree().create_timer(2.0), "timeout")
+    
+func test_p1_can_wait_while_p3_dies_over_and_over():
+    while Settings.InGame.get_data("player_deaths_by_id")["3"] != 20:
+        yield(get_tree(), 'idle_frame')
     
 func test_p1_yield_to_show_result():
+    var btn = _obj.get_node("Scene1/InGame/0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button")
+    btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     print("Signals Used = " + str(Settings.__signals_used))
@@ -241,4 +250,8 @@ func test_p1_yield_to_show_result():
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 1)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(5.0), "timeout")
+
+func test_p1_coordinate_exit():
+    Settings.InGame.set_data("Testing_Complete", true)
+    yield(get_tree(), 'idle_frame')

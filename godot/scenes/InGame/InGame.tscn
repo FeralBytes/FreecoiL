@@ -348,8 +348,11 @@ func build_player_kills():
             var player_id = players_ranked_by_kills[rank]
             var compare_kills = player_kills_by_id[player_id]
             if kills > compare_kills:
-                players_ranked_by_kills.insert(rank, id)
-        if id in players_ranked_by_kills:
+                if players_ranked_by_kills.has(id):
+                    pass
+                else:
+                    players_ranked_by_kills.insert(rank, id)
+        if players_ranked_by_kills.has(id):
             pass
         else:
             players_ranked_by_kills.append(id)
@@ -365,8 +368,11 @@ func build_player_deaths():
             var player_id = players_ranked_by_deaths[rank]
             var compare_deaths = player_deaths_by_id[player_id]
             if deaths > compare_deaths:
-                players_ranked_by_deaths.insert(rank, id)
-        if id in players_ranked_by_deaths:
+                if players_ranked_by_deaths.has(id):
+                    pass
+                else:
+                    players_ranked_by_deaths.insert(rank, id)
+        if players_ranked_by_deaths.has(id):
             pass
         else:
             players_ranked_by_deaths.append(id)
@@ -397,14 +403,17 @@ func build_team_scores():
     build_header(\"Team #\", \"Score\")
     var team_scores = Settings.InGame.get_data(\"game_team_scores\")
     var teams_ranked_by_score = []
-    for id in team_scores:
+    for id in range(team_scores.size()):
         var score = team_scores[id]
         for rank in range(0, teams_ranked_by_score.size()):
             var team_num = teams_ranked_by_score[rank]
             var compare_score = team_scores[team_num]
             if score > compare_score:
-                teams_ranked_by_score.insert(rank, team_num)
-        if id in teams_ranked_by_score:
+                if teams_ranked_by_score.has(id):
+                    pass
+                else:
+                    teams_ranked_by_score.insert(rank, id)
+        if teams_ranked_by_score.has(id):
             pass
         else:
             teams_ranked_by_score.append(id)

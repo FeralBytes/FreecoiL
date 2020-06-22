@@ -514,7 +514,8 @@ func fi_got_shot(laser_id):
                 if Settings.InGame.get_data("game_friendly_fire"):
                     legit_hit = true
                 else:
-                    if not (laser_id in Settings.Session.get_data("game_player_teammates")):
+                    if not (Settings.InGame.get_data("player_id_by_laser")[laser_id] in 
+                        Settings.Session.get_data("game_player_teammates")):
                         legit_hit = true
             else:
                 legit_hit = true

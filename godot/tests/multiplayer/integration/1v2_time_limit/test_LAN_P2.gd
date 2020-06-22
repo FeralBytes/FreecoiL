@@ -11,7 +11,7 @@ onready var OvertimeTimer = Timer.new()
 func _ready():
     add_child(OvertimeTimer)
     OvertimeTimer.connect("timeout", self, "overtime_exit")
-    OvertimeTimer.wait_time = 60
+    OvertimeTimer.wait_time = 120
     OvertimeTimer.start()
     
 func overtime_exit():
@@ -147,10 +147,25 @@ func test_p2_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
-    yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.game_history.size(), 33)
+    yield(get_tree().create_timer(2.0), "timeout")
+
+func test_p2_can_be_killed_by_p3_friendly_fire():
+    assert_eq(Settings.InGame.get_data("game_friendly_fire"), false)
+    var shot_counter = 0
+    for i in range(0, 3):
+        if shot_counter > 15:
+            shot_counter = 0
+        Settings.Session.set_data("game_player_health", 1)
+        yield(get_tree(), 'idle_frame')
+        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["3"], shot_counter, 0, 0)
+        yield(get_tree().create_timer(2.0), "timeout")
+        shot_counter += 1
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 0)
 
 func test_p2_yield_to_show_result():
+    var btn = _obj.get_node("Scene1/InGame/0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button")
+    btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     print("Signals Used = " + str(Settings.__signals_used))
@@ -161,4 +176,9 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     assert_eq(Settings.Session.get_data("game_player_kills"), 1)
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree().create_timer(5.0), "timeout")
+
+func test_p2_wait_for_coordinated_exit():
+    while Settings.InGame.get_data("Testing_Complete") == null:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree(), 'idle_frame')

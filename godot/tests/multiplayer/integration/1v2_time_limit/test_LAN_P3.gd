@@ -11,7 +11,7 @@ onready var OvertimeTimer = Timer.new()
 func _ready():
     add_child(OvertimeTimer)
     OvertimeTimer.connect("timeout", self, "overtime_exit")
-    OvertimeTimer.wait_time = 60
+    OvertimeTimer.wait_time = 120
     OvertimeTimer.start()
     
 func overtime_exit():
@@ -149,8 +149,19 @@ func test_p3_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
-    yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.game_history.size(), 33)
+    yield(get_tree().create_timer(2.0), "timeout")
+    
+func test_p3_can_be_killed_for_20_times():
+    var shot_counter = 0
+    for i in range(0, 20):
+        if shot_counter > 15:
+            shot_counter = 0
+        Settings.Session.set_data("game_player_health", 1)
+        yield(get_tree(), 'idle_frame')
+        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["1"], shot_counter, 0, 0)
+        yield(get_tree().create_timer(2.0), "timeout")
+        shot_counter += 1
 
 func test_p3_yield_to_show_result():
     yield(get_tree(), 'idle_frame')
@@ -163,3 +174,8 @@ func test_p3_yield_to_show_result():
     print(_obj.current_scene.game_history)
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
     yield(get_tree().create_timer(1.0), "timeout")
+
+func test_p3_wait_for_coordinated_exit():
+    while Settings.InGame.get_data("Testing_Complete") == null:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree(), 'idle_frame')
