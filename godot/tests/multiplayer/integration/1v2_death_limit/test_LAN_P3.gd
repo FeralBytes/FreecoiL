@@ -76,7 +76,7 @@ func test_p3_can_click_client():
     yield(yield_for(1.5), YIELD)  # Prevents a race between  Player 2 and Player 3.
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("current_menu"), "2,1")
+    assert_eq(Settings.Session.get_data("current_menu"), "4,1")
 
 func test_p3_can_join_team_1():
     while _obj.current_scene.name != "Lobbies":

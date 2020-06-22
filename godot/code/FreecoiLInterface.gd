@@ -115,17 +115,19 @@ func enable_recoil(enabled):
     if FreecoiL != null:
         recoil_enabled = enabled
         if Settings.Session.get_data("fi_laser_is_connected") == 2:
-            FreecoiL.enableRecoil(recoil_enabled)     
+            FreecoiL.enableRecoil(recoil_enabled)   
+            if recoil_enabled:
+                Settings.Session.set_data("fi_laser_recoil", 1)
+            else:
+                Settings.Session.set_data("fi_laser_recoil", 2)  
         get_tree().call_group("FreecoiL", "fi_recoil_enabled_changed")
         
 func toggle_recoil():
     var fi_laser_recoil = Settings.Session.get_data("fi_laser_recoil")
     if fi_laser_recoil != 0:
         if fi_laser_recoil == 1:
-            Settings.Session.set_data("fi_laser_recoil", 2)
             FreecoiL.enableRecoil(false)
         else:
-            Settings.Session.set_data("fi_laser_recoil", 1)
             FreecoiL.enableRecoil(true)
         
 
@@ -194,7 +196,8 @@ func _fine_access_location_enabled():
         print('Fine Access Enabled!')
     else:
         if FreecoiL != null:
-            OS.request_permissions()
+            # TODO: detect if permissions were granted, should be in the returned bool below.
+            var __ = OS.request_permissions()
             #FreecoiL.enableFineAccess()
         
 func _on_bt_connect_timeout():

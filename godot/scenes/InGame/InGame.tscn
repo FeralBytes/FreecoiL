@@ -568,14 +568,16 @@ func update_value(new_val):
 script/source = "extends Label
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
+onready var RespawnButton = get_parent().get_node(\"RespawnButton\")
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_respawn\"), self, \"update_time_remaining\")
+    if Settings.InGame.get_data(\"game_respawn_delay\") >= 0:
+        Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_respawn\"), self, \"update_time_remaining\")
+        RespawnButton.hide()
+    else:
+        text = \"when you press the button below.\"
 
 func update_time_remaining(new_val):
     var time_minutes = int(new_val / 60)
@@ -1411,9 +1413,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,0-Respawn/CenterContainer"]
-margin_top = 112.0
+margin_top = 86.0
 margin_right = 540.0
-margin_bottom = 448.0
+margin_bottom = 474.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
@@ -1457,7 +1459,14 @@ custom_styles/normal = SubResource( 26 )
 custom_fonts/font = SubResource( 27 )
 text = "in: 00:00"
 align = 1
+autowrap = true
 script = SubResource( 29 )
+
+[node name="RespawnButton" type="Button" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
+margin_top = 344.0
+margin_right = 540.0
+margin_bottom = 388.0
+text = "Press To Respawn"
 
 [node name="Header2" parent="1,0-Respawn" instance=ExtResource( 2 )]
 my_menu = "1,0"
@@ -1853,6 +1862,7 @@ allow_preferences = false
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/LeftBumper" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/LeftBumper" method="_on_LeftBumper_pressed" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" method="_on_RightBumper_pressed" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,0-Respawn/CenterContainer/VBoxContainer/RespawnButton" to="." method="_on_RespawnButton_pressed" flags=3]
 [connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="timeout" from="TickTocTimer" to="." method="tick_toc" flags=3]

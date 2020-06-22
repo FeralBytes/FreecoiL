@@ -1,7 +1,7 @@
 extends Node
 
 signal finished_loading
-export(String) var lobby_xy = "3,1"
+export(String) var lobby_xy = "5,1"
 # Declare member variables here.
 var current_scene
 var previous_scene

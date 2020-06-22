@@ -79,13 +79,19 @@ func test_p1_can_click_host():
     assert_eq(Settings.Session.get_data("current_menu"), "1,1")
 
 func test_p1_can_click_custom_match_setup():
-    var btn = _obj.get_node("Scene1/MainMenu/1,1-Networked Game 2/CenterContainer/VBoxContainer/Button")
+    var btn = _obj.get_node("Scene1/MainMenu/3,1-Networked Game 4/CenterContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "0,3")
 
 func test_p1_can_click_no():
     var btn = _obj.get_node("Scene1/MainMenu/0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "1,3")
+    
+func test_p1_can_click_submit_health_val():
+    var btn = _obj.get_node("Scene1/MainMenu/1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "2,3")
@@ -111,11 +117,17 @@ func test_p1_can_set_death_limit():
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "4,3")
     
-func test_p1_can_click_submit_respawn_delay():
-    var btn = _obj.get_node("Scene1/MainMenu/4,3-Custom Setup 5/CenterContainer/VBoxContainer/VBoxContainer/Button")
+func test_p1_can_click_respawn_via_timer():
+    var btn = _obj.get_node("Scene1/MainMenu/4,3-Custom Setup 5/CenterContainer/VBoxContainer/HBoxContainer/Button2")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("current_menu"), "3,1")
+    assert_eq(Settings.Session.get_data("current_menu"), "4,4")
+    
+func test_p1_can_click_submit_respawn_delay():
+    var btn = _obj.get_node("Scene1/MainMenu/4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "5,1")
     
 func test_p1_can_press_ready():
     while _obj.current_scene.name != "Lobbies":

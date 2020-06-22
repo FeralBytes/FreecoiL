@@ -5,7 +5,7 @@
 
    README.md
    CONTRIBUTING.md
-   contributing/PreCompiled.md
+   documentation/index.md
    contributing/Compiling.md
    contributing/IssuesStillNeedingWork.md
    CHANGELOG.md

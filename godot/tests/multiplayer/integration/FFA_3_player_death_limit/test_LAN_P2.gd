@@ -75,7 +75,7 @@ func test_p2_can_click_client():
     var btn = _obj.get_node("Scene1/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
-    assert_eq(Settings.Session.get_data("current_menu"), "2,1")
+    assert_eq(Settings.Session.get_data("current_menu"), "4,1")
 
 func test_p2_can_press_ready():
     while _obj.current_scene.name != "Lobbies":

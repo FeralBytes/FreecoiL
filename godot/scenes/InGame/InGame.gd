@@ -45,6 +45,11 @@ func _ready():
         invert_mups_to_lasers(Settings.InGame.get_data("player_laser_by_id"))
     add_to_group("FreecoiL")
     get_tree().call_group("Container", "next_menu", "0,-1")
+    var force_recoil = Settings.InGame.get_data("force_recoil")
+    if force_recoil == "on":
+        FreecoiLInterface.enable_recoil(true)
+    elif force_recoil == "off":
+        FreecoiLInterface.enable_recoil(false)
     FreecoiLInterface.set_laser_id(Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
     # Make Connections
     Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
@@ -73,13 +78,15 @@ func set_player_start_game_vars():
     Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
     Settings.Session.set_data("game_tick_toc_time_elapsed", 0)
     Settings.Session.set_data("game_started", 0)  # Quad State: 0=Not Stated, 1=Started, 2=Paused, 3=Game Over
-    Settings.Session.set_data("game_player_team", Settings.InGame.get_data("player_team_by_id")[Settings.Session.get_data("mup_id")])
+    Settings.Session.set_data("game_player_team", Settings.InGame.get_data("player_team_by_id")[
+        Settings.Session.get_data("mup_id")])
     Settings.Session.set_data("game_player_teammates", 
         Settings.InGame.get_data("game_teams_by_team_num_by_id")[Settings.Session.get_data("game_player_team")])
     Settings.Session.set_data("game_player_last_killed_by", "")
     Settings.Session.set_data("game_player_deaths", 0)
     Settings.Session.set_data("game_player_kills", 0)
-    Settings.Session.set_data("game_player_laser_id", Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
+    Settings.Session.set_data("game_player_laser_id", Settings.InGame.get_data("player_laser_by_id")[
+        Settings.Session.get_data("mup_id")])
     StartGameTimer.wait_time = Settings.InGame.get_data("game_start_delay")
     StartGameTimer.connect("timeout", self, "start_the_game")
     StartGameTimer.one_shot = true
@@ -93,9 +100,10 @@ func set_player_start_game_vars():
     HitIndicatorTimer.wait_time = Settings.Preferences.get_data("player_hit_indicator_duration")
     HitIndicatorTimer.one_shot = true
     HitIndicatorTimer.connect("timeout", self, "hit_indicator_stop")
-    RespawnTimer.connect("timeout", self, "respawn_finish")
-    RespawnTimer.wait_time = Settings.InGame.get_data("game_respawn_delay")
-    RespawnTimer.one_shot = true
+    if Settings.InGame.get_data("game_respawn_delay") > 0:
+        RespawnTimer.connect("timeout", self, "respawn_finish")
+        RespawnTimer.wait_time = Settings.InGame.get_data("game_respawn_delay")
+        RespawnTimer.one_shot = true
     
 func set_player_respawn_vars():
     var weapon_type = Settings.InGame.get_data("game_start_weapon_type")
@@ -110,7 +118,9 @@ func set_player_respawn_vars():
     Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
     Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
     Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
-    #Settings.Session.set_data("game_player_alive", true)
+    # TODO: Set the shot mode.
+    FreecoiLInterface.set_shot_mode(Settings.Session.get_data("game_weapon_shot_mode"),
+        Settings.Session.get_data("game_indoor_mode"))
     
 func start_game_start_delay(__):
     if get_tree().is_network_server():
@@ -445,7 +455,8 @@ func respawn_start(laser_id):
     if Settings.Session.get_data("game_started") == 1:
         FreecoiLInterface.reload_start()
         Settings.Session.set_data("game_player_alive", false)
-        RespawnTimer.start()
+        if Settings.InGame.get_data("game_respawn_delay") > 0:
+            RespawnTimer.start()
         Settings.Session.set_data("game_tick_toc_respawn", Settings.InGame.get_data("game_respawn_delay"))
         record_game_event("died", {"laser_id": laser_id})
         if laser_id != 0:
@@ -522,3 +533,7 @@ func fi_power_btn_pushed():
         FreecoiLInterface.enable_recoil(false)
     else:
         FreecoiLInterface.enable_recoil(true)
+
+
+func _on_RespawnButton_pressed():
+    respawn_finish()

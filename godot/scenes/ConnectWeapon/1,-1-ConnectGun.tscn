@@ -14,6 +14,7 @@ script/source = "extends Button
 
 
 var menu_is_visible = false
+var previous_connection_status = 0
 
 onready var XLbl = get_parent().get_parent().get_node(\"XLbl\")
 onready var GunStatus = get_parent().get_parent().get_node(\"GunStatus\")
@@ -68,6 +69,25 @@ func update_display(laser_connected=0):
             GunStatus.text = \"Searching For Gun\"
             text = \"Reconnecting To Gun\"
             disabled = true
+            previous_connection_status = laser_connected
+#    if previous_connection_status == 4:
+#        previous_connection_status = 0
+#        FreecoiLInterface.reload_start()
+#        print(\"Reload Started\")
+#        yield(get_tree(), 'idle_frame')
+#        var force_recoil = Settings.InGame.get_data(\"force_recoil\")
+#        if force_recoil == \"on\":
+#            FreecoiLInterface.enable_recoil(true)
+#        elif force_recoil == \"off\":
+#            FreecoiLInterface.enable_recoil(false)
+#        print(\"Recoil Forced\")
+#        yield(get_tree(), 'idle_frame')
+#        var laser_id = Settings.InGame.get_data(\"player_laser_by_id\")[Settings.Session.get_data(\"mup_id\")]
+#        FreecoiLInterface.set_laser_id(laser_id)
+#        print(\"Laser ID Set\" + str(laser_id))
+#        yield(get_tree(), 'idle_frame')
+#        FreecoiLInterface.reload_finish(Settings.Session.get_data(\"game_weapon_magazine_ammo\"))
+#        print(\"Recload Finished\")
             
 
 

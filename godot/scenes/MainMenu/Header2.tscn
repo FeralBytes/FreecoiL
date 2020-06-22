@@ -175,7 +175,11 @@ func _on_GunBtn_pressed():
 
 
 func _on_RecoilBtn_pressed():
-    FreecoiLInterface.toggle_recoil()
+    var force_recoil = Settings.InGame.get_date(\"force_recoil\")
+    if force_recoil == null or force_recoil == \"dont\":
+        FreecoiLInterface.toggle_recoil()
+    else:
+        pass
 
 
 func _on_Preferences_pressed():
@@ -319,7 +323,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-dev23 "
+text = " Ver: 0.3.0-dev26 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
