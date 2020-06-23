@@ -8,7 +8,7 @@
 [ext_resource path="res://assets/images/target_person.png" type="Texture" id=6]
 [ext_resource path="res://assets/images/heart.png" type="Texture" id=7]
 [ext_resource path="res://assets/images/pistol_ammo.png" type="Texture" id=8]
-[ext_resource path="res://assets/sounds/reload.wav" type="AudioStream" id=9]
+[ext_resource path="res://assets/sounds/mag_change.wav" type="AudioStream" id=9]
 [ext_resource path="res://assets/sounds/empty_gun_shot.wav" type="AudioStream" id=10]
 [ext_resource path="res://assets/sounds/gun_shot_fast.wav" type="AudioStream" id=11]
 [ext_resource path="res://scenes/InGame/InGame.gd" type="Script" id=12]
@@ -1829,7 +1829,7 @@ pitch_scale = 1.7
 
 [node name="ReloadSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 9 )
-pitch_scale = 0.17
+pitch_scale = 1.2
 
 [node name="TangoDownSound" type="AudioStreamPlayer2D" parent="."]
 skew = 4.37114e-08
