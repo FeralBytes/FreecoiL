@@ -15,17 +15,17 @@ const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signal.
 
 var DEBUG_GUI = false
-var DEBUG_LEVEL = 3
+var DEBUG_LEVEL = 1
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
-var Testing = Data.new("Testing")
+var Testing = Data.new("Testing", null, false, false, false)
 # warning-ignore:unused_class_variable
-var Preferences = Data.new("Preferences", USER_DIR + "Preferences.json", true, true)
+var Preferences = Data.new("Preferences", USER_DIR + "Preferences.json", true, true, false)
 # warning-ignore:unused_class_variable
 var InGame = Data.new("InGame", USER_DIR + "InGame.json", false, true, true)
 # warning-ignore:unused_class_variable
-var Session = Data.new("Session")
+var Session = Data.new("Session", null, false, false, false)
 # warning-ignore:unused_class_variable
 var Network = Data.new("Network", null, false, false, true)
 

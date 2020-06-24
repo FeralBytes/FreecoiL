@@ -1,4 +1,4 @@
-[gd_scene load_steps=42 format=2]
+[gd_scene load_steps=43 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -55,17 +55,19 @@ func update_val(val):
 
 
 func _on_PlayerName_text_entered(new_text):
-    Settings.Preferences.set_data(\"player_name\", new_text)
-    get_tree().call_group(\"Network\", \"set_player_name\")
+    new_text = new_text.strip_edges()
+    if new_text == \"\":
+        text = Settings.Preferences.get_data(\"player_name\")
+    else:
+        Settings.Preferences.set_data(\"player_name\", new_text)
+        get_tree().call_group(\"Network\", \"set_player_name\")
 "
 
 [sub_resource type="GDScript" id=4]
 script/source = "extends Button
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
+onready var PlayerName =  get_parent().get_node(\"HBoxContainer/PlayerName\")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -79,6 +81,7 @@ func _ready():
 
 
 func _on_Button_pressed():
+    PlayerName._on_PlayerName_text_entered(PlayerName.text)
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
@@ -129,14 +132,23 @@ func _ready():
 
 
 func _on_LineEdit_text_entered(new_text):
-    Settings.Preferences.set_data(\"player_name\", new_text)
-    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    new_text = new_text.strip_edges()
+    if new_text == \"\":
+        pass
+    else:
+        Settings.Preferences.set_data(\"player_name\", new_text)
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 
 
 func _on_Button_pressed():
-    var new_text = text
-    Settings.Preferences.set_data(\"player_name\", new_text)
-    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    text = text.strip_edges()
+    if text == \"\":
+        placeholder_text = \"Please Enter A Callsign!\"
+        grab_focus()
+    else:
+        var new_text = text
+        Settings.Preferences.set_data(\"player_name\", new_text)
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
 [sub_resource type="DynamicFont" id=7]
@@ -598,17 +610,8 @@ script/source = "extends Button
 
 
 func _on_Button_pressed():
-    get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,6\")
     Settings.InGame.set_data(\"game_respawn_delay\", -1)
-    # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
-    Settings.InGame.set_data(\"game_start_delay\", 5)
-    Settings.InGame.set_data(\"game_weapon_types\",{\"P1S\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"single\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}, \"P2B\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"burst\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}, \"P3A\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"auto\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
-    Settings.InGame.set_data(\"game_start_weapon_type\", \"P1S\")
-    Settings.InGame.set_data(\"game_start_ammo\", {\"P1S\": 300})
-    get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
 [sub_resource type="GDScript" id=31]
@@ -624,18 +627,10 @@ script/source = "extends Button
 
 
 func _on_Button_pressed():
-    get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,6\")
     var respawn_delay = get_parent().get_node(\"PlusMinusWidget\").current_val
     Settings.InGame.set_data(\"game_respawn_delay\", respawn_delay)
-    # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
-    Settings.InGame.set_data(\"game_start_delay\", 5)
-    Settings.InGame.set_data(\"game_weapon_types\",{\"P1S\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"single\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}, \"P2B\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"burst\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}, \"P3A\": {\"magazine_size\": 10, \"damage\": 1, 
-        \"shot_modes\": [\"auto\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
-    Settings.InGame.set_data(\"game_start_weapon_type\", \"P1S\")
-    Settings.InGame.set_data(\"game_start_ammo\", {\"P1S\": 300})
-    get_tree().call_group(\"Container\", \"load_lobby\") 
+    
 
 
 func _on_PlusMinusWidget_PMWidChanged(new_value):
@@ -644,6 +639,45 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
 
 func _on_HSlider_value_changed(value):
     get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
+"
+
+[sub_resource type="GDScript" id=35]
+script/source = "extends ReferenceRect
+
+const my_menu = \"0,6\"
+const default_wpns = {\"P1S\": {\"magazine_size\": 10, \"damage\": 1, \"shot_modes\": [\"single\"], \"reload_speed\": 3, 
+            \"rate_of_fire\": 0.3}, 
+        \"P1B\": {\"magazine_size\": 10, \"damage\": 1, \"shot_modes\": [\"burst\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}, 
+        \"P1A\": {\"magazine_size\": 10, \"damage\": 1, \"shot_modes\": [\"auto\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3},
+        \"P2S\": {\"magazine_size\": 17, \"damage\": 1, \"shot_modes\": [\"single\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3},
+        \"P2B\": {\"magazine_size\": 17, \"damage\": 1, \"shot_modes\": [\"burst\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3},
+        \"P2A\": {\"magazine_size\": 17, \"damage\": 1, \"shot_modes\": [\"auto\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3},
+        \"A1SBA\": {\"magazine_size\": 30, \"damage\": 1, \"shot_modes\": [\"single\", \"burst\", \"auto\"], \"reload_speed\": 3, 
+            \"rate_of_fire\": 0.3},
+        \"M1A\": {\"magazine_size\": 100, \"damage\": 1, \"shot_modes\": [\"auto\"], \"reload_speed\": 3, 
+            \"rate_of_fire\": 0.3},
+        \"A2SBA\": {\"magazine_size\": 30, \"damage\": 2, \"shot_modes\": [\"single\", \"burst\", \"auto\"], \"reload_speed\": 3, 
+            \"rate_of_fire\": 0.3}}
+const default_start_wpns = [\"P1S\"]
+const default_start_ammo = {\"P1S\": 300}
+const default_wpn_for_prob = \"P1S\"
+const default_wpn_probabilities = {\"P1S\":0.32, \"P1B\":0.1, \"P1A\":0.1, \"P2S\":0.1, \"P2B\":0.1, \"P2A\":0.1, 
+        \"A1SBA\":0.1, \"M1A\":0.05, \"A2SBA\": 0.03} 
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+
+
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        Settings.InGame.set_data(\"game_weapon_types\", default_wpns)
+        Settings.InGame.set_data(\"game_start_weapon_types\", default_start_wpns)
+        Settings.InGame.set_data(\"game_start_ammo\", default_start_ammo)
+        get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
+        # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
+        Settings.InGame.set_data(\"game_start_delay\", 5)
+        get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
 [sub_resource type="GDScript" id=33]
@@ -1945,15 +1979,18 @@ custom_constants/separation = 30
 margin_right = 540.0
 margin_bottom = 47.0
 current_val = 15
+allow_zero = false
 apply_minimum_value = true
+minimum_value = 1
 apply_maximum_value = true
-maximum_value = 999
+maximum_value = 600
 
 [node name="HSlider" type="HSlider" parent="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 77.0
 margin_right = 540.0
 margin_bottom = 117.0
-max_value = 999.0
+min_value = 1.0
+max_value = 600.0
 value = 15.0
 rounded = true
 tick_count = 20
@@ -1968,6 +2005,542 @@ script = SubResource( 32 )
 
 [node name="Header2" parent="4,4-Custom Setup 5,1" instance=ExtResource( 7 )]
 my_menu = "4,4"
+
+[node name="0,6-Custom Setup 6" type="ReferenceRect" parent="."]
+margin_top = 5760.0
+margin_right = 540.0
+margin_bottom = 6720.0
+rect_min_size = Vector2( 540, 960 )
+script = SubResource( 35 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,6-Custom Setup 6"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 958.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,6-Custom Setup 6/CenterContainer"]
+margin_right = 540.0
+margin_bottom = 838.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Weapons Configuration"
+align = 1
+
+[node name="Label2" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Enable Weapons For The Match"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 124.0
+custom_constants/separation = 15
+
+[node name="Label" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 192.0
+margin_bottom = 36.0
+text = "Designation"
+
+[node name="Label2" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 207.0
+margin_right = 374.0
+margin_bottom = 36.0
+text = "Start With"
+
+[node name="Label3" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 390.0
+margin_right = 540.0
+margin_bottom = 36.0
+size_flags_horizontal = 10
+text = "Available"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 540.0
+margin_bottom = 748.0
+rect_min_size = Vector2( 540, 616 )
+
+[node name="GridContainer" type="GridContainer" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer"]
+margin_right = 540.0
+margin_bottom = 240.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/vseparation = 30
+custom_constants/hseparation = 15
+columns = 3
+
+[node name="Label4" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 12.0
+margin_right = 192.0
+margin_bottom = 48.0
+rect_min_size = Vector2( 192, 0 )
+text = "P1S"
+
+[node name="CheckButton" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_right = 303.0
+margin_bottom = 60.0
+pressed = true
+
+[node name="CheckButton2" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 390.0
+margin_right = 540.0
+margin_bottom = 60.0
+rect_min_size = Vector2( 150, 0 )
+size_flags_horizontal = 10
+pressed = true
+
+[node name="Label5" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 102.0
+margin_right = 192.0
+margin_bottom = 138.0
+text = "P2B"
+
+[node name="CheckButton3" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_top = 90.0
+margin_right = 303.0
+margin_bottom = 150.0
+size_flags_horizontal = 0
+
+[node name="CheckButton4" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 318.0
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 150.0
+pressed = true
+
+[node name="Label6" type="Label" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 192.0
+margin_right = 192.0
+margin_bottom = 228.0
+text = "P3A"
+
+[node name="CheckButton5" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_top = 180.0
+margin_right = 303.0
+margin_bottom = 240.0
+size_flags_horizontal = 0
+
+[node name="CheckButton6" type="CheckButton" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 318.0
+margin_top = 180.0
+margin_right = 540.0
+margin_bottom = 240.0
+pressed = true
+
+[node name="HSeparator" type="HSeparator" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_top = 756.0
+margin_right = 540.0
+margin_bottom = 786.0
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="0,6-Custom Setup 6/CenterContainer/VBoxContainer"]
+margin_top = 794.0
+margin_right = 540.0
+margin_bottom = 838.0
+text = "Submit Settings"
+
+[node name="Header2" parent="0,6-Custom Setup 6" instance=ExtResource( 7 )]
+my_menu = "0,6"
+
+[node name="1,6-Custom Setup 7" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = 5760.0
+margin_right = 1080.0
+margin_bottom = 6720.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="1,6-Custom Setup 7"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 958.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,6-Custom Setup 7/CenterContainer"]
+margin_right = 540.0
+margin_bottom = 838.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Weapons Configuration"
+align = 1
+
+[node name="Label2" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Set Ammo For Starting Weapons"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 124.0
+custom_constants/separation = 15
+
+[node name="Label" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 192.0
+margin_bottom = 36.0
+text = "Designation"
+
+[node name="Label2" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 207.0
+margin_right = 395.0
+margin_bottom = 36.0
+rect_min_size = Vector2( 188, 0 )
+text = "Slider"
+align = 1
+
+[node name="Label3" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 410.0
+margin_right = 540.0
+margin_bottom = 36.0
+size_flags_horizontal = 10
+text = "Amount"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 540.0
+margin_bottom = 748.0
+rect_min_size = Vector2( 540, 616 )
+
+[node name="GridContainer" type="GridContainer" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/ScrollContainer"]
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/vseparation = 30
+custom_constants/hseparation = 15
+columns = 3
+
+[node name="Label4" type="Label" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 4.0
+margin_right = 192.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 192, 0 )
+text = "P1S"
+
+[node name="HSlider" type="HSlider" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_right = 387.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 180, 0 )
+value = 50.0
+
+[node name="LineEdit" type="LineEdit" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 410.0
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 130, 0 )
+size_flags_horizontal = 10
+text = "200"
+align = 1
+
+[node name="HSeparator" type="HSeparator" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_top = 756.0
+margin_right = 540.0
+margin_bottom = 786.0
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="1,6-Custom Setup 7/CenterContainer/VBoxContainer"]
+margin_top = 794.0
+margin_right = 540.0
+margin_bottom = 838.0
+text = "Submit Settings"
+
+[node name="Header2" parent="1,6-Custom Setup 7" instance=ExtResource( 7 )]
+my_menu = "1,6"
+
+[node name="2,6-Custom Setup 8" type="ReferenceRect" parent="."]
+margin_left = 1080.0
+margin_top = 5760.0
+margin_right = 1620.0
+margin_bottom = 6720.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="2,6-Custom Setup 8"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 958.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="2,6-Custom Setup 8/CenterContainer"]
+margin_right = 540.0
+margin_bottom = 838.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Weapons Configuration"
+align = 1
+
+[node name="Label2" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Set Ammo For Picked Up Weapons"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 124.0
+custom_constants/separation = 15
+
+[node name="Label" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 192.0
+margin_bottom = 36.0
+text = "Designation"
+
+[node name="Label2" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 207.0
+margin_right = 395.0
+margin_bottom = 36.0
+rect_min_size = Vector2( 188, 0 )
+text = "Slider"
+align = 1
+
+[node name="Label3" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 410.0
+margin_right = 540.0
+margin_bottom = 36.0
+size_flags_horizontal = 10
+text = "Amount"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 540.0
+margin_bottom = 748.0
+rect_min_size = Vector2( 540, 616 )
+
+[node name="GridContainer" type="GridContainer" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer"]
+margin_right = 540.0
+margin_bottom = 118.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/vseparation = 30
+custom_constants/hseparation = 15
+columns = 3
+
+[node name="Label4" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 4.0
+margin_right = 192.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 192, 0 )
+text = "P1S"
+
+[node name="HSlider" type="HSlider" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_right = 387.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 180, 0 )
+value = 50.0
+
+[node name="LineEdit" type="LineEdit" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 410.0
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 130, 0 )
+size_flags_horizontal = 10
+text = "50"
+align = 1
+
+[node name="Label5" type="Label" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 78.0
+margin_right = 192.0
+margin_bottom = 114.0
+rect_min_size = Vector2( 192, 0 )
+text = "P2B"
+
+[node name="HSlider2" type="HSlider" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_top = 74.0
+margin_right = 387.0
+margin_bottom = 114.0
+rect_min_size = Vector2( 180, 0 )
+value = 50.0
+
+[node name="LineEdit2" type="LineEdit" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 410.0
+margin_top = 74.0
+margin_right = 540.0
+margin_bottom = 118.0
+rect_min_size = Vector2( 130, 0 )
+size_flags_horizontal = 10
+text = "50"
+align = 1
+
+[node name="HSeparator" type="HSeparator" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_top = 756.0
+margin_right = 540.0
+margin_bottom = 786.0
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="2,6-Custom Setup 8/CenterContainer/VBoxContainer"]
+margin_top = 794.0
+margin_right = 540.0
+margin_bottom = 838.0
+text = "Submit Settings"
+
+[node name="Header2" parent="2,6-Custom Setup 8" instance=ExtResource( 7 )]
+my_menu = "2,6"
+
+[node name="3,6-Custom Setup 9" type="ReferenceRect" parent="."]
+margin_left = 1620.0
+margin_top = 5760.0
+margin_right = 2160.0
+margin_bottom = 6720.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="3,6-Custom Setup 9"]
+margin_top = 120.0
+margin_right = 540.0
+margin_bottom = 958.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="3,6-Custom Setup 9/CenterContainer"]
+margin_right = 540.0
+margin_bottom = 838.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Weapons Configuration"
+align = 1
+
+[node name="Label2" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Probability Of Drops"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 124.0
+custom_constants/separation = 15
+
+[node name="Label" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 192.0
+margin_bottom = 36.0
+text = "Designation"
+
+[node name="Label2" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 207.0
+margin_right = 525.0
+margin_bottom = 36.0
+rect_min_size = Vector2( 318, 0 )
+text = "Probability"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 540.0
+margin_bottom = 748.0
+rect_min_size = Vector2( 540, 616 )
+
+[node name="GridContainer" type="GridContainer" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer"]
+margin_right = 540.0
+margin_bottom = 180.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/vseparation = 30
+custom_constants/hseparation = 15
+columns = 2
+
+[node name="Label4" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 2.0
+margin_right = 192.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 192, 0 )
+text = "P1S"
+
+[node name="HSlider" type="HSlider" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_right = 527.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 320, 0 )
+value = 50.0
+
+[node name="Label5" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 72.0
+margin_right = 192.0
+margin_bottom = 108.0
+rect_min_size = Vector2( 192, 0 )
+text = "P2B"
+
+[node name="HSlider2" type="HSlider" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_top = 70.0
+margin_right = 527.0
+margin_bottom = 110.0
+rect_min_size = Vector2( 320, 0 )
+value = 50.0
+
+[node name="Label6" type="Label" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_top = 142.0
+margin_right = 192.0
+margin_bottom = 178.0
+rect_min_size = Vector2( 192, 0 )
+text = "P3A"
+
+[node name="HSlider3" type="HSlider" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer/ScrollContainer/GridContainer"]
+margin_left = 207.0
+margin_top = 140.0
+margin_right = 527.0
+margin_bottom = 180.0
+rect_min_size = Vector2( 320, 0 )
+max_value = 1000.0
+value = 100.0
+
+[node name="HSeparator" type="HSeparator" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_top = 756.0
+margin_right = 540.0
+margin_bottom = 786.0
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="3,6-Custom Setup 9/CenterContainer/VBoxContainer"]
+margin_top = 794.0
+margin_right = 540.0
+margin_bottom = 838.0
+text = "Submit Settings"
+
+[node name="Header2" parent="3,6-Custom Setup 9" instance=ExtResource( 7 )]
+my_menu = "3,6"
 
 [node name="0,2-No Network Game 1" type="ReferenceRect" parent="."]
 margin_top = 1920.0

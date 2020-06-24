@@ -106,7 +106,7 @@ func set_player_start_game_vars():
         RespawnTimer.one_shot = true
     
 func set_player_respawn_vars():
-    var weapon_type = Settings.InGame.get_data("game_start_weapon_type")
+    var weapon_type = Settings.InGame.get_data("game_start_weapon_types")[0]
     Settings.Session.set_data("game_weapon_type", weapon_type)
     Settings.Session.set_data("game_weapon_damage", Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
     Settings.Session.set_data("game_weapon_shot_modes", Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
@@ -201,7 +201,7 @@ func _process(__):
                         EmptyShotSound.play()
                     elif event_to_sort["type"] == "reloading":
                         ReloadSound.volume_db = -20
-                        ReloadSound.pitch_scale = 0.45 / event_to_sort["additional"]["reload_speed"]
+                        #ReloadSound.pitch_scale = 0.45 / event_to_sort["additional"]["reload_speed"]
                         ReloadSound.play()
                     elif event_to_sort["type"] == "died":
                         if event_to_sort["additional"]["laser_id"] == Settings.Session.get_data("game_player_laser_id"):
@@ -420,7 +420,7 @@ func reload_start():
     Settings.Session.set_data("game_weapon_total_ammo", collect_magazine_ammo)
     Settings.Session.set_data("game_weapon_magazine_ammo", 0)
     ReloadSound.volume_db = 0
-    ReloadSound.pitch_scale = 0.45 / Settings.Session.get_data("game_weapon_reload_speed")
+    #ReloadSound.pitch_scale = 0.45 / Settings.Session.get_data("game_weapon_reload_speed")
     ReloadSound.play()
     record_game_event("reloading", {"gun": Settings.Session.get_data("game_weapon_type"), 
         "reload_speed": Settings.Session.get_data("game_weapon_reload_speed")})

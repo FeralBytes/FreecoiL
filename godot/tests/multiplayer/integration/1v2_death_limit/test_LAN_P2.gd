@@ -11,7 +11,7 @@ onready var OvertimeTimer = Timer.new()
 func _ready():
     add_child(OvertimeTimer)
     OvertimeTimer.connect("timeout", self, "overtime_exit")
-    OvertimeTimer.wait_time = 60
+    OvertimeTimer.wait_time = 120
     OvertimeTimer.start()
     
 func overtime_exit():
@@ -183,3 +183,122 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     yield(get_tree().create_timer(1.0), "timeout")
+    
+func test_p2_wait_for_coordinated_next_phase():
+    while Settings.InGame.get_data("Testing_Next_Phase") == null:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree(), 'idle_frame')
+    
+func test_p2_can_return_to_main_menu():
+    var btn = _obj.get_node("Scene1/InGame/0,1-End of Game/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    while _obj.current_scene.name != "MainMenu":
+        yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.name, "MainMenu")
+    while _obj.loading_state != "idle":
+        yield(get_tree(), 'idle_frame')
+    
+func test_p2_can_click_start_a_networked_game_again():
+    var btn = _obj.get_node("Scene0/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
+
+func test_p2_can_click_host():
+    var btn = _obj.get_node("Scene0/MainMenu/0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "1,1")
+
+func test_p2_can_click_custom_match_setup():
+    var btn = _obj.get_node("Scene0/MainMenu/3,1-Networked Game 4/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,3")
+
+func test_p2_can_click_yes():
+    var btn = _obj.get_node("Scene0/MainMenu/0,3-Custom Setup 1/CenterContainer/VBoxContainer/HBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,4")
+    
+func test_p2_can_click_submit_team_num():
+    var btn = _obj.get_node("Scene0/MainMenu/0,4-Custom Setup 1,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,5")
+    
+func test_p2_can_disable_friendly_fire():
+    var btn = _obj.get_node("Scene0/MainMenu/0,5-Custom Setup 1,2/CenterContainer/VBoxContainer/HBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "1,3")
+
+func test_p2_can_click_submit_health_val():
+    var btn = _obj.get_node("Scene0/MainMenu/1,3-Custom Setup 2/CenterContainer/VBoxContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "2,3")
+    
+func test_p2_can_click_outdoors():
+    var btn = _obj.get_node("Scene0/MainMenu/2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer/Button2")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "3,3")
+    
+func test_p2_can_click_death_limit():
+    var btn = _obj.get_node("Scene0/MainMenu/3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.InGame.get_data("game_limit_mode"), "deaths")
+    assert_eq(Settings.Session.get_data("current_menu"), "3,4")
+    
+func test_p2_can_set_death_limit():
+    var plus_minus_widget = _obj.get_node("Scene0/MainMenu/3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget")
+    plus_minus_widget.set_current_val(1)
+    var btn = _obj.get_node("Scene0/MainMenu/3,4-Custom Setup 4,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "4,3")
+    
+func test_p2_can_click_respawn_via_button():
+    var btn = _obj.get_node("Scene0/MainMenu/4,3-Custom Setup 5/CenterContainer/VBoxContainer/HBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "5,1")
+    
+func test_p2_can_join_team_2():
+    while _obj.current_scene.name != "Lobbies":
+        yield(get_tree(), 'idle_frame')
+    assert_eq(_obj.current_scene.name, "Lobbies")
+    while _obj.loading_state != "idle":
+        yield(get_tree(), 'idle_frame')
+    # We make sure the host waits for all of the bots to join.
+    while Settings.Network.get_data("mups_to_peers").size() != 3:
+        yield(get_tree(), 'idle_frame')
+    Settings.InGame.set_data("game_start_delay", 1)
+    var btn = _obj.get_node("Scene1/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 1)
+    btn = _obj.get_node("Scene1/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("ui_team_being_viewed"), 2)
+    btn = _obj.get_node("Scene1/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("player_team"), 2)
+    var tmp = _obj.get_node("Scene1/Lobbies/0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer")
+    btn = tmp.get_child(0).get_child(1)
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+
+func test_p2_can_start_a_match_again():
+    while Settings.Session.get_data("game_started") != 1:
+        yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("game_started"), 1)
+
+func test_p2_can_coordinate_exit():
+    Settings.InGame.set_data("Testing_Complete", true)
+    yield(get_tree(), 'idle_frame')

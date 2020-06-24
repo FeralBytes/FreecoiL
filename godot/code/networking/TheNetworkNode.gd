@@ -120,6 +120,25 @@ func reset_networking():
         yield(get_tree().create_timer(0.1), "timeout")
         Client = null
     get_tree().set_network_peer(null)
+    # Reset Network Variables:
+    network_loops.clear()
+    host_udp_broadcast = false
+    Settings.Session.set_data("server_ip", "")
+    Settings.Session.set_data("server_ignore_list", [])
+    Settings.Session.set_data("mup_id", null)  # mup_id = my_unique_persistant_id
+    Settings.Network.set_data("mups_to_peers", {"1": 1})
+    Settings.Network.set_data("mups_ready", {}, false, false)
+    Settings.Network.set_data("peers_minimum", Settings.MIN_PLAYERS)
+    Settings.Network.set_data("mups_status", {"1": "do_not_connect"})
+    Settings.Network.set_data("websockets_init_comp", false)
+    Settings.Network.set_data("websockets_client_connected", false)
+    Settings.InGame.set_data("player_name_by_id", {})
+    Settings.InGame.set_data("player_team_by_id", {})
+    Settings.InGame.set_data("game_teams_by_team_num_by_id", [])
+    Settings.Session.set_data("all_ready", false, false, false)
+    Settings.Session.set_data("server_invite", false)
+    Settings.Session.set_data("connection_status", "do_not_connect")
+    Settings.Session.set_data("mups_reconnected", [], false, false)
     yield(get_tree(), "idle_frame")  # Yield at least one time to be a coroutine.
 
 #### SCENETREE SERVER NETWORKING FUNCTIONS

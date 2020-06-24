@@ -39,7 +39,7 @@
 
 ## Notes
 
-The if two or more buttons are stacked then a seperation of 30 was used to make them more clickable. If two or more buttons are horizontally side by side then a seperation of 60 was used to make the more clickable.
+The if two or more buttons are stacked then a seperation of 30 was used to make them more clickable. If two or more buttons are horizontally side by side then a seperation of ~60 was used to make the more clickable.
 
 ## JSON Color Object Code
 

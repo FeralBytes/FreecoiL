@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=2]
+[gd_scene load_steps=48 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -261,6 +261,7 @@ func _ready():
 
 
 func _on_Button_pressed():
+    get_tree().call_group(\"Network\", \"reset_networking\")
     get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
 "
 
@@ -403,6 +404,8 @@ func build_team_scores():
     build_header(\"Team #\", \"Score\")
     var team_scores = Settings.InGame.get_data(\"game_team_scores\")
     var teams_ranked_by_score = []
+    var teams_by_team_num_by_id = Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")
+    var team_0_size = teams_by_team_num_by_id[0].size()
     for id in range(team_scores.size()):
         var score = team_scores[id]
         for rank in range(0, teams_ranked_by_score.size()):
@@ -412,11 +415,23 @@ func build_team_scores():
                 if teams_ranked_by_score.has(id):
                     pass
                 else:
-                    teams_ranked_by_score.insert(rank, id)
+                    if id == 0:
+                        if team_0_size == 0:
+                            pass
+                        else:
+                            teams_ranked_by_score.insert(rank, id)
+                    else:
+                        teams_ranked_by_score.insert(rank, id)
         if teams_ranked_by_score.has(id):
             pass
         else:
-            teams_ranked_by_score.append(id)
+            if id == 0:
+                if team_0_size == 0:
+                    pass
+                else:
+                    teams_ranked_by_score.append(id)
+            else:
+                teams_ranked_by_score.append(id)
     build_gui_table(teams_ranked_by_score, \"team_name_by_num\", \"game_team_scores\")
 
 func build_table(table_name):
@@ -611,260 +626,6 @@ func _ready():
 
 func update_val(new_val):
     pass
-"
-
-[sub_resource type="GDScript" id=31]
-script/source = "extends Button
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
-
-
-func _on_Button_pressed():
-    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
-"
-
-[sub_resource type="GDScript" id=32]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    update_value(Settings.InGame.get_data(\"player_laser_by_id\")[Settings.Session.get_data(\"mup_id\")])
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=33]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    update_value(Settings.InGame.get_data(\"player_name_by_id\")[Settings.Session.get_data(\"mup_id\")])
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=34]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_type\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=35]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_damage\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=36]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_shot_modes\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=37]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_shot_mode\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=38]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_size\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=39]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=40]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_health\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=41]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_team\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=42]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_player_teammates\"), self, \"update_value\")
-
-func update_value(new_val):
-    text = str(new_val)
-"
-
-[sub_resource type="GDScript" id=43]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-onready var InGame = get_parent().get_parent().get_parent().get_parent().get_parent()
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    call_deferred(\"update_val\")
-
-
-func update_val():
-    while true:
-        yield(get_tree().create_timer(1.0), \"timeout\")
-        text = str(InGame.game_history.size())
-        
-"
-
-[sub_resource type="GDScript" id=44]
-script/source = "extends Button
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    pass # Replace with function body.
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#    pass
-
-
-func _on_Button2_pressed():
-    get_parent().get_parent().get_parent().get_parent().respawn_start(32)
 "
 
 [node name="InGame" type="Control"]
@@ -1565,261 +1326,6 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="CenterContainer" type="CenterContainer" parent="1,1-TestOutput"]
-margin_right = 40.0
-margin_bottom = 40.0
-rect_min_size = Vector2( 540, 960 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VBoxContainer" type="VBoxContainer" parent="1,1-TestOutput/CenterContainer"]
-margin_top = 168.0
-margin_right = 540.0
-margin_bottom = 792.0
-rect_min_size = Vector2( 540, 0 )
-
-[node name="Button" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_right = 540.0
-margin_bottom = 44.0
-text = "Back To In Game"
-script = SubResource( 31 )
-
-[node name="HBoxContainer" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 52.0
-margin_right = 540.0
-margin_bottom = 88.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 162.0
-margin_right = 324.0
-margin_bottom = 36.0
-text = "Player ID:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 328.0
-margin_right = 377.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 32 )
-
-[node name="HBoxContainer9" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 96.0
-margin_right = 540.0
-margin_bottom = 132.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
-margin_left = 136.0
-margin_right = 351.0
-margin_bottom = 36.0
-text = "Player Name:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer9"]
-margin_left = 355.0
-margin_right = 404.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 33 )
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 140.0
-margin_right = 540.0
-margin_bottom = 176.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 135.0
-margin_right = 352.0
-margin_bottom = 36.0
-text = "Weapon Type:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 356.0
-margin_right = 405.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 34 )
-
-[node name="HBoxContainer3" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 184.0
-margin_right = 540.0
-margin_bottom = 220.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
-margin_left = 110.0
-margin_right = 377.0
-margin_bottom = 36.0
-text = "Weapon Damage:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer3"]
-margin_left = 381.0
-margin_right = 430.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 35 )
-
-[node name="HBoxContainer4" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 228.0
-margin_right = 540.0
-margin_bottom = 264.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 144.0
-margin_right = 342.0
-margin_bottom = 36.0
-text = "Shot Modes:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer4"]
-margin_left = 346.0
-margin_right = 395.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 36 )
-
-[node name="HBoxContainer5" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 272.0
-margin_right = 540.0
-margin_bottom = 308.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
-margin_left = 91.0
-margin_right = 396.0
-margin_bottom = 36.0
-text = "Weapon Shot Mode:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer5"]
-margin_left = 400.0
-margin_right = 449.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 37 )
-
-[node name="HBoxContainer6" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 316.0
-margin_right = 540.0
-margin_bottom = 352.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
-margin_left = 64.0
-margin_right = 422.0
-margin_bottom = 36.0
-text = "Weapon Magazine Size:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer6"]
-margin_left = 426.0
-margin_right = 475.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 38 )
-
-[node name="HBoxContainer7" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 360.0
-margin_right = 540.0
-margin_bottom = 396.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
-margin_left = 122.0
-margin_right = 365.0
-margin_bottom = 36.0
-text = "Weapon Ammo:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer7"]
-margin_left = 369.0
-margin_right = 418.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 39 )
-
-[node name="HBoxContainer8" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 404.0
-margin_right = 540.0
-margin_bottom = 440.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
-margin_left = 129.0
-margin_right = 357.0
-margin_bottom = 36.0
-text = "Player Health:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer8"]
-margin_left = 361.0
-margin_right = 410.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 40 )
-
-[node name="HBoxContainer10" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 448.0
-margin_right = 540.0
-margin_bottom = 484.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
-margin_left = 138.0
-margin_right = 349.0
-margin_bottom = 36.0
-text = "Player Team:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer10"]
-margin_left = 353.0
-margin_right = 402.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 41 )
-
-[node name="HBoxContainer11" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 492.0
-margin_right = 540.0
-margin_bottom = 528.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
-margin_left = 90.0
-margin_right = 396.0
-margin_bottom = 36.0
-text = "Player Teammates:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer11"]
-margin_left = 400.0
-margin_right = 449.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 42 )
-
-[node name="HBoxContainer12" type="HBoxContainer" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 536.0
-margin_right = 540.0
-margin_bottom = 572.0
-alignment = 1
-
-[node name="Label" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer12"]
-margin_left = 75.0
-margin_right = 411.0
-margin_bottom = 36.0
-text = "Size of Game History:"
-
-[node name="Label2" type="Label" parent="1,1-TestOutput/CenterContainer/VBoxContainer/HBoxContainer12"]
-margin_left = 415.0
-margin_right = 464.0
-margin_bottom = 36.0
-text = "01"
-script = SubResource( 43 )
-
-[node name="Button2" type="Button" parent="1,1-TestOutput/CenterContainer/VBoxContainer"]
-margin_top = 580.0
-margin_right = 540.0
-margin_bottom = 624.0
-text = "Test"
-script = SubResource( 44 )
-
 [node name="EmptyShotSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 10 )
 
@@ -1872,6 +1378,4 @@ allow_preferences = false
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/HBoxContainer/RightBumper" method="_on_RightBumper_pressed" flags=3]
 [connection signal="pressed" from="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" to="-1,1-Scoreboard/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,0-Respawn/CenterContainer/VBoxContainer/RespawnButton" to="." method="_on_RespawnButton_pressed" flags=3]
-[connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
-[connection signal="pressed" from="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" to="1,1-TestOutput/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="timeout" from="TickTocTimer" to="." method="tick_toc" flags=3]
