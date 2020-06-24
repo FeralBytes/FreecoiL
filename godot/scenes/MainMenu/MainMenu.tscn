@@ -641,7 +641,7 @@ func _on_HSlider_value_changed(value):
     get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=33]
 script/source = "extends ReferenceRect
 
 const my_menu = \"0,6\"
@@ -680,7 +680,7 @@ func check_if_visible(current_menu):
         get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
-[sub_resource type="GDScript" id=33]
+[sub_resource type="GDScript" id=34]
 script/source = "extends OptionButton
 
 
@@ -711,7 +711,7 @@ func _on_OptionButton_item_selected(index):
     get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=35]
 script/source = "extends RichTextLabel
 
 
@@ -2011,7 +2011,7 @@ margin_top = 5760.0
 margin_right = 540.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 35 )
+script = SubResource( 33 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2603,7 +2603,7 @@ margin_top = 127.0
 margin_right = 540.0
 margin_bottom = 171.0
 align = 1
-script = SubResource( 33 )
+script = SubResource( 34 )
 
 [node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_top = 179.0
@@ -2621,7 +2621,7 @@ rect_min_size = Vector2( 540, 40 )
 bbcode_enabled = true
 bbcode_text = "[center][url=https://discordapp.com/invite/tn4hThV]FreecoiL Discord Link[/url][/center]"
 text = "FreecoiL Discord Link"
-script = SubResource( 34 )
+script = SubResource( 35 )
 
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
