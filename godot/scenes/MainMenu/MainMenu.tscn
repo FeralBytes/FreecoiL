@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=2]
+[gd_scene load_steps=44 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -7,6 +7,7 @@
 [ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=5]
 [ext_resource path="res://scenes/MainMenu/Tests.tscn" type="PackedScene" id=6]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/voices/EN_MV_login2.wav" type="AudioStream" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ReferenceRect
@@ -89,9 +90,7 @@ func _on_Button_pressed():
 script/source = "extends ReferenceRect
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
+onready var LoginPlayerAudio = get_node(\"LoginPlayerAudio\")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -107,6 +106,8 @@ func force_player_name(__):
         Settings.Preferences.set_data(\"player_name\", \"No Name\")
         if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
+            if LoginPlayerAudio.playing == false:
+                LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
 #        force_gun_connection(null)
         
@@ -812,6 +813,7 @@ margin_right = 539.0
 margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 3 )
+max_length = 13
 script = SubResource( 3 )
 
 [node name="Button" type="Button" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
@@ -869,6 +871,7 @@ margin_right = 540.0
 margin_bottom = 40.0
 theme = ExtResource( 3 )
 align = 1
+max_length = 13
 context_menu_enabled = false
 placeholder_text = "Callsign?"
 placeholder_alpha = 0.15
@@ -884,6 +887,9 @@ text = "Login"
 [node name="Header2" parent="0,-1-Get Player Name" instance=ExtResource( 7 )]
 my_menu = "0,-1"
 allow_main_menu = false
+
+[node name="LoginPlayerAudio" type="AudioStreamPlayer" parent="0,-1-Get Player Name"]
+stream = ExtResource( 8 )
 
 [node name="0,0-Game Options" type="ReferenceRect" parent="."]
 margin_right = 540.0

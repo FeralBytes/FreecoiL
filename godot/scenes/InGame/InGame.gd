@@ -530,10 +530,12 @@ func fi_got_shot(laser_id):
                 respawn_start(laser_id)
     
 func fi_power_btn_pushed():
-    if FreecoiLInterface.recoil_enabled:
-        FreecoiLInterface.enable_recoil(false)
-    else:
-        FreecoiLInterface.enable_recoil(true)
+    var force_recoil = Settings.InGame.get_date("force_recoil")
+    if force_recoil == null or force_recoil == "dont":
+        if FreecoiLInterface.recoil_enabled:
+            FreecoiLInterface.enable_recoil(false)
+        else:
+            FreecoiLInterface.enable_recoil(true)
 
 
 func _on_RespawnButton_pressed():

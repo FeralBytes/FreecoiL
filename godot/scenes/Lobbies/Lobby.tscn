@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=2]
+[gd_scene load_steps=25 format=2]
 
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
@@ -7,16 +7,19 @@
 [ext_resource path="res://assets/themes/default/default_RightBumper.theme" type="Theme" id=5]
 [ext_resource path="res://assets/themes/default/default_LineEdit.theme" type="Theme" id=6]
 [ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/voices/EN_MV_lobby.wav" type="AudioStream" id=8]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ReferenceRect
 
+onready var WelcomeLobbyAudio = get_parent().get_node(\"WelcomeLobbyAudio\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
     if get_tree().is_network_server():
         Settings.Session.connect(Settings.Session.monitor_data(\"all_ready\"), self, \"set_player_laser_ids\")
     get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    WelcomeLobbyAudio.play()
 
 
 func set_player_laser_ids(all_ready):
@@ -200,9 +203,10 @@ onready var TeamNumLbl = get_parent().get_parent().get_node(\"Team\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+    Settings.Session.set_data(\"player_team\", 0)
+    Settings.Session.set_data(\"ui_team_being_viewed\", 0) 
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams_by_team_num_by_id\"), self, \"update_team_list\")
     Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
-    Settings.Session.set_data(\"ui_team_being_viewed\", 0) 
     Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
     Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_team_list\")
     Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"update_team_list\")
@@ -980,6 +984,7 @@ align = 1
 margin_top = 166.0
 margin_right = 540.0
 margin_bottom = 210.0
+max_length = 13
 
 [node name="Header2" parent="1,0-Name Conflict" instance=ExtResource( 3 )]
 my_menu = "1,0"
@@ -992,6 +997,9 @@ allow_preferences = false
 my_menu = "1,-1"
 on_mainmenu_scene = false
 allow_preferences = false
+
+[node name="WelcomeLobbyAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 8 )
 [connection signal="item_selected" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" to="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" method="_on_Button_pressed" flags=3]

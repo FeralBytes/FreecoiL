@@ -164,6 +164,7 @@ func _on_MenuBtn_pressed():
         
 func _on_MainMenu_pressed():
     if on_mainmenu_scene:
+        get_tree().call_group(\"Network\", \"reset_networking\")
         get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
     else:
         get_tree().call_group(\"Network\", \"reset_networking\")
@@ -195,7 +196,11 @@ func _on_Exit_pressed():
 
 
 func _on_Recoil_pressed():
-    FreecoiLInterface.toggle_recoil()
+    var force_recoil = Settings.InGame.get_date(\"force_recoil\")
+    if force_recoil == null or force_recoil == \"dont\":
+        FreecoiLInterface.toggle_recoil()
+    else:
+        pass
     hide_settings_menu_popup()
 "
 
@@ -324,7 +329,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-alpha2 "
+text = " Ver: 0.3.0-beta1 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
