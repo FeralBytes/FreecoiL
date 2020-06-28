@@ -1,4 +1,4 @@
-[gd_scene load_steps=44 format=2]
+[gd_scene load_steps=48 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -91,6 +91,7 @@ script/source = "extends ReferenceRect
 
 
 onready var LoginPlayerAudio = get_node(\"LoginPlayerAudio\")
+onready var CallSignLineEdit = get_node(\"CenterContainer/VBoxContainer/VBoxContainer/LineEdit\")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -106,6 +107,7 @@ func force_player_name(__):
         Settings.Preferences.set_data(\"player_name\", \"No Name\")
         if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
+            CallSignLineEdit.grab_focus()
             if LoginPlayerAudio.playing == false:
                 LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
@@ -664,6 +666,10 @@ const default_start_ammo = {\"P1S\": 300}
 const default_wpn_for_prob = \"P1S\"
 const default_wpn_probabilities = {\"P1S\":0.32, \"P1B\":0.1, \"P1A\":0.1, \"P2S\":0.1, \"P2B\":0.1, \"P2A\":0.1, 
         \"A1SBA\":0.1, \"M1A\":0.05, \"A2SBA\": 0.03} 
+var wpns_available = default_wpns
+var start_wpns = default_start_wpns
+        
+onready var Grid = get_node(\"CenterContainer/VBoxContainer/ScrollContainer/GridContainer\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -675,13 +681,198 @@ func check_if_visible(current_menu):
         Settings.InGame.set_data(\"game_weapon_types\", default_wpns)
         Settings.InGame.set_data(\"game_start_weapon_types\", default_start_wpns)
         Settings.InGame.set_data(\"game_start_ammo\", default_start_ammo)
+        Settings.InGame.set_data(\"game_weapon_prob_default\", default_wpn_for_prob)
+        Settings.InGame.set_data(\"game_weapon_probabilities\", default_wpn_probabilities)
+        clear_grid()
+        build_grid()
+
+
+func clear_grid():
+    for child in Grid.get_children():
+        child.queue_free()
+        
+func build_grid():
+    for weapon in default_wpns:
+        var wpn_lbl = Label.new()
+        var wpn_start_with = CheckButton.new()
+        var wpn_available = CheckButton.new()
+        wpn_lbl.text = weapon
+        wpn_lbl.rect_min_size.x = 192
+        if default_start_wpns.has(weapon):
+            wpn_start_with.pressed = true
+        if default_wpns.keys().has(weapon):
+            wpn_available.pressed = true
+        wpn_available.size_flags_horizontal = SIZE_SHRINK_END + SIZE_EXPAND
+        wpn_start_with.connect(\"toggled\", self, \"on_start_with_toggled\", [weapon, wpn_start_with])
+        wpn_available.connect(\"toggled\", self, \"on_wpn_available_toggled\", [weapon, wpn_available])
+        Grid.add_child(wpn_lbl)
+        Grid.add_child(wpn_start_with)
+        Grid.add_child(wpn_available)
+        
+func on_start_with_toggled(on, weapon, btn_ref):
+    if on == false:
+        if start_wpns.has(weapon):
+            if start_wpns.size() == 1:  # Don't erase if only 1 start weapon must have 1.
+                btn_ref.pressed = true
+            else:
+                if weapon == \"P1S\":
+                    Settings.InGame.set_data(\"game_start_ammo\", {})
+                start_wpns.erase(weapon)
+    if on == true:
+        if start_wpns.has(weapon):
+            pass
+        else:
+            start_wpns.append(weapon)
+    Settings.InGame.set_data(\"game_start_weapon_types\", start_wpns)
+
+func on_wpn_available_toggled(on, weapon, btn_ref):
+    if on == false:
+        if wpns_available.keys().has(weapon):
+            if wpns_available.keys().size() == 1:
+                btn_ref.pressed = true
+            else:
+                wpns_available.erase(weapon)
+    if on == true:
+        if wpns_available.keys().has(weapon):
+            pass
+        else:
+            wpns_available[weapon] = default_wpns[weapon]
+    Settings.InGame.set_data(\"game_weapon_types\", wpns_available) 
+"
+
+[sub_resource type="GDScript" id=34]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,6\")
+"
+
+[sub_resource type="GDScript" id=35]
+script/source = "extends ReferenceRect
+
+
+const my_menu = \"1,6\"
+
+onready var Grid = get_node(\"CenterContainer/VBoxContainer/ScrollContainer/GridContainer\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+
+
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        clear_grid()
+        build_grid()
+
+func clear_grid():
+    for child in Grid.get_children():
+        child.queue_free()
+
+func build_grid():
+    var start_wpns = Settings.InGame.get_data(\"game_start_weapon_types\")
+    var wpns_available = Settings.InGame.get_data(\"game_weapon_types\")
+    var game_start_ammo = Settings.InGame.get_data(\"game_start_ammo\")
+    for weapon in start_wpns:
+        var wpn_lbl = Label.new()
+        var ammo_slider = HSlider.new()
+        var ammo_lineedit = LineEdit.new()
+        wpn_lbl.text = weapon
+        wpn_lbl.rect_min_size.x = 192
+        ammo_slider.rect_min_size.x = 180
+        ammo_slider.min_value = 0
+        ammo_slider.max_value = 999
+        ammo_lineedit.size_flags_horizontal = SIZE_SHRINK_END + SIZE_EXPAND
+        ammo_lineedit.rect_min_size.x = 130
+        ammo_slider.connect(\"value_changed\", self, \"on_ammo_slider_changed\", [weapon, ammo_slider, ammo_lineedit])
+        ammo_lineedit.connect(\"text_entered\", self, \"on_ammo_lineedit_entered\", [weapon, ammo_lineedit, ammo_slider])
+        if game_start_ammo.keys().has(weapon):
+            ammo_slider.value = game_start_ammo[weapon]
+            ammo_lineedit.text = str(game_start_ammo[weapon])
+        Grid.add_child(wpn_lbl)
+        Grid.add_child(ammo_slider)
+        Grid.add_child(ammo_lineedit)
+
+func on_ammo_slider_changed(new_val, weapon, slider_ref, lineedit_ref):
+    var game_start_ammo = Settings.InGame.get_data(\"game_start_ammo\")
+    game_start_ammo[weapon] = new_val
+    Settings.InGame.set_data(\"game_start_ammo\", game_start_ammo)
+    lineedit_ref.text = str(new_val)
+
+func on_ammo_lineedit_entered(new_val, weapon, lineedit_ref, slider_ref):
+    if new_val.is_valid_integer():
+        var game_start_ammo = Settings.InGame.get_data(\"game_start_ammo\")
+        game_start_ammo[weapon] = int(new_val)
+        Settings.InGame.set_data(\"game_start_ammo\", game_start_ammo)
+        slider_ref.value = int(new_val)
+    else:
+        lineedit_ref.text = \"100\"
+        slider_ref.value = int(new_val)
+"
+
+[sub_resource type="GDScript" id=36]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"2,6\")
+"
+
+[sub_resource type="GDScript" id=37]
+script/source = "extends ReferenceRect
+
+
+const my_menu = \"2,6\"
+
+onready var Grid = get_node(\"CenterContainer/VBoxContainer/ScrollContainer/GridContainer\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+
+
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        #clear_grid()
+        #build_grid()
         get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
         # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
         Settings.InGame.set_data(\"game_start_delay\", 5)
         get_tree().call_group(\"Container\", \"load_lobby\") 
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=38]
 script/source = "extends OptionButton
 
 
@@ -712,7 +903,7 @@ func _on_OptionButton_item_selected(index):
     get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=39]
 script/source = "extends RichTextLabel
 
 
@@ -2159,6 +2350,7 @@ margin_top = 794.0
 margin_right = 540.0
 margin_bottom = 838.0
 text = "Submit Settings"
+script = SubResource( 34 )
 
 [node name="Header2" parent="0,6-Custom Setup 6" instance=ExtResource( 7 )]
 my_menu = "0,6"
@@ -2169,6 +2361,7 @@ margin_top = 5760.0
 margin_right = 1080.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
+script = SubResource( 35 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2274,6 +2467,7 @@ margin_top = 794.0
 margin_right = 540.0
 margin_bottom = 838.0
 text = "Submit Settings"
+script = SubResource( 36 )
 
 [node name="Header2" parent="1,6-Custom Setup 7" instance=ExtResource( 7 )]
 my_menu = "1,6"
@@ -2284,6 +2478,7 @@ margin_top = 5760.0
 margin_right = 1620.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
+script = SubResource( 37 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2609,7 +2804,7 @@ margin_top = 127.0
 margin_right = 540.0
 margin_bottom = 171.0
 align = 1
-script = SubResource( 34 )
+script = SubResource( 38 )
 
 [node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_top = 179.0
@@ -2627,7 +2822,7 @@ rect_min_size = Vector2( 540, 40 )
 bbcode_enabled = true
 bbcode_text = "[center][url=https://discordapp.com/invite/tn4hThV]FreecoiL Discord Link[/url][/center]"
 text = "FreecoiL Discord Link"
-script = SubResource( 35 )
+script = SubResource( 39 )
 
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
@@ -2670,6 +2865,8 @@ my_menu = "-1,-1"
 [connection signal="PMWidChanged" from="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/PlusMinusWidget" to="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
 [connection signal="value_changed" from="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/HSlider" to="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_HSlider_value_changed" flags=3]
 [connection signal="pressed" from="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" to="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button" to="0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button" to="1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
 [connection signal="meta_clicked" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" method="_on_RichTextLabel_meta_clicked" flags=3]

@@ -294,9 +294,16 @@ func _laser_telem_batteryLvl(batteryLvl):
          battery_sum += battery_lvl_array[i]
     battery_lvl_avg = battery_sum / battery_lvl_array.size()
     if battery_lvl_avg != prev_battery_lvl_avg:
-        # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
-        Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
-        prev_battery_lvl_avg = battery_lvl_avg
+        var physical_laser_type = Settings.Session.get_data("physical_laser_type")
+        if physical_laser_type == null:
+            physical_laser_type = "RK-45"
+        if physical_laser_type == "SR-12":
+            Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25 / 1.5)
+            prev_battery_lvl_avg = battery_lvl_avg
+        else:
+            # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
+            Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
+            prev_battery_lvl_avg = battery_lvl_avg
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
     _on_laser_gun_still_connected()
     
@@ -341,4 +348,8 @@ func _new_status(status, level):
     #     4 = critical
     #     5 = exception
     Settings.Log('FreecoiL Java: DEBUG: ' + status) # debug level always print
+    if "Pistol detected." in status:
+        Settings.Session.set_data("physical_laser_type", "RK-45")
+    elif "Riffle detected." in status:
+        Settings.Session.set_data("physical_laser_type", "SR-12")
     

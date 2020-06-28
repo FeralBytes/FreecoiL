@@ -108,13 +108,13 @@ func test_p2_can_disconnect_from_game():
 func test_p2_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
-    yield(get_tree().create_timer(8.0), "timeout")
+    yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
     FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
     yield(get_tree().create_timer(2.0), "timeout")
     FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
-    yield(get_tree().create_timer(2.0), "timeout")
+    yield(get_tree().create_timer(10.0), "timeout")
     
 func test_p2_can_reconnect_to_game():
     Settings.Session.set_data("connection_status", "disconnected")
@@ -135,19 +135,19 @@ func test_p2_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
+    assert_eq(_obj.current_scene.game_history.size(), 39)
     yield(get_tree(), 'idle_frame')
     
 func test_p2_has_1_death_for_player_1():
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
     yield(get_tree(), 'idle_frame')
 
-func test_p2_has_1_kill_for_player_2():
-    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+func test_p2_has_2_kills_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 2)
     yield(get_tree(), 'idle_frame')
 
-func test_p2_session_game_player_kills_is_1():
-    assert_eq(Settings.Session.get_data("game_player_kills"), 1)
+func test_p2_session_game_player_kills_is_2():
+    assert_eq(Settings.Session.get_data("game_player_kills"), 2)
     yield(get_tree(), 'idle_frame')
 
 func test_p2_yield_to_show_result():
@@ -160,4 +160,9 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree(), 'idle_frame')
+    
+func test_p2_wait_for_coordinated_exit():
+    while Settings.InGame.get_data("Testing_Complete") == null:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree(), 'idle_frame')

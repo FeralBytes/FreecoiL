@@ -42,6 +42,7 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_recoil\"), self, \"update_recoil\")
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_battery_lvl\"), self, \"update_battery\")
     Settings.Session.connect(Settings.Session.monitor_data(\"connection_status\"), self, \"update_wifi\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"force_recoil\"), self, \"update_recoil_force_mode\")
     SettingsMenu.color = Color(Settings.Session.get_data(\"ThemeMenuBackground\"))
     MenuBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeFontColor\"))
 
@@ -155,6 +156,17 @@ func show_settings_menu_popup():
     SettingsMenu.set_global_position(rect_global_position + Vector2(30, 70))
     SettingsMenu.show()
     settings_menu_is_poped_up = true
+    
+func update_recoil_force_mode(force_mode):
+    var gun_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+    if gun_connected == null:
+        gun_connected = 0
+    if gun_connected == 2:
+        if force_mode == \"on\":
+            update_recoil(1)
+        elif force_mode == \"off\":
+            update_recoil(2)
+        # else: pass.
 
 func _on_MenuBtn_pressed():
     if settings_menu_is_poped_up:

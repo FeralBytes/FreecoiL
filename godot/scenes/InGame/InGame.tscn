@@ -1039,9 +1039,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-End of Game/CenterContainer"]
-margin_top = 188.0
+margin_top = 169.0
 margin_right = 540.0
-margin_bottom = 372.0
+margin_bottom = 391.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
@@ -1064,10 +1064,16 @@ margin_bottom = 132.0
 text = "View the Final Scores"
 script = SubResource( 17 )
 
-[node name="Button" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
+[node name="HSeparator" type="HSeparator" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
 margin_top = 140.0
 margin_right = 540.0
-margin_bottom = 184.0
+margin_bottom = 170.0
+custom_constants/separation = 30
+
+[node name="Button" type="Button" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
+margin_top = 178.0
+margin_right = 540.0
+margin_bottom = 222.0
 text = "Return to the Main Menu"
 script = SubResource( 18 )
 
@@ -1094,9 +1100,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
-margin_left = 2.0
 margin_top = 4.0
-margin_right = 542.0
+margin_right = 540.0
 margin_bottom = 852.0
 rect_min_size = Vector2( 540, 0 )
 

@@ -176,7 +176,7 @@ func test_p2_yield_to_show_result():
     print(_obj.current_scene.game_history)
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
     assert_eq(Settings.Session.get_data("game_player_kills"), 1)
-    yield(get_tree().create_timer(5.0), "timeout")
+    yield(get_tree(), 'idle_frame')
 
 func test_p2_wait_for_coordinated_exit():
     while Settings.InGame.get_data("Testing_Complete") == null:

@@ -142,6 +142,18 @@ func test_p1_can_click_submit_respawn_delay():
     var btn = _obj.get_node("Scene1/MainMenu/4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,6")
+    
+func test_p1_can_click_submit_wpn_start_avail():
+    var btn = _obj.get_node("Scene1/MainMenu/0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "1,6")
+    
+func test_p1_can_click_submit_starting_ammo():
+    var btn = _obj.get_node("Scene1/MainMenu/1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "5,1")
     
 func test_p1_can_join_team_2():

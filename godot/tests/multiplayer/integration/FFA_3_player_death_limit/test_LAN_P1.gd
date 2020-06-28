@@ -127,6 +127,18 @@ func test_p1_can_click_submit_respawn_delay():
     var btn = _obj.get_node("Scene1/MainMenu/4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button")
     btn.emit_signal("pressed")
     yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "0,6")
+    
+func test_p1_can_click_submit_wpn_start_avail():
+    var btn = _obj.get_node("Scene1/MainMenu/0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("current_menu"), "1,6")
+    
+func test_p1_can_click_submit_starting_ammo():
+    var btn = _obj.get_node("Scene1/MainMenu/1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button")
+    btn.emit_signal("pressed")
+    yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("current_menu"), "5,1")
     
 func test_p1_can_press_ready():
@@ -177,6 +189,10 @@ func test_p1_can_be_eliminated():
     assert_eq(Settings.InGame.get_data("player_status_by_id")["1"], "eliminated")
     yield(get_tree(), 'idle_frame')
     
+func test_p1_current_menu_is_eliminated():
+    assert_eq(Settings.Session.get_data("current_menu"), "2,0")
+    yield(get_tree(), 'idle_frame')
+    
 func test_p1_game_history_size_is_correct_after_rejoin():
     var all_players_have_rejoined = false
     while all_players_have_rejoined == false:
@@ -193,19 +209,19 @@ func test_p1_game_history_size_is_correct_after_rejoin():
     yield(get_tree().create_timer(2.0), "timeout")
     var unack_events_size = _obj.current_scene.server_unackn_events_by_mup["2"].size()
     print("server_unackn_events_by_mup = " + str(_obj.current_scene.server_unackn_events_by_mup))
-    assert_eq(_obj.current_scene.game_history.size(), 31 + unack_events_size)
+    assert_eq(_obj.current_scene.game_history.size(), 39 + unack_events_size)
     yield(get_tree(), 'idle_frame')
     
 func test_p1_has_1_death_for_player_1():
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
     yield(get_tree(), 'idle_frame')
     
-func test_p1_has_1_kill_for_player_2():
-    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+func test_p1_has_2_kills_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 2)
     yield(get_tree(), 'idle_frame')
     
-func test_p1_current_menu_is_correct():
-    assert_eq(Settings.Session.get_data("current_menu"), "2,0")
+func test_p1_current_menu_is_end_game():
+    assert_eq(Settings.Session.get_data("current_menu"), "0,1")
     yield(get_tree(), 'idle_frame')
 
 func test_p1_yield_to_show_result():
@@ -236,4 +252,8 @@ func test_p1_yield_to_show_result():
     print("Settings.Preferences:")
     print(Settings.Preferences.__settings)
     print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree(), 'idle_frame')
+    
+func test_p1_coordinate_exit():
+    Settings.InGame.set_data("Testing_Complete", true)
+    yield(get_tree(), 'idle_frame')

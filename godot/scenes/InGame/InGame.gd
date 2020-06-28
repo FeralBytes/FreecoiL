@@ -12,6 +12,7 @@ var server_unackn_events_by_mup = {}
 var catch_up_active = false
 var last_connection_status = null
 var rng = RandomNumberGenerator.new()
+var change_weapon_in_process = false
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -106,7 +107,9 @@ func set_player_start_game_vars():
         RespawnTimer.one_shot = true
     
 func set_player_respawn_vars():
-    var weapon_type = Settings.InGame.get_data("game_start_weapon_types")[0]
+    var start_game_wpn_types = Settings.InGame.get_data("game_start_weapon_types")
+    var weapon_type = start_game_wpn_types[0]
+    Settings.Session.set_data("game_player_weapons", start_game_wpn_types)
     Settings.Session.set_data("game_weapon_type", weapon_type)
     Settings.Session.set_data("game_weapon_damage", Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
     Settings.Session.set_data("game_weapon_shot_modes", Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
@@ -118,7 +121,6 @@ func set_player_respawn_vars():
     Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
     Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
     Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
-    # TODO: Set the shot mode.
     FreecoiLInterface.set_shot_mode(Settings.Session.get_data("game_weapon_shot_mode"),
         Settings.Session.get_data("game_indoor_mode"))
     
@@ -158,6 +160,8 @@ func end_game(reason):
         EndReason.text = "Out of Lives"
     elif reason == "team_elimination":
         EndReason.text = "Only One Team Left Standing"
+    elif reason == "ffa_elimination":
+        EndReason.text = "Only One Player Left Standing"
 
 ###############################################################################
 # Game Event Recording Functions
@@ -237,7 +241,6 @@ func _process(__):
                     Settings.InGame.set_data("player_kills_by_id", player_kills_by_id)
                     player_deaths_by_id[victim_mup] = player_deaths_by_id[victim_mup] + 1
                     Settings.InGame.set_data("player_deaths_by_id", player_deaths_by_id)
-                    # TODO: Catch if whole team is eliminated. And that there is only 1 remaining team.
                     var team_is_eliminated = true
                     for player in player_team_by_id:
                         if player_team_by_id[player] == elim_player_team:
@@ -265,6 +268,15 @@ func _process(__):
                                 teams_remaining += 1
                         if teams_remaining <= 1:
                             call_deferred("end_game", "team_elimination")
+                    if Settings.InGame.get_data("game_teams") == false:
+                        var number_of_players_alive = 0
+                        var game_teams_by_team_num_by_id = Settings.InGame.get_data("game_teams_by_team_num_by_id")
+                        for player_mup in game_teams_by_team_num_by_id[0]:
+                            if player_status_by_id[player_mup] != "eliminated":
+                                number_of_players_alive += 1
+                        if number_of_players_alive == 1:
+                            call_deferred("end_game", "ffa_elimination")
+                        
                 elif event_to_sort["type"] == "died":
                     var laser_id = event_to_sort["additional"]["laser_id"]
                     var shooter_mup = Settings.InGame.get_data("player_id_by_laser")[laser_id]
@@ -485,6 +497,34 @@ func hit_indicator_start():
 func hit_indicator_stop():
     pass
 
+func change_weapon(wpn_name=null):
+    FreecoiLInterface.reload_start()
+    var player_wpns = Settings.Session.get_data("game_player_weapons")
+    var weapon_type = Settings.Session.get_data("game_weapon_type")
+    if wpn_name == null:  # We just swap to the next weapon
+        var counter = 0
+        for wpn in player_wpns:  # find the index of the weapon.
+            if wpn == weapon_type:
+                break
+            else:
+                counter += 1
+        counter += 1
+        if counter == player_wpns.size():
+            counter = 0
+        weapon_type = player_wpns[counter]
+        Settings.Session.set_data("game_weapon_type", weapon_type)
+        Settings.Session.set_data("game_weapon_damage", Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
+        Settings.Session.set_data("game_weapon_shot_modes", Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
+        Settings.Session.set_data("game_weapon_shot_mode", Settings.Session.get_data("game_weapon_shot_modes")[0])
+        Settings.Session.set_data("game_weapon_magazine_size", Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
+        Settings.Session.set_data("game_weapon_magazine_ammo", 0)
+        Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
+        Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
+        Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
+        FreecoiLInterface.set_shot_mode(Settings.Session.get_data("game_weapon_shot_mode"),
+            Settings.Session.get_data("game_indoor_mode"))
+        reload_start()
+
 ###############################################################################
 # FreecoiL group callback Functions
 ###############################################################################  
@@ -530,13 +570,15 @@ func fi_got_shot(laser_id):
                 respawn_start(laser_id)
     
 func fi_power_btn_pushed():
-    var force_recoil = Settings.InGame.get_date("force_recoil")
+    var force_recoil = Settings.InGame.get_data("force_recoil")
     if force_recoil == null or force_recoil == "dont":
         if FreecoiLInterface.recoil_enabled:
             FreecoiLInterface.enable_recoil(false)
         else:
             FreecoiLInterface.enable_recoil(true)
 
+func fi_thumb_btn_pushed():
+    change_weapon(null)
 
 func _on_RespawnButton_pressed():
     respawn_finish()

@@ -119,6 +119,33 @@ func test_p3_can_log_offline_events():
     FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
     yield(get_tree().create_timer(1.0), "timeout")
     
+func test_p3_can_be_eliminated():
+    while Settings.Session.get_data("game_player_alive") != true:
+        yield(get_tree(), 'idle_frame')
+    while Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree().create_timer(3.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    yield(get_tree(), 'idle_frame')
+    FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
+    yield(get_tree().create_timer(0.1), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    yield(get_tree().create_timer(1.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    yield(get_tree().create_timer(1.0), "timeout")
+    Settings.Session.set_data("game_player_health", 1)
+    yield(get_tree(), 'idle_frame')
+    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("game_player_alive"), false)
+    yield(get_tree(), 'idle_frame')
+    assert_eq(Settings.Session.get_data("game_player_deaths"), 1)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p3_current_menu_is_eliminated():
+    assert_eq(Settings.Session.get_data("current_menu"), "2,0")
+    yield(get_tree(), 'idle_frame')
+    
 func test_p3_can_reconnect_to_game():
     Settings.Session.set_data("connection_status", "disconnected")
     yield(get_tree(), 'idle_frame')
@@ -138,15 +165,23 @@ func test_p3_game_history_size_is_correct_after_rejoin():
         yield(get_tree(), 'idle_frame')
     # Give time to resync.
     yield(get_tree().create_timer(2.0), "timeout")
-    assert_eq(_obj.current_scene.game_history.size(), 31)
+    assert_eq(_obj.current_scene.game_history.size(), 39)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p3_status_is_eliminated():
+    assert_eq(Settings.InGame.get_data("player_status_by_id")["3"], "eliminated")
     yield(get_tree(), 'idle_frame')
     
 func test_p3_has_1_death_for_player_1():
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")["1"], 1)
     yield(get_tree(), 'idle_frame')
 
-func test_p3_has_1_kill_for_player_2():
-    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 1)
+func test_p3_has_2_kills_for_player_2():
+    assert_eq(Settings.InGame.get_data("player_kills_by_id")["2"], 2)
+    yield(get_tree(), 'idle_frame')
+    
+func test_p3_has_1_death_for_p3():
+    assert_eq(Settings.InGame.get_data("player_deaths_by_id")["3"], 1)
     yield(get_tree(), 'idle_frame')
 
 func test_p3_yield_to_show_result():
@@ -159,4 +194,9 @@ func test_p3_yield_to_show_result():
     print(_obj.current_scene.game_history.size())
     print(_obj.current_scene.game_history)
     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    yield(get_tree().create_timer(1.0), "timeout")
+    yield(get_tree(), 'idle_frame')
+
+func test_p3_wait_for_coordinated_exit():
+    while Settings.InGame.get_data("Testing_Complete") == null:
+        yield(get_tree(), 'idle_frame')
+    yield(get_tree(), 'idle_frame')
