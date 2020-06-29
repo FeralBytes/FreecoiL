@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=2]
+[gd_scene load_steps=49 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -219,6 +219,27 @@ func update_time_remaining(new_val):
 "
 
 [sub_resource type="GDScript" id=17]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_type\"), self, \"update_weapon_type\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_total_ammo\"), self, \"update_weapon_type\")
+
+
+func update_weapon_type(__):
+    var new_wpn = Settings.Session.get_data(\"game_weapon_type\")
+    var wpn_ammo = Settings.Session.get_data(\"game_weapon_total_ammo\")
+    text = new_wpn + \" total ammo = \" + str(wpn_ammo)
+"
+
+[sub_resource type="GDScript" id=18]
 script/source = "extends Button
 
 
@@ -241,7 +262,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Button
 
 
@@ -261,11 +282,13 @@ func _ready():
 
 
 func _on_Button_pressed():
+    get_parent().get_parent().get_parent().get_parent().catch_up_active = true  # InGame Node.
+    yield(get_tree(), \"idle_frame\")
     get_tree().call_group(\"Network\", \"reset_networking\")
     get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
 "
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Label
 
 
@@ -297,7 +320,7 @@ func update_text_based_on_network_peers(mups_network_status):
         text = \"Scoreboard (Missing Data)\"
 "
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=21]
 script/source = "extends OptionButton
 
 
@@ -498,11 +521,11 @@ func _on_OptionButton_pressed():
     get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
 "
 
-[sub_resource type="DynamicFont" id=21]
+[sub_resource type="DynamicFont" id=22]
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=23]
 script/source = "extends Button
 
 onready var DropDown = get_parent().get_parent().get_node(\"OptionButton\")
@@ -517,11 +540,11 @@ func _on_LeftBumper_pressed():
     DropDown.selected = move_to
 "
 
-[sub_resource type="DynamicFont" id=23]
+[sub_resource type="DynamicFont" id=24]
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=24]
+[sub_resource type="GDScript" id=25]
 script/source = "extends Button
 
 
@@ -537,7 +560,7 @@ func _on_RightBumper_pressed():
     DropDown.selected = move_to
 "
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=26]
 script/source = "extends Button
 
 
@@ -561,17 +584,20 @@ func _on_Button_pressed():
     if text == \"Return to Main Game Screen\":
         get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
     else:
+        get_parent().get_parent().get_parent().get_parent().catch_up_active = true  # InGame Node.
+        yield(get_tree(), \"idle_frame\")
+        get_tree().call_group(\"Network\", \"reset_networking\")
         get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
 "
 
-[sub_resource type="StyleBoxFlat" id=26]
+[sub_resource type="StyleBoxFlat" id=27]
 bg_color = Color( 0.666667, 0.145098, 0, 1 )
 
-[sub_resource type="DynamicFont" id=27]
+[sub_resource type="DynamicFont" id=28]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=29]
 script/source = "extends Label
 
 
@@ -588,7 +614,7 @@ func update_value(new_val):
     text = \"Killed by: \" + new_val
 "
 
-[sub_resource type="GDScript" id=29]
+[sub_resource type="GDScript" id=30]
 script/source = "extends Label
 
 
@@ -610,7 +636,7 @@ func update_time_remaining(new_val):
     text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Label
 
 
@@ -760,9 +786,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
-margin_top = 48.0
+margin_top = 67.0
 margin_right = 540.0
-margin_bottom = 812.0
+margin_bottom = 792.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="CenterContainer" type="CenterContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
@@ -1010,12 +1036,12 @@ text = "Time Remaining: 00:00"
 align = 1
 script = SubResource( 16 )
 
-[node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+[node name="GunType" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
 margin_top = 689.0
 margin_right = 540.0
-margin_bottom = 764.0
-text = "
-"
+margin_bottom = 725.0
+align = 1
+script = SubResource( 17 )
 
 [node name="Header2" parent="0,0-Playing" instance=ExtResource( 2 )]
 on_mainmenu_scene = false
@@ -1062,7 +1088,7 @@ margin_top = 88.0
 margin_right = 540.0
 margin_bottom = 132.0
 text = "View the Final Scores"
-script = SubResource( 17 )
+script = SubResource( 18 )
 
 [node name="HSeparator" type="HSeparator" parent="0,1-End of Game/CenterContainer/VBoxContainer"]
 margin_top = 140.0
@@ -1075,7 +1101,7 @@ margin_top = 178.0
 margin_right = 540.0
 margin_bottom = 222.0
 text = "Return to the Main Menu"
-script = SubResource( 18 )
+script = SubResource( 19 )
 
 [node name="Header2" parent="0,1-End of Game" instance=ExtResource( 2 )]
 my_menu = "0,1"
@@ -1110,14 +1136,14 @@ margin_right = 540.0
 margin_bottom = 36.0
 text = "Scoreboard"
 align = 1
-script = SubResource( 19 )
+script = SubResource( 20 )
 
 [node name="OptionButton" type="OptionButton" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
 margin_top = 44.0
 margin_right = 540.0
 margin_bottom = 88.0
 align = 1
-script = SubResource( 20 )
+script = SubResource( 21 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -1129,9 +1155,9 @@ custom_constants/separation = 12
 margin_right = 39.0
 margin_bottom = 700.0
 theme = ExtResource( 17 )
-custom_fonts/font = SubResource( 21 )
+custom_fonts/font = SubResource( 22 )
 text = "<"
-script = SubResource( 22 )
+script = SubResource( 23 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1154,15 +1180,15 @@ margin_left = 493.0
 margin_right = 532.0
 margin_bottom = 700.0
 theme = ExtResource( 16 )
-custom_fonts/font = SubResource( 23 )
+custom_fonts/font = SubResource( 24 )
 text = ">"
-script = SubResource( 24 )
+script = SubResource( 25 )
 
 [node name="Button" type="Button" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]
 margin_top = 804.0
 margin_right = 540.0
 margin_bottom = 848.0
-script = SubResource( 25 )
+script = SubResource( 26 )
 
 [node name="Header2" parent="-1,1-Scoreboard" instance=ExtResource( 2 )]
 my_menu = "-1,1"
@@ -1196,8 +1222,8 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "You have been Killed."
 align = 1
 
@@ -1205,11 +1231,11 @@ align = 1
 margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "Killed by: Player Name"
 align = 1
-script = SubResource( 28 )
+script = SubResource( 29 )
 
 [node name="HSeparator" type="HSeparator" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_top = 118.0
@@ -1221,8 +1247,8 @@ custom_constants/separation = 100
 margin_top = 226.0
 margin_right = 540.0
 margin_bottom = 277.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "You will respawn"
 align = 1
 
@@ -1230,12 +1256,12 @@ align = 1
 margin_top = 285.0
 margin_right = 540.0
 margin_bottom = 336.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "in: 00:00"
 align = 1
 autowrap = true
-script = SubResource( 29 )
+script = SubResource( 30 )
 
 [node name="RespawnButton" type="Button" parent="1,0-Respawn/CenterContainer/VBoxContainer"]
 margin_top = 344.0
@@ -1275,8 +1301,8 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "You have been Killed."
 align = 1
 
@@ -1284,11 +1310,11 @@ align = 1
 margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "Killed by: Player Name"
 align = 1
-script = SubResource( 28 )
+script = SubResource( 29 )
 
 [node name="HSeparator" type="HSeparator" parent="2,0-Eliminated/CenterContainer/VBoxContainer"]
 margin_top = 118.0
@@ -1300,8 +1326,8 @@ custom_constants/separation = 100
 margin_top = 226.0
 margin_right = 540.0
 margin_bottom = 493.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "You have been eliminated from the game. Please wait for the other players to finish."
 align = 1
 autowrap = true
@@ -1310,11 +1336,11 @@ autowrap = true
 margin_top = 501.0
 margin_right = 540.0
 margin_bottom = 552.0
-custom_styles/normal = SubResource( 26 )
-custom_fonts/font = SubResource( 27 )
+custom_styles/normal = SubResource( 27 )
+custom_fonts/font = SubResource( 28 )
 text = "Death Limit Reached."
 align = 1
-script = SubResource( 30 )
+script = SubResource( 31 )
 
 [node name="Header2" parent="2,0-Eliminated" instance=ExtResource( 2 )]
 my_menu = "2,0"
@@ -1374,6 +1400,8 @@ one_shot = true
 my_menu = "1,-1"
 on_mainmenu_scene = false
 allow_preferences = false
+
+[node name="ObjectiveVoice" type="AudioStreamPlayer" parent="."]
 [connection signal="pressed" from="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" to="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,1-End of Game/CenterContainer/VBoxContainer/Button2" to="0,1-End of Game/CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
 [connection signal="pressed" from="0,1-End of Game/CenterContainer/VBoxContainer/Button" to="0,1-End of Game/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]

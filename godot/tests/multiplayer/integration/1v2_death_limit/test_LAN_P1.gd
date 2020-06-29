@@ -290,6 +290,10 @@ func test_p1_can_return_to_main_menu():
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
         
+func test_p1_network_status_is_correct():
+    assert_eq(Settings.Session.get_data("connection_status"), "do_not_connect")
+    yield(get_tree(), 'idle_frame')
+
 func test_p1_can_click_start_a_networked_game_again():
     var btn = _obj.get_node("Scene0/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")
     btn.emit_signal("pressed")

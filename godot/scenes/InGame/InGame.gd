@@ -27,6 +27,7 @@ onready var ReloadTimer = get_node("ReloadTimer")
 onready var TickTocTimer = get_node("TickTocTimer")
 onready var EventRecordTimer = get_node("EventRecordTimer")
 onready var EndReason = get_node("0,1-End of Game/CenterContainer/VBoxContainer/EndReason")
+onready var ObjectiveVoice = get_node("ObjectiveVoice")
 
 
 func invert_mups_to_lasers(mups_to_lasers):
@@ -56,6 +57,10 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
     Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "connection_status_event")
     rng.randomize()
+    if Settings.InGame.get_data("game_limit_mode") == "time":
+        ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_03.wav")
+    else:
+        ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_02.wav")
     set_player_start_game_vars()
     get_tree().call_group("Network", "tell_server_i_am_ready", true)
 
@@ -111,16 +116,21 @@ func set_player_respawn_vars():
     var weapon_type = start_game_wpn_types[0]
     Settings.Session.set_data("game_player_weapons", start_game_wpn_types)
     Settings.Session.set_data("game_weapon_type", weapon_type)
-    Settings.Session.set_data("game_weapon_damage", Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
-    Settings.Session.set_data("game_weapon_shot_modes", Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
+    Settings.Session.set_data("game_weapon_damage", 
+        Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
+    Settings.Session.set_data("game_weapon_shot_modes", 
+        Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
     Settings.Session.set_data("game_weapon_shot_mode", Settings.Session.get_data("game_weapon_shot_modes")[0])
-    Settings.Session.set_data("game_weapon_magazine_size", Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
+    Settings.Session.set_data("game_weapon_magazine_size", 
+        Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
     Settings.Session.set_data("game_weapon_magazine_ammo", 0)
     Settings.Session.set_data("game_player_health", Settings.InGame.get_data("game_start_health"))
     Settings.Session.set_data("game_player_ammo", Settings.InGame.get_data("game_start_ammo"))
     Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
-    Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
-    Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
+    Settings.Session.set_data("game_weapon_reload_speed", 
+        Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
+    Settings.Session.set_data("game_weapon_rate_of_fire", 
+        Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
     FreecoiLInterface.set_shot_mode(Settings.Session.get_data("game_weapon_shot_mode"),
         Settings.Session.get_data("game_indoor_mode"))
     
@@ -135,6 +145,7 @@ remotesync func remote_start_game_start_delay():
     TickTocTimer.start()
     StartGameTimer.start()
     get_tree().call_group("Container", "next_menu", "-1,-1")
+    ObjectiveVoice.play()
     if get_tree().is_network_server():
         record_game_event("start_game_delay")
     
@@ -187,7 +198,7 @@ func _process(__):
                             game_history.insert(index + 1, event_to_sort)
                             break
                         elif event_to_sort["event_id"] == event["event_id"]:
-                            # Duplication happens, but not as bad as the old system. We may need to return to prevent the processing below.
+                            # Duplication happens, but not as bad as the old system. 
                             break
                         else:
                             pass  # Sort Further down the list.
@@ -195,7 +206,8 @@ func _process(__):
             game_history.append(event_to_sort)
         # Process Alerts
         if game_history.has(event_to_sort):
-            if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): # We already alert off our own events in real time.
+            if event_to_sort["rec_by"] != Settings.Session.get_data("mup_id"): 
+                # We already alert off our own events in real time.
                 if near_time(event_to_sort["client_time"]):
                     if event_to_sort["type"] == "fired":
                         GunShotSound.volume_db = -25
@@ -417,7 +429,8 @@ func connection_status_event(new_status):
 func tick_toc():
     if Settings.Session.get_data("game_started") == 1:
         if Settings.InGame.get_data("game_limit_mode") == "time":
-            Settings.Session.set_data("game_tick_toc_time_remaining", Settings.Session.get_data("game_tick_toc_time_remaining") - 1)
+            Settings.Session.set_data("game_tick_toc_time_remaining", 
+                Settings.Session.get_data("game_tick_toc_time_remaining") - 1)
         Settings.Session.set_data("game_tick_toc_time_elapsed", Settings.Session.get_data("game_tick_toc_time_elapsed") + 1)
         if not Settings.Session.get_data("game_player_alive"):
             Settings.Session.set_data("game_tick_toc_respawn", Settings.Session.get_data("game_tick_toc_respawn") - 1)
@@ -428,7 +441,8 @@ func tick_toc():
 func reload_start():
     FreecoiLInterface.reload_start()
     ReloadTimer.start()
-    var collect_magazine_ammo = Settings.Session.get_data("game_weapon_magazine_ammo") + Settings.Session.get_data("game_weapon_total_ammo")
+    var collect_magazine_ammo = (Settings.Session.get_data("game_weapon_magazine_ammo") + 
+        Settings.Session.get_data("game_weapon_total_ammo"))
     Settings.Session.set_data("game_weapon_total_ammo", collect_magazine_ammo)
     Settings.Session.set_data("game_weapon_magazine_ammo", 0)
     ReloadSound.volume_db = 0
@@ -441,7 +455,8 @@ func reload_finish():
     var remove_magazine_ammo = 0
     if Settings.Session.get_data("game_weapon_total_ammo") > Settings.Session.get_data("game_weapon_magazine_size"):
         Settings.Session.set_data("game_weapon_magazine_ammo", Settings.Session.get_data("game_weapon_magazine_size"))
-        remove_magazine_ammo = Settings.Session.get_data("game_weapon_total_ammo") - Settings.Session.get_data("game_weapon_magazine_size")
+        remove_magazine_ammo = (Settings.Session.get_data("game_weapon_total_ammo") - 
+            Settings.Session.get_data("game_weapon_magazine_size"))
     elif Settings.Session.get_data("game_weapon_total_ammo") == 0:
         Settings.Session.set_data("game_weapon_magazine_ammo", 0)
     else:
@@ -513,14 +528,19 @@ func change_weapon(wpn_name=null):
             counter = 0
         weapon_type = player_wpns[counter]
         Settings.Session.set_data("game_weapon_type", weapon_type)
-        Settings.Session.set_data("game_weapon_damage", Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
-        Settings.Session.set_data("game_weapon_shot_modes", Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
+        Settings.Session.set_data("game_weapon_damage", 
+            Settings.InGame.get_data("game_weapon_types")[weapon_type]["damage"])
+        Settings.Session.set_data("game_weapon_shot_modes", 
+            Settings.InGame.get_data("game_weapon_types")[weapon_type]["shot_modes"])
         Settings.Session.set_data("game_weapon_shot_mode", Settings.Session.get_data("game_weapon_shot_modes")[0])
-        Settings.Session.set_data("game_weapon_magazine_size", Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
+        Settings.Session.set_data("game_weapon_magazine_size", 
+            Settings.InGame.get_data("game_weapon_types")[weapon_type]["magazine_size"])
         Settings.Session.set_data("game_weapon_magazine_ammo", 0)
         Settings.Session.set_data("game_weapon_total_ammo", Settings.Session.get_data("game_player_ammo")[weapon_type])
-        Settings.Session.set_data("game_weapon_reload_speed", Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
-        Settings.Session.set_data("game_weapon_rate_of_fire", Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
+        Settings.Session.set_data("game_weapon_reload_speed", 
+            Settings.InGame.get_data("game_weapon_types")[weapon_type]["reload_speed"])
+        Settings.Session.set_data("game_weapon_rate_of_fire", 
+            Settings.InGame.get_data("game_weapon_types")[weapon_type]["rate_of_fire"])
         FreecoiLInterface.set_shot_mode(Settings.Session.get_data("game_weapon_shot_mode"),
             Settings.Session.get_data("game_indoor_mode"))
         reload_start()

@@ -32,8 +32,12 @@ func check_if_visible(current_menu):
     else:
         menu_is_visible = false
         
-func update_display(laser_connected=0):
+func update_display(laser_connected=-1):
     if menu_is_visible:
+        if laser_connected == -1:
+            laser_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+            if laser_connected == null:
+                laser_connected = 0
         if laser_connected == 0:
             XLbl.text = \"X\"
             XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeBadState\"))

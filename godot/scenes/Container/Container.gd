@@ -50,10 +50,9 @@ func goto_scene(scene_path):
     if loading_state != "idle":
         yield(self, "finished_loading")
     Settings.Log("Going to scene: " + str(scene_path))
+    background_load_scene(scene_path)
     if SceneFader != null:
         get_tree().call_group("SceneFader", "fade_in")
-    #   SceneFader.fade_in()
-    background_load_scene(scene_path)
     
     
 func background_load_scene(scene_path,  resource_type="scene"):

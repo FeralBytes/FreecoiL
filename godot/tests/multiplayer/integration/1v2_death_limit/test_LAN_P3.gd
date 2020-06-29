@@ -196,6 +196,10 @@ func test_p3_can_return_to_main_menu():
     assert_eq(_obj.current_scene.name, "MainMenu")
     while _obj.loading_state != "idle":
         yield(get_tree(), 'idle_frame')
+        
+func test_p3_network_status_is_correct():
+    assert_eq(Settings.Session.get_data("connection_status"), "do_not_connect")
+    yield(get_tree(), 'idle_frame')
     
 func test_p3_can_click_start_a_networked_game_again():
     var btn = _obj.get_node("Scene0/MainMenu/0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2")

@@ -139,6 +139,8 @@ func reset_networking():
     Settings.Session.set_data("server_invite", false)
     Settings.Session.set_data("connection_status", "do_not_connect")
     Settings.Session.set_data("mups_reconnected", [], false, false)
+    Settings.Session.set_data("player_team", 0)
+    Settings.Session.set_data("ui_team_being_viewed", 0)
     yield(get_tree(), "idle_frame")  # Yield at least one time to be a coroutine.
 
 #### SCENETREE SERVER NETWORKING FUNCTIONS

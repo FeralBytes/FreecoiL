@@ -179,6 +179,10 @@ func _on_MainMenu_pressed():
         get_tree().call_group(\"Network\", \"reset_networking\")
         get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
     else:
+        var maybe_ingame = get_parent().get_parent()
+        if maybe_ingame.name == \"InGame\":
+            maybe_ingame.catch_up_active = true  # InGame Node.
+            yield(get_tree(), \"idle_frame\")
         get_tree().call_group(\"Network\", \"reset_networking\")
         get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
     hide_settings_menu_popup()
@@ -189,7 +193,7 @@ func _on_GunBtn_pressed():
 
 
 func _on_RecoilBtn_pressed():
-    var force_recoil = Settings.InGame.get_date(\"force_recoil\")
+    var force_recoil = Settings.InGame.get_data(\"force_recoil\")
     if force_recoil == null or force_recoil == \"dont\":
         FreecoiLInterface.toggle_recoil()
     else:
@@ -341,7 +345,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-beta1 "
+text = " Ver: 0.3.0-rc1 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false

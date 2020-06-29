@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/EN_MV_mission_objective_03.wav-1843f01896be7ac24688fa5c7055e453.sample"
+
+[deps]
+
+source_file="res://assets/voices/EN_MV_mission_objective_03.wav"
+dest_files=[ "res://.import/EN_MV_mission_objective_03.wav-1843f01896be7ac24688fa5c7055e453.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0
