@@ -60,7 +60,10 @@ func _ready():
     if Settings.InGame.get_data("game_limit_mode") == "time":
         ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_03.wav")
     else:
-        ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_02.wav")
+        if Settings.InGame.get_data("game_teams") == true:
+            ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_02.wav")
+        else:
+            ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_01.wav")
     set_player_start_game_vars()
     get_tree().call_group("Network", "tell_server_i_am_ready", true)
 
