@@ -5,15 +5,30 @@
 ### Fixed
 ### Removed
 
-## [0.3.0] - In Development
+## [0.4.0] - In Development
+### Added
+### Changed
+### Fixed
+### Removed
+
+## [0.3.0] - 2020-06-30
 ### Added
 - Added icons and improved the menu to make the different status more obvious to the user.
+- Added more game configuration options, different gun types, more game mode options.
+- Added sounds that now trigger off network events.
+- Added score tracking and score board.
+- Added in game voice guidance.
 ### Changed
 - Changed the settings to an improved module that utilizes signals and can sync across the network.
 - Improved the lobby a lot!
 - Changed the menu and gun connection icons.
+- Dramatically improved menus and reduced the loading time and time between setting up options.
+- Expanded testing to include some unit testing and lots of integration testing to include multiplayer game testing.
 ### Fixed
 - Fixed entering the game without a gun conencted causing a crash and or crashing mid game if a gun disconnects.
+- Fixed networking so that full drop in and out support during a game now works.
+- Fixed existing game options to actually all work without conflicts.
+- Fixed SR-12 battery level reporting.
 ### Removed
 
 ## [0.2.0-rc1] - 2018-11-30
