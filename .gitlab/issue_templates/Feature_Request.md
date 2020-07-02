@@ -5,9 +5,10 @@
 ### Have you thought of alternative implementations?:
 <!-- Explain. -->
 ### Will this impact other features?:
-<!-- List the features it impacts and if able explian how. -->
+<!-- List the features it impacts and if able explain how. -->
 ### Mock Ups:
-<!-- Please attach any images or mockups that you have made. -->
+<!-- Please attach any images or mock-ups that you have made. -->
 ### Do you plan to start a PR for this feature?:
 <!-- If not do you have an idea of how to go about coding the feature? -->
+
 /label ~feature_request

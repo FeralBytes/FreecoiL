@@ -1,0 +1,198 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://assets/images/pistol.png" type="Texture" id=2]
+[ext_resource path="res://assets/fonts/Monoid Regular Nerd Font Complete.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="StyleBoxEmpty" id=1]
+
+[sub_resource type="DynamicFont" id=2]
+size = 300
+font_data = ExtResource( 3 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Button
+
+
+var menu_is_visible = false
+var previous_connection_status = 0
+
+onready var XLbl = get_parent().get_parent().get_node(\"XLbl\")
+onready var GunStatus = get_parent().get_parent().get_node(\"GunStatus\")
+onready var GunSprite = get_parent().get_parent().get_parent().get_parent().get_node(\"GunSprite\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_is_connected\"), self, \"update_display\")
+
+func check_if_visible(current_menu):
+    if current_menu == \"1,-1\":
+        menu_is_visible = true
+        update_display()
+    else:
+        menu_is_visible = false
+        
+func update_display(laser_connected=-1):
+    if menu_is_visible:
+        if laser_connected == -1:
+            laser_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+            if laser_connected == null:
+                laser_connected = 0
+        if laser_connected == 0:
+            XLbl.text = \"X\"
+            XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeBadState\"))
+            GunSprite.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+            GunStatus.text = \"Disconnected From Gun\"
+            text = \"Connect To Gun\"
+            disabled = false
+        elif laser_connected == 1:
+            XLbl.text = \"\"
+            XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeCautionState\"))
+            GunSprite.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+            GunStatus.text = \"Searching For Gun\"
+            text = \"Connecting To Gun\"
+            disabled = true
+        elif laser_connected == 2:
+            XLbl.text = \"\"
+            XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GunSprite.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GunStatus.text = \"Connected To Gun\"
+            text = \"Disconnect Gun\"
+            disabled = false
+        elif laser_connected == 3:
+            XLbl.text = \"X\"
+            XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeBadState\"))
+            GunSprite.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+            GunStatus.text = \"Lost Connection To Gun\"
+            text = \"Connect To Gun\"
+            disabled = false
+        elif laser_connected == 4:
+            XLbl.text = \"\"
+            XLbl.self_modulate= Color(Settings.Session.get_data(\"ThemeCautionState\"))
+            GunSprite.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+            GunStatus.text = \"Searching For Gun\"
+            text = \"Reconnecting To Gun\"
+            disabled = true
+            previous_connection_status = laser_connected
+#    if previous_connection_status == 4:
+#        previous_connection_status = 0
+#        FreecoiLInterface.reload_start()
+#        print(\"Reload Started\")
+#        yield(get_tree(), 'idle_frame')
+#        var force_recoil = Settings.InGame.get_data(\"force_recoil\")
+#        if force_recoil == \"on\":
+#            FreecoiLInterface.enable_recoil(true)
+#        elif force_recoil == \"off\":
+#            FreecoiLInterface.enable_recoil(false)
+#        print(\"Recoil Forced\")
+#        yield(get_tree(), 'idle_frame')
+#        var laser_id = Settings.InGame.get_data(\"player_laser_by_id\")[Settings.Session.get_data(\"mup_id\")]
+#        FreecoiLInterface.set_laser_id(laser_id)
+#        print(\"Laser ID Set\" + str(laser_id))
+#        yield(get_tree(), 'idle_frame')
+#        FreecoiLInterface.reload_finish(Settings.Session.get_data(\"game_weapon_magazine_ammo\"))
+#        print(\"Recload Finished\")
+            
+
+
+func _on_ConnectGunBtn_pressed():
+    var laser_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+    if laser_connected == 0:
+        FreecoiLInterface.connect_to_laser_gun()
+    elif laser_connected == 2:
+        print(\"Not Implemented Yet: Disconnect from gun.\")
+    elif laser_connected == 3:
+        FreecoiLInterface.connect_to_laser_gun()
+    
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", Settings.Session.get_data(\"previous_menu\"))
+"
+
+[node name="1,-1-ConnectGun" type="ReferenceRect"]
+margin_left = 540.0
+margin_top = -960.0
+margin_right = 1080.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GunSprite" type="Sprite" parent="."]
+modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
+position = Vector2( 273.752, 305.865 )
+scale = Vector2( 0.7, 0.7 )
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 590.0
+rect_min_size = Vector2( 540, 460 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_right = 540.0
+margin_bottom = 492.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="XLbl" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 400.0
+rect_min_size = Vector2( 540, 400 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
+custom_colors/font_color = Color( 1, 0.0901961, 0.0901961, 1 )
+text = ""
+align = 1
+
+[node name="GunStatus" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_top = 404.0
+margin_right = 540.0
+margin_bottom = 418.0
+text = "Gun is Disconnected"
+align = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+margin_top = 422.0
+margin_right = 540.0
+margin_bottom = 492.0
+custom_constants/separation = 30
+
+[node name="ConnectGunBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 20.0
+text = "Connect To Gun"
+script = SubResource( 3 )
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 50.0
+margin_right = 540.0
+margin_bottom = 70.0
+text = "Return To Previous Menu"
+script = SubResource( 4 )
+[connection signal="pressed" from="CenterContainer/VBoxContainer/VBoxContainer/ConnectGunBtn" to="CenterContainer/VBoxContainer/VBoxContainer/ConnectGunBtn" method="_on_ConnectGunBtn_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]

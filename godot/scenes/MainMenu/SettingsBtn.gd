@@ -8,14 +8,16 @@ func _ready():
 
 func _on_SettingsBtn_pressed():
     SettingsMenu.popup()
+    SettingsMenu.rect_position = rect_global_position + Vector2(30, 70)
 
 
 func _on_MainMenuBtn_pressed():
     SettingsMenu.hide()
-    SceneManager.goto_scene("res://scenes/MainMenu/MainMenu2.tscn")
+    get_tree().call_group("Container", "next_menu", "0,0")
 
 
 func _on_ToggleRecoil_pressed():
+    FreecoiLInterface.enable_recoil(!FreecoiLInterface.recoil_enabled)
     SettingsMenu.hide()
     LazerInterface.enable_recoil(!LazerInterface.recoil_enabled)
 
@@ -26,3 +28,7 @@ func _on_ExitApp_pressed():
     
 func exit_the_app():
     get_tree().quit()
+
+
+func _on_ChangePlayerName_pressed():
+    get_tree().call_group("Container", "next_menu", "0,-1")

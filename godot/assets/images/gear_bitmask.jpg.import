@@ -1,0 +1,15 @@
+[remap]
+
+importer="bitmap"
+type="BitMap"
+path="res://.import/gear_bitmask.jpg-97afb6cfe51f405dcecdfe5473a61059.res"
+
+[deps]
+
+source_file="res://assets/images/gear_bitmask.jpg"
+dest_files=[ "res://.import/gear_bitmask.jpg-97afb6cfe51f405dcecdfe5473a61059.res" ]
+
+[params]
+
+create_from=0
+threshold=0.5

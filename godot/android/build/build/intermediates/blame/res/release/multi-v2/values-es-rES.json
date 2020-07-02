@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/incremental/mergeReleaseResources/merged.dir/values-es-rES/values-es-rES.xml",
+            "map": [
+                {
+                    "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/res/values-es-rES/values-es-rES.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "78",
+                        "endOffsets": "129"
+                    }
+                }
+            ]
+        }
+    ]
+}

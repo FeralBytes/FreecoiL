@@ -7,7 +7,7 @@ signal Network_changed
 const user_dir = "user://"
 const res_dir = "res://"
 const settings_path = user_dir + "settings.cfg"
-const VERSION = "0.2.1-rc2"
+const VERSION = "0.3.1-dev1"
 
 # 0 : File didn't open
 # 1 : File open
@@ -131,12 +131,12 @@ var Saved = {
         "WarningAlert" : "e0992e",
         "CriticalAlert" : "f44336"
     },
-    "LazercoilDefaults":
+    "FreecoiLDefaults":
     {
         "Speech": 100,
         "SoundEffects": 100
     },
-    "LazercoilPreferences":
+    "FreecoiLPreferences":
     {
         "PlayerName": ""
     },

@@ -1,0 +1,98 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://scenes/Container/Container.gd" type="Script" id=1]
+[ext_resource path="res://scenes/Widgets/ToolTip.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/Container/TheCamera.gd" type="Script" id=3]
+[ext_resource path="res://scenes/SceneFader/SceneFader.tscn" type="PackedScene" id=4]
+[ext_resource path="res://code/networking/TheNetworkNode.tscn" type="PackedScene" id=5]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Label
+
+# Declare member variables here. Examples:
+var lines = []
+# var b = \"text\"
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    self.visible = Settings.DEBUG_GUI
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+func put(line_txt):
+    lines.append(line_txt)
+    if len(lines) > 6:
+        lines.pop_front()
+    var display_lines = \"\"
+    for line in lines:
+        display_lines += line + \"\\n\"
+    self.text = display_lines
+
+func toggle_visibility():
+    self.visible = Settings.DEBUG_GUI
+"
+
+[sub_resource type="Environment" id=2]
+background_mode = 4
+glow_enabled = true
+glow_intensity = 1.0
+glow_blend_mode = 0
+glow_hdr_threshold = 1.01
+glow_bicubic_upscale = true
+
+[node name="Container" type="Node"]
+script = ExtResource( 1 )
+
+[node name="Scene1" type="Node" parent="."]
+
+[node name="Scene0" type="Node" parent="."]
+
+[node name="UI" type="Node" parent="." groups=[
+"UIContainer",
+]]
+
+[node name="PauseMenu" type="Node" parent="." groups=[
+"PauseMenuContainer",
+]]
+
+[node name="Loading" type="Node" parent="."]
+
+[node name="Camera" type="Node" parent="."]
+
+[node name="ToolTip" parent="Camera" instance=ExtResource( 2 )]
+margin_left = -500.0
+margin_top = -100.0
+margin_right = -2420.0
+margin_bottom = -1180.0
+
+[node name="TheCamera" type="Camera2D" parent="Camera"]
+offset = Vector2( 270, 480 )
+rotating = true
+current = true
+script = ExtResource( 3 )
+
+[node name="TopLayer" type="CanvasLayer" parent="Camera"]
+
+[node name="TheNetworkNode" parent="Camera/TopLayer" groups=[
+"Network",
+] instance=ExtResource( 5 )]
+
+[node name="SceneFader" parent="Camera/TopLayer" instance=ExtResource( 4 )]
+
+[node name="DebugOutput" type="Label" parent="Camera/TopLayer" groups=[
+"DebugOutput",
+]]
+modulate = Color( 1, 1, 1, 0.654902 )
+margin_right = 540.0
+margin_bottom = 250.0
+autowrap = true
+max_lines_visible = 12
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource( 2 )

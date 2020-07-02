@@ -1,0 +1,21 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/EN_MV_login2.wav-02082669e05b464c627dff100d08270c.sample"
+
+[deps]
+
+source_file="res://assets/voices/EN_MV_login2.wav"
+dest_files=[ "res://.import/EN_MV_login2.wav-02082669e05b464c627dff100d08270c.sample" ]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop=false
+compress/mode=0

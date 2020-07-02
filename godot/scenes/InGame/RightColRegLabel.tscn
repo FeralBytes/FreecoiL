@@ -1,0 +1,11 @@
+[gd_scene format=2]
+
+[node name="Label2" type="Label"]
+margin_left = 250.0
+margin_right = 430.0
+margin_bottom = 75.0
+rect_min_size = Vector2( 180, 0 )
+size_flags_vertical = 1
+text = "Average Life Length"
+align = 1
+autowrap = true

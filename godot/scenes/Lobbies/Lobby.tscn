@@ -1,0 +1,1014 @@
+[gd_scene load_steps=25 format=2]
+
+[ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
+[ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=3]
+[ext_resource path="res://assets/themes/default/default_LeftBumper.theme" type="Theme" id=4]
+[ext_resource path="res://assets/themes/default/default_RightBumper.theme" type="Theme" id=5]
+[ext_resource path="res://assets/themes/default/default_LineEdit.theme" type="Theme" id=6]
+[ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/voices/EN_MV_lobby.wav" type="AudioStream" id=8]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends ReferenceRect
+
+onready var WelcomeLobbyAudio = get_parent().get_node(\"WelcomeLobbyAudio\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    if get_tree().is_network_server():
+        Settings.Session.connect(Settings.Session.monitor_data(\"all_ready\"), self, \"set_player_laser_ids\")
+    get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    WelcomeLobbyAudio.play()
+
+
+func set_player_laser_ids(all_ready):
+    if all_ready:
+        if get_tree().is_network_server():
+            var player_laser_by_id = {}
+            var player_score_by_id = {}
+            var player_deaths_by_id = {}
+            var player_status_by_id = {}
+            var player_assists_by_id = {}
+            var mups_ready = Settings.Network.get_data(\"mups_ready\").duplicate()  # Reuse
+            if Settings.InGame.get_data(\"game_teams\"):
+                var player_team_by_id = Settings.InGame.get_data(\"player_team_by_id\")
+                var game_number_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+                var players_per_team = int(Settings.MAX_PLAYERS / game_number_of_teams)
+                var game_teams_by_team_num_by_id = Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")
+                for mups_id in mups_ready:
+                    var player_team = player_team_by_id[mups_id]
+                    var player_team_index_pos = game_teams_by_team_num_by_id[player_team].find(mups_id)
+                    player_laser_by_id[mups_id] = ((player_team - 1) * players_per_team) + player_team_index_pos + 1
+                var game_team_scores = []
+                var team_name_by_num = []
+                for team_num in range (game_number_of_teams + 1):
+                    game_team_scores.append(0)
+                    team_name_by_num.append(team_num)
+                Settings.InGame.set_data(\"game_team_scores\", game_team_scores)
+                Settings.InGame.set_data(\"team_name_by_num\", team_name_by_num)
+                Settings.InGame.set_data(\"game_team_elimination_order\", [])
+            else:
+                for mups_id in mups_ready:
+                    player_laser_by_id[mups_id] = int(mups_id)
+            for mups_id in mups_ready:
+                player_score_by_id[mups_id] = 0
+                player_deaths_by_id[mups_id] = 0
+                player_status_by_id[mups_id] = \"dead\"
+                player_assists_by_id[mups_id] = 0
+            Settings.InGame.set_data(\"player_laser_by_id\", player_laser_by_id)
+            Settings.InGame.set_data(\"game_history\", [])
+            Settings.InGame.set_data(\"game_actions_count\", 0)
+            Settings.InGame.set_data(\"player_kills_by_id\", player_score_by_id)
+            Settings.InGame.set_data(\"player_deaths_by_id\", player_deaths_by_id)
+            Settings.InGame.set_data(\"player_assists_by_id\", player_assists_by_id)
+            Settings.InGame.set_data(\"player_status_by_id\", player_status_by_id)
+            get_tree().call_group(\"Network\", \"unready_all_mups\")
+            get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/InGame/InGame.tscn\")
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends OptionButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"change_index\")
+    add_item(\"Teams Lobby\")
+    set_item_metadata(0, \"0,0\")
+    add_item(\"Player Details\")
+    set_item_metadata(1, \"0,1\")
+    add_item(\"Game Settings\")
+    set_item_metadata(2, \"0,-1\")
+
+func change_index(menu):
+    if menu == \"0,0\":
+        selected = 0
+    elif menu == \"0,1\":
+        selected = 1
+    elif menu == \"0,-1\":
+        selected = 2
+    else:
+        selected = 0
+
+
+func _on_LobbyDropDown_item_selected(index):
+    var resource_path = get_item_metadata(index)
+    if resource_path != null:
+        get_tree().call_group(\"Container\", \"next_menu\", resource_path)
+
+
+func _on_LobbyDropDown_pressed():
+    get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_respawn_delay\"), self, \"update_host_status\")
+    if Settings.InGame.get_data(\"game_respawn_delay\") != null:
+        update_host_status(null)
+
+
+func update_host_status(__):
+    text = \"The Host has joined the lobby.\"
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    update_teams(Settings.InGame.get_data(\"game_teams\"))
+
+
+func update_teams(teams):
+    if teams:
+        text = 'Teams are turned \"ON\".'
+    else:
+        text = 'Teams are turned \"OFF\".'
+"
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Button
+
+
+onready var Team = get_parent().get_node(\"HBoxContainer/VBoxContainer/Team\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Network.connect(Settings.Network.monitor_data(\"player_team_by_id\"), self, \"check_if_team_assigned\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"check_if_team_assigned\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"check_if_team_assigned\")
+    check_if_team_assigned(null)
+    
+func check_if_team_assigned(__):
+    if Settings.Session.get_data(\"player_team\") == null:
+        Settings.Session.set_data(\"player_team\", 0)
+    if Settings.InGame.get_data(\"game_teams\"):
+        if Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+            text = \"Pick a team other than Team 0.\"
+            disabled = true
+        elif Settings.Session.get_data(\"ui_team_being_viewed\") == Settings.Session.get_data(\"player_team\"):
+            text = \"You Are On This Team\"
+            disabled = true
+        else:
+            text = \"Join This Team\"
+            disabled = false
+    else:
+        text = \"Teams are Disabled\"
+        disabled = true
+
+
+
+func _on_Button_pressed():
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
+    Settings.Session.set_data(\"player_team\", new_team)
+    get_tree().call_group(\"Network\", \"set_player_team\")
+    
+"
+
+[sub_resource type="DynamicFont" id=6]
+size = 50
+font_data = ExtResource( 1 )
+
+[sub_resource type="GDScript" id=7]
+script/source = "extends VBoxContainer
+
+
+onready var LeftBtn = get_parent().get_parent().get_parent().get_node(\"LeftBtn\")
+onready var RightBtn = get_parent().get_parent().get_parent().get_node(\"RightBtn\")
+onready var TeamNumLbl = get_parent().get_parent().get_node(\"Team\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.set_data(\"player_team\", 0)
+    Settings.Session.set_data(\"ui_team_being_viewed\", 0) 
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams_by_team_num_by_id\"), self, \"update_team_list\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"player_team\"), self, \"update_team_list\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"ui_team_being_viewed\"), self, \"update_team_list\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_team_list\")
+    Settings.Network.connect(Settings.Network.monitor_data(\"mups_ready\"), self, \"update_team_list\")
+    update_team_list(null)
+
+
+func update_team_list(__):
+    if Settings.InGame.get_data(\"game_teams\"):
+        LeftBtn.disabled = false
+        RightBtn.disabled = false
+        if Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+            TeamNumLbl.text = \"Rogue Players (No Team)\"
+        else:
+            TeamNumLbl.text = \"Team \" + str(Settings.Session.get_data(\"ui_team_being_viewed\"))
+    else:
+        LeftBtn.disabled = true
+        RightBtn.disabled = true
+        TeamNumLbl.text = \"Rogue Players (No Team)\"
+        Settings.Session.set_data(\"ui_team_being_viewed\", 0, false, false)
+    for child in get_children():
+        child.queue_free()
+    if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) > 0:
+        var mups_ready = Settings.Network.get_data(\"mups_ready\")
+        if len(Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")) - 1 >= Settings.Session.get_data(\"ui_team_being_viewed\"):
+            for entry in Settings.InGame.get_data(\"game_teams_by_team_num_by_id\")[Settings.Session.get_data(\"ui_team_being_viewed\")]:
+                var player_names = Settings.InGame.get_data(\"player_name_by_id\")
+                if entry in player_names:
+                    var player_name = player_names[entry]
+                    var new_player_btn = Button.new()
+                    new_player_btn.text = player_name
+                    new_player_btn.rect_min_size.x = 250
+                    new_player_btn.clip_text = true
+                    new_player_btn.connect(\"pressed\", self, \"on_player_entry_clicked\", [entry])
+                    var ready_btn = Button.new()
+                    if Settings.Session.get_data(\"mup_id\") != entry:
+                        ready_btn.disabled = true
+                    if mups_ready.has(entry):
+                        if mups_ready[entry] == true:
+                            ready_btn.text = \"Ready\"
+                            ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+                        else:
+                            if Settings.InGame.get_data(\"game_teams\") and Settings.Session.get_data(\"ui_team_being_viewed\") == 0:
+                                ready_btn.text = \"Pick a Team\"
+                                ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+                            else:
+                                ready_btn.text = \"Not Ready\"
+                            ready_btn.modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+                    else:
+                        ready_btn.text = \"Not Ready\"
+                        ready_btn.modulate = Color(\"ff0505\")
+                    ready_btn.rect_min_size.x = 160
+                    ready_btn.connect(\"pressed\", self, \"on_player_ready\", [ready_btn, entry])
+                    var hbox_container = HBoxContainer.new()
+                    hbox_container.add_constant_override(\"separation\", 10)
+                    hbox_container.alignment = BoxContainer.ALIGN_CENTER
+                    hbox_container.rect_min_size.x = 430
+                    hbox_container.add_child(new_player_btn)
+                    hbox_container.add_child(ready_btn)
+                    add_child(hbox_container)
+
+func mups_not_ready(btn, mups_ready):
+    btn.modulate = Color(\"ff0505\")
+    btn.text = \"Not Ready\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = false
+    return mups_ready
+    
+func mups_pick_team(btn, mups_ready):
+    btn.modulate = Color(\"ff0505\")
+    btn.text = \"Pick a Team\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = false
+    return mups_ready
+
+func mups_ready(btn, mups_ready):
+    btn.modulate = Color(\"03ff13\")
+    btn.text = \"Ready\"
+    mups_ready[Settings.Session.get_data(\"mup_id\")] = true
+    return mups_ready 
+
+func on_player_ready(btn, entry):
+    if Settings.Session.get_data(\"mup_id\") == entry:
+        var mups_status = Settings.Network.get_data(\"mups_ready\").duplicate()
+        if btn.modulate == Color(\"ff0505\"):  # Red
+            if Settings.InGame.get_data(\"game_teams\"):
+                if Settings.InGame.get_data(\"player_team_by_id\")[Settings.Session.get_data(\"mup_id\")] == 0:
+                    mups_status = mups_pick_team(btn, mups_status)
+                else:
+                    mups_status = mups_ready(btn, mups_status)
+            else:
+                mups_status = mups_ready(btn, mups_status)
+        else:
+            mups_status = mups_not_ready(btn, mups_status)
+        if mups_status != Settings.Network.get_data(\"mups_ready\"):
+            get_tree().call_group(\"Network\", \"tell_server_i_am_ready\", mups_status[Settings.Session.get_data(\"mup_id\")])
+
+func on_player_entry_clicked(name):
+    print(\"on_player_entry_clicked() \" + str(name))
+
+func _on_LeftBtn_pressed():
+    var game_num_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+    if game_num_of_teams == null:
+        return
+    elif Settings.InGame.get_data(\"game_teams\") == false:
+        return
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
+    if new_team == 0:
+        new_team = game_num_of_teams
+    else:
+        new_team = new_team - 1
+    Settings.Session.set_data(\"ui_team_being_viewed\", new_team)
+
+
+func _on_RightBtn_pressed():
+    var game_num_of_teams = Settings.InGame.get_data(\"game_number_of_teams\")
+    if game_num_of_teams == null:
+        return
+    elif Settings.InGame.get_data(\"game_teams\") == false:
+        return
+    var new_team = Settings.Session.get_data(\"ui_team_being_viewed\")
+    if new_team == game_num_of_teams:
+        new_team = 0
+    else:
+        new_team = new_team + 1
+    Settings.Session.set_data(\"ui_team_being_viewed\", new_team)
+"
+
+[sub_resource type="DynamicFont" id=8]
+size = 50
+font_data = ExtResource( 1 )
+
+[sub_resource type="StyleBoxFlat" id=9]
+bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
+corner_radius_top_left = 50
+corner_radius_bottom_left = 50
+
+[sub_resource type="StyleBoxFlat" id=10]
+bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
+corner_radius_top_right = 50
+corner_radius_bottom_right = 50
+
+[sub_resource type="GDScript" id=11]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_scenario\"), self, \"update_match_scenario\")
+    if Settings.InGame.get_data(\"game_scenario\") != null:
+        update_match_scenario(Settings.InGame.get_data(\"game_scenario\"))
+
+func update_match_scenario(scenario):
+    if scenario == \"custom\":
+        text = \"Custom\"
+"
+
+[sub_resource type="GDScript" id=12]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_teams\"), self, \"update_teams\")
+    update_teams(Settings.InGame.get_data(\"game_teams\"))
+
+
+func update_teams(teams):
+    if teams:
+        text = \"ON\"
+    else:
+        text = \"OFF\"
+"
+
+[sub_resource type="GDScript" id=13]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_number_of_teams\"), self, \"update_num_teams\")
+    update_num_teams(Settings.InGame.get_data(\"game_number_of_teams\"))
+
+
+func update_num_teams(num_of_teams):
+    text = str(num_of_teams)
+    if num_of_teams == null:
+        text = \"0 (No Teams)\"
+    elif num_of_teams == 0:
+        text += \"0 (No Teams)\"
+"
+
+[sub_resource type="GDScript" id=14]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_indoor_mode\"), self, \"update_indoor_outdoor\")
+    update_indoor_outdoor(Settings.InGame.get_data(\"game_indoor_mode\"))
+
+func update_indoor_outdoor(indoor):
+    if indoor == null:
+        text = \"Unknown\"
+    elif indoor:
+        text = \"Indoors\"
+    else:
+        text = \"Outdoors\"
+"
+
+[sub_resource type="GDScript" id=15]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_limit_mode\"), self, \"update_limit_mode\")
+    update_limit_mode(Settings.InGame.get_data(\"game_limit_mode\"))
+
+func update_limit_mode(mode):
+    if mode == null:
+        text = \"Unknown\"
+    elif mode == \"time\":
+        text = \"Time\"
+    elif mode == \"deaths\":
+        text = \"deaths\"
+"
+
+[sub_resource type="GDScript" id=16]
+script/source = "extends LineEdit
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"game_respawn_delay\"), self, \"update_respawn_delay\")
+    update_respawn_delay(Settings.InGame.get_data(\"game_respawn_delay\"))
+
+
+func update_respawn_delay(delay):
+    if delay == null:
+        text = \"Unknown\"
+    else:
+        text = str(delay)
+"
+
+[node name="Lobbies" type="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+theme = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="0,0-Game Lobby" type="ReferenceRect" parent="."]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Game Lobby"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 946.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer"]
+margin_left = 2.0
+margin_right = 542.0
+margin_bottom = 876.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 540, 0 )
+text = "Game Lobby"
+align = 1
+script = SubResource( 2 )
+
+[node name="Label2" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 540.0
+margin_bottom = 88.0
+text = "The host is  setting up the game."
+align = 1
+script = SubResource( 3 )
+
+[node name="Teams" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 540.0
+margin_bottom = 132.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 4 )
+
+[node name="JoinTeam" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 140.0
+margin_right = 540.0
+margin_bottom = 184.0
+script = SubResource( 5 )
+
+[node name="Label" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 125.0
+text = "Network Match Lobby"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
+margin_top = 192.0
+margin_right = 540.0
+margin_bottom = 876.0
+custom_constants/separation = 12
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 43.0
+margin_bottom = 684.0
+theme = ExtResource( 4 )
+custom_fonts/font = SubResource( 6 )
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 55.0
+margin_right = 485.0
+margin_bottom = 684.0
+rect_min_size = Vector2( 430, 0 )
+alignment = 1
+
+[node name="Team" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 430.0
+margin_bottom = 36.0
+text = "Rogue Players (No Team)"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 430.0
+margin_bottom = 684.0
+rect_min_size = Vector2( 430, 640 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 118.0
+rect_min_size = Vector2( 430, 0 )
+custom_constants/separation = 30
+script = SubResource( 7 )
+
+[node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 44.0
+text = "Joe"
+
+[node name="Button2" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_top = 74.0
+margin_right = 430.0
+margin_bottom = 118.0
+text = "Joe"
+
+[node name="RightBtn" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 497.0
+margin_right = 536.0
+margin_bottom = 684.0
+theme = ExtResource( 5 )
+custom_fonts/font = SubResource( 8 )
+text = ">"
+
+[node name="Header2" parent="0,0-Game Lobby" instance=ExtResource( 3 )]
+on_mainmenu_scene = false
+allow_preferences = false
+
+[node name="0,1-Player Details" type="ReferenceRect" parent="."]
+margin_top = 960.0
+margin_right = 540.0
+margin_bottom = 1920.0
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,1-Player Details"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer"]
+margin_left = 2.0
+margin_top = 12.0
+margin_right = 542.0
+margin_bottom = 848.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 540, 0 )
+align = 1
+script = SubResource( 2 )
+
+[node name="Label2" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 540.0
+margin_bottom = 88.0
+text = "The host is setting up the game."
+align = 1
+script = SubResource( 3 )
+
+[node name="Teams" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 540.0
+margin_bottom = 132.0
+text = "Teams are turned \"OFF\"."
+align = 1
+script = SubResource( 4 )
+
+[node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 140.0
+margin_right = 540.0
+margin_bottom = 184.0
+script = SubResource( 5 )
+
+[node name="Label" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 90.0
+margin_right = 540.0
+margin_bottom = 125.0
+text = "Network Match Lobby"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
+margin_top = 192.0
+margin_right = 540.0
+margin_bottom = 836.0
+custom_constants/separation = 12
+alignment = 1
+
+[node name="LeftBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 4.0
+margin_right = 43.0
+margin_bottom = 644.0
+custom_styles/normal = SubResource( 9 )
+custom_fonts/font = SubResource( 6 )
+text = "<"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 55.0
+margin_right = 485.0
+margin_bottom = 644.0
+rect_min_size = Vector2( 430, 0 )
+alignment = 1
+
+[node name="Team" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_right = 430.0
+margin_bottom = 36.0
+text = "Rogue Players (No Team)!"
+align = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 430.0
+margin_bottom = 644.0
+rect_min_size = Vector2( 430, 600 )
+scroll_horizontal_enabled = false
+
+[node name="TeamContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer"]
+margin_right = 430.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 430, 0 )
+script = SubResource( 7 )
+
+[node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
+margin_right = 430.0
+margin_bottom = 44.0
+text = "Joe"
+
+[node name="RightBtn" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 497.0
+margin_right = 536.0
+margin_bottom = 644.0
+custom_styles/normal = SubResource( 10 )
+custom_fonts/font = SubResource( 8 )
+text = ">"
+
+[node name="Header2" parent="0,1-Player Details" instance=ExtResource( 3 )]
+my_menu = "0,1"
+on_mainmenu_scene = false
+allow_preferences = false
+
+[node name="0,-1-Game Settings" type="ReferenceRect" parent="."]
+margin_top = -960.0
+margin_right = 540.0
+margin_bottom = -6.10352e-05
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,-1-Game Settings"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer"]
+margin_top = 187.0
+margin_right = 540.0
+margin_bottom = 673.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="LobbyDropDown" type="OptionButton" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 44.0
+rect_min_size = Vector2( 540, 0 )
+align = 1
+script = SubResource( 2 )
+
+[node name="Label2" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 52.0
+margin_right = 540.0
+margin_bottom = 88.0
+text = "The host is setting up the game."
+align = 1
+script = SubResource( 3 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 540.0
+margin_bottom = 486.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 40.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "Scenario type:"
+clip_text = true
+
+[node name="Scenario" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "Unknown"
+align = 2
+script = SubResource( 11 )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 70.0
+margin_right = 540.0
+margin_bottom = 110.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "Teams are turned:"
+clip_text = true
+
+[node name="Teams" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "Off"
+align = 2
+script = SubResource( 12 )
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 140.0
+margin_right = 540.0
+margin_bottom = 180.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "Number of Teams:"
+clip_text = true
+
+[node name="NumOfTeams" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer3"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "0 (No Teams)"
+align = 2
+script = SubResource( 13 )
+
+[node name="HBoxContainer4" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 210.0
+margin_right = 540.0
+margin_bottom = 250.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "The match is played:"
+clip_text = true
+
+[node name="InOrOut" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer4"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "Unknown"
+align = 2
+script = SubResource( 14 )
+
+[node name="HBoxContainer5" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 280.0
+margin_right = 540.0
+margin_bottom = 320.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer5"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "Game ending limit:"
+clip_text = true
+
+[node name="GameEnding" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer5"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "Unknown"
+align = 2
+script = SubResource( 15 )
+
+[node name="HBoxContainer6" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
+margin_top = 350.0
+margin_right = 540.0
+margin_bottom = 390.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer6"]
+margin_top = 2.0
+margin_right = 300.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 300, 0 )
+text = "Respawn delay:"
+clip_text = true
+
+[node name="RespawnDelay" type="LineEdit" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer/HBoxContainer6"]
+margin_left = 304.0
+margin_right = 539.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 235, 0 )
+theme = ExtResource( 6 )
+text = "Unknown"
+align = 2
+script = SubResource( 16 )
+
+[node name="Header2" parent="0,-1-Game Settings" instance=ExtResource( 3 )]
+my_menu = "0,-1"
+on_mainmenu_scene = false
+allow_preferences = false
+
+[node name="1,0-Name Conflict" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_right = 1080.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="1,0-Name Conflict"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="1,0-Name Conflict/CenterContainer"]
+margin_top = 325.0
+margin_right = 540.0
+margin_bottom = 535.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label2" type="Label" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 114.0
+text = "You have a Callsign conflict with another player, and the other player was in the lobby first."
+align = 1
+autowrap = true
+
+[node name="Label" type="Label" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 122.0
+margin_right = 540.0
+margin_bottom = 158.0
+text = "Please change your callsign."
+align = 1
+
+[node name="LineEdit" type="LineEdit" parent="1,0-Name Conflict/CenterContainer/VBoxContainer"]
+margin_top = 166.0
+margin_right = 540.0
+margin_bottom = 210.0
+max_length = 13
+
+[node name="Header2" parent="1,0-Name Conflict" instance=ExtResource( 3 )]
+my_menu = "1,0"
+on_mainmenu_scene = false
+allow_preferences = false
+
+[node name="1,-1-ConnectGun" parent="." instance=ExtResource( 7 )]
+
+[node name="Header2" parent="1,-1-ConnectGun" instance=ExtResource( 3 )]
+my_menu = "1,-1"
+on_mainmenu_scene = false
+allow_preferences = false
+
+[node name="WelcomeLobbyAudio" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 8 )
+[connection signal="item_selected" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" to="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+[connection signal="item_selected" from="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" to="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" to="0,1-Player Details/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/Button" to="0,1-Player Details/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/LeftBtn" to="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_LeftBtn_pressed" flags=3]
+[connection signal="pressed" from="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/RightBtn" to="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer" method="_on_RightBtn_pressed" flags=3]
+[connection signal="item_selected" from="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" to="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
+[connection signal="pressed" from="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" to="0,-1-Game Settings/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]

@@ -1,0 +1,236 @@
+[gd_scene load_steps=8 format=2]
+
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
+[ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    if Settings.Session.get_data(\"fi_laser_is_connected\") == 2:
+        text = \"Connected to \" + str(FreecoiLInterface.laser_gun_id)
+    else:
+        text = \"Connect Gun\"
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button_pressed():
+    if Settings.Session.get_data(\"fi_laser_is_connected\") == 2:
+        pass
+    else:
+        FreecoiLInterface.connect_to_laser_gun()
+"
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    add_to_group(\"FreecoiL\")
+    if FreecoiLInterface.recoil_enabled:
+        text = \"Recoil Enabled: Press to Disable.\"
+    else:
+        text = \"Recoil Disabled: Press to Enable.\"
+
+func fi_recoil_enabled_changed():
+    if FreecoiLInterface.recoil_enabled:
+        text = \"Recoil Enabled: Press to Disable.\"
+    else:
+        text = \"Recoil Disabled: Press to Enable.\"
+
+
+func _on_Button2_pressed():
+    FreecoiLInterface.enable_recoil(!FreecoiLInterface.recoil_enabled)
+"
+
+[sub_resource type="GDScript" id=3]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button3_pressed():
+    Settings.DEBUG_GUI = !Settings.DEBUG_GUI
+    get_tree().call_group(\"DebugOutput\", \"toggle_visibility\")
+"
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends OptionButton
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    add_item(\"Do Not Load A Scene For Testing\")
+    set_item_metadata(0, null)
+    add_item(\"Load 'Lobby' For Testing\")
+    set_item_metadata(1, \"res://scenes/Lobbies/Lobby.tscn\")
+    add_item(\"Load 'InGame' For Testing\")
+    set_item_metadata(2, \"res://scenes/InGame/InGame.tscn\")
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_OptionButton_item_selected(index):
+    var resource_path = get_item_metadata(index)
+    if resource_path != null:
+        if resource_path == \"res://scenes/InGame/InGame.tscn\":
+            Settings.Session.set_data(\"mup_id\", \"1\")
+            Settings.InGame.set_data(\"player_laser_by_id\", {\"1\": 1})
+            Settings.InGame.set_data(\"player_name_by_id\", {\"1\": \"Tester\"})
+            Settings.InGame.set_data(\"game_start_delay\", 5)
+            Settings.InGame.set_data(\"game_limit_mode\", \"time\")
+            Settings.InGame.set_data(\"game_time_limit\", 120)
+            Settings.InGame.set_data(\"game_indoor_mode\", true)
+            Settings.InGame.set_data(\"game_teams\", true)
+            Settings.InGame.set_data(\"game_number_of_teams\", 2)
+            Settings.InGame.set_data(\"player_team_by_id\", {\"1\": 1})
+            Settings.InGame.set_data(\"game_teams_by_team_num_by_id\", [[], [\"1\"], [\"2\"]])
+            Settings.InGame.set_data(\"game_weapon_types\",{\"M9\": {\"magazine_size\": 15, \"damage\": 1, 
+                \"shot_modes\": [\"semi-automatic\"], \"reload_speed\": 3, \"rate_of_fire\": 0.3}})
+            Settings.InGame.set_data(\"game_start_weapon_type\", \"M9\")
+            Settings.InGame.set_data(\"game_start_health\", 30)
+            Settings.InGame.set_data(\"game_start_ammo\", {\"M9\": 300})
+            Settings.InGame.set_data(\"game_friendly_fire\", false)
+            Settings.InGame.set_data(\"game_respawn_delay\", 5)
+        get_tree().call_group(\"Container\", \"goto_scene\", resource_path)
+
+
+func _on_OptionButton_pressed():
+    get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
+"
+
+[sub_resource type="GDScript" id=5]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button4_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
+"
+
+[node name="Tests" type="Control"]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+theme = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 560.0
+rect_min_size = Vector2( 540, 460 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_top = 108.0
+margin_right = 540.0
+margin_bottom = 352.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Tests"
+align = 1
+
+[node name="Button" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 88.0
+text = "Connect to Gun"
+script = SubResource( 1 )
+
+[node name="Button2" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 96.0
+margin_right = 540.0
+margin_bottom = 140.0
+text = "Enable Recoil"
+script = SubResource( 2 )
+
+[node name="Button3" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 148.0
+margin_right = 540.0
+margin_bottom = 192.0
+text = "Enable/Disable Debug Output"
+script = SubResource( 3 )
+
+[node name="OptionButton" type="OptionButton" parent="CenterContainer/VBoxContainer"]
+visible = false
+margin_top = 200.0
+margin_right = 540.0
+margin_bottom = 244.0
+align = 1
+script = SubResource( 4 )
+
+[node name="Button4" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 200.0
+margin_right = 540.0
+margin_bottom = 244.0
+text = "Test"
+script = SubResource( 5 )
+
+[node name="Header2" parent="." instance=ExtResource( 2 )]
+my_menu = "-1,0"
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button" to="CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button2" to="CenterContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button3" to="CenterContainer/VBoxContainer/Button3" method="_on_Button3_pressed" flags=3]
+[connection signal="item_selected" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/OptionButton" to="CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Button4" to="CenterContainer/VBoxContainer/Button4" method="_on_Button4_pressed" flags=3]

@@ -35,8 +35,8 @@ func _on_NumOfTeams_PMWidChanged(new_val):
     if SetConf.Session.teams:
         if new_val <= 1:
             NumOfTeams.set_val(2)
-        elif new_val >= LazerInterface.MAX_TEAMS + 1:
-            NumOfTeams.set_val(LazerInterface.MAX_TEAMS)
+        elif new_val >= FreecoiLInterface.MAX_TEAMS + 1:
+            NumOfTeams.set_val(FreecoiLInterface.MAX_TEAMS)
         else:
             SetConf.Session.num_of_teams = new_val
     else:

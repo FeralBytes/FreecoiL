@@ -6,7 +6,7 @@ onready var HostPopup = get_node("HostSetupPopup")
 func _ready():
     add_to_group("networking")
     add_to_group("lobby")
-    NetworkingCode.setup_as_host()
+    get_tree().call_group("Network", "setup_server_part1")
     
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -15,7 +15,7 @@ func _ready():
 
 
 func _on_GoToLobby_pressed():
-    SceneManager.goto_scene("res://scenes/Lobbies/NetworkLobby.tscn")
+    get_tree().call_group("Container", "goto_scene", "res://scenes/Lobbies/NetworkLobby.tscn")
 
 ##########################################
 # "networking" group calls
@@ -43,7 +43,7 @@ func lobby_hide_popup():
     HostPopup.hide()
 
 func _on_CustomMatchSetupBtn_pressed():
-    SceneManager.goto_scene("res://scenes/Setups/NetworkSetupCustom2.tscn")
+    get_tree().call_group("Container", "goto_scene", "res://scenes/Setups/NetworkSetupCustom2.tscn")
 
 
 func _on_ScenariomatchSetupBtn_pressed():

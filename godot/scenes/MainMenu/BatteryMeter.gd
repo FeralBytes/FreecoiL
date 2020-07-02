@@ -2,11 +2,14 @@ extends TextureProgress
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    SetConf.Session.connect("Session_battery_lvl_changed", self, "update_battery")
-    update_battery()
+    Settings.Session.connect(Settings.Session.monitor_data("battery_lvl"), self, "update_battery")
+    update_battery(Settings.Session.get_data("battery_lvl"))
 
-func update_battery():
-    value = SetConf.Session.battery_lvl
+func update_battery(new_val):
+    if new_val == null:
+        value = 0
+    else:
+        value = new_val
     if value > 82:
         self_modulate = Color("07f210")  # Green
     if value <= 82:

@@ -18,51 +18,42 @@ onready var ConnectPopup = get_node("ConnectPopup")
 onready var ConnectWeapon2 = get_node("ConnectPopup/ConnectWeapon2")
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    add_to_group("lazercoil")
+    add_to_group("FreecoiL")
     add_to_group("connect_weapon")
     blink_timer.connect("timeout", self, "_on_adjust_blink")
     blink_timer.wait_time = 0.02
     add_child(blink_timer)
-    if LazerInterface.state_lazer_gun_is_connected:
+    if FreecoiLInterface.laser_is_connected:
         self.disabled = true
         self.texture_normal = pistol_clear
         self.state = "connected"
     else:
-        li_lazer_gun_disconnected()
+        fi_laser_gun_disconnected()
         
-func delayed_goto_scene():
-    #Trying to fix crash when going to game scene too soon after gun is connected.
-    yield(get_tree().create_timer(0.5), "timeout" )
-    var s = scene
-    scene = null
-    SceneManager.goto_scene(s)
 
-#func li_trigger_btn_pushed():
+#func fi_trigger_btn_pushed():
 #    empty_gun_shot.play()
     
-func li_lazer_gun_connected():
+func fi_laser_gun_connected():
     self.disabled = true
     self.texture_normal = pistol_clear
     Countdown.stop()
     blink_timer.stop()
     set_modulate(Color(1,1,1))
-    if scene != null:
-        call_deferred("delayed_goto_scene")
-    else:
-        ConnectionCompleteSnd.play()
+    ConnectionCompleteSnd.play()
     
-func li_lazer_gun_disconnected():
+func fi_laser_gun_disconnected():
     Countdown.stop()
     blink_timer.start()
     self.disabled = false
     self.texture_normal = pistol_blur
     self.state = "disconnected"
     
-func li_bt_connect_timeout():
-    li_lazer_gun_disconnected()
+func fi_bt_connect_timeout():
+    fi_laser_gun_disconnected()
     
-func li_bt_connection_timed_out():
-    li_lazer_gun_disconnected()
+func fi_bt_connection_timed_out():
+    fi_laser_gun_disconnected()
 
 func _on_ConnectWeapon_pressed():
     self.disabled = true
@@ -70,7 +61,7 @@ func _on_ConnectWeapon_pressed():
     Countdown.start()
     self.state = "connecting"
     self.texture_normal = pistol_clear
-    LazerInterface.connect_to_lazer_gun()
+    FreecoiLInterface.connect_to_laser_gun()
 
 func _on_ConnectWeapon2_pressed():
     ConnectWeapon2.disabled = true
@@ -79,7 +70,8 @@ func _on_ConnectWeapon2_pressed():
     self.state = "connecting"
     self.texture_normal = pistol_clear
     ConnectWeapon2.text = "Connecting..." + "%02d" % countdown
-    LazerInterface.connect_to_lazer_gun()
+    set_modulate(Color(1,1,1))
+    FreecoiLInterface.connect_to_laser_gun()
     
 func _on_adjust_blink():
     if green <= 0:
@@ -87,15 +79,19 @@ func _on_adjust_blink():
     if green >= 1:
         increasing = false
     if increasing:
-        green += 0.02
-        blue += 0.02
         if self.state == "connecting":
             self.texture_normal = pistol_blur
+            green += 0.02
+        else:
+            green += 0.02
+            blue += 0.02
     else:
-        green -= 0.02
-        blue -= 0.02
         if self.state == "connecting":
             self.texture_normal = pistol_clear
+            green -= 0.02
+        else:
+            green -= 0.02
+            blue -= 0.02
     set_modulate(Color(1, green, blue))
 
 
@@ -113,9 +109,10 @@ func _on_Countdown_timeout():
 # connect_weapon group funcs
 ###############################
 func connect_weapon_guard(s):
-    print("SetConf.Saved.SetConf.test = ", SetConf.Saved.SetConf.test)
-    if SetConf.Saved.SetConf.test:
-        SceneManager.goto_scene(s)
+    pass
+    print("SetConf.Saved.SetConf.test = ", Settings.Testing.get_data("SetConf.test"))
+    if Settings.Testing.get_data("SetConf.test") == null:
+        get_tree().call_group("Container", "goto_scene", s)
     else:
         scene = s
         ConnectPopup.popup_centered()

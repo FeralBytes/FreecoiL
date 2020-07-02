@@ -1,7 +1,7 @@
 ## Summary:
 <!-- Sumarize the issue in one sentence. -->
-### LazerCoiL version:
-<!-- Specify commit hash if not an official release. -->
+### FazerCoiL version:
+<!-- Specify commit hash or development version if not an official release version. -->
 ### OS/device including version:
 <!-- Android? Windows? / Samsung? Something? -->
 ### What is the Bug?:
@@ -16,4 +16,5 @@ output, logs, and code as it's very hard to read otherwise. -->
 ### Possible Fixes:
 <!-- If you can, link to the line of code that might be responsible for the 
 problem or even better submit a PR. -->
+
 /label ~bug

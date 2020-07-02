@@ -8,7 +8,7 @@ onready var NonBlockingPopup = get_node("NonBlockingPopup")
 # Called when the node enters the scene tree for the first time.
 func _ready():
     add_to_group("lobby")
-    if not SetConf.Session.quick_start_complete:
+    if Settings.Session.get_data("quick_start_complete") == null:
         QuickStartBtn.disabled = true
     call_deferred("first_frame")
         
@@ -17,29 +17,28 @@ func _ready():
 #    pass
 
 func first_frame():
-    if SetConf.Session.player_name == "":
+    if Settings.InGame.get_data("player_name") == null:
         NonBlockingPopup.add_content("res://scenes/Popups/MissingPlayerNamePopup.tscn")
         NonBlockingPopup.popup()
-    var temp = load("res://code/Resets.gd").new()
-    temp.reset_networking_code()
+    get_tree().call_group("Network", "reset_networking")
 
 func _on_NoNetwork_pressed():
-    SceneManager.goto_scene("res://scenes/Setups/NoNetworkSetup.tscn")
+    get_tree().call_group("Container", "goto_scene", "res://scenes/Setups/NoNetworkSetup.tscn")
 
 
 func _on_Testing_pressed():
-    SceneManager.goto_scene("res://scenes/TestingScene/TestingScene.tscn")
+    get_tree().call_group("Container", "goto_scene", "res://scenes/TestingScene/TestingScene.tscn")
 
 
 func _on_QuickStart_pressed():
-    if not LazerInterface.state_lazer_gun_is_connected:
+    if not FreecoiLInterface.laser_is_connected:
         get_tree().call_group("connect_weapon", "connect_weapon_guard", "res://scenes/InGame/InGameNoNetwork.tscn")
     else:
-        SceneManager.goto_scene("res://scenes/InGame/InGameNoNetwork.tscn")
+        get_tree().call_group("Container", "goto_scene", "res://scenes/InGame/InGameNoNetwork.tscn")
 
 
 func _on_Networked_pressed():
-    SceneManager.goto_scene("res://scenes/Setups/NetworkSetup0.tscn")
+    get_tree().call_group("Container", "goto_scene", "res://scenes/Setups/NetworkSetup0.tscn")
 
 
 ##############################################

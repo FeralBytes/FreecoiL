@@ -32,5 +32,5 @@ Disagreements happen but can be settled if both parties are open minded.
 * Focus on what is best for the community
 * Show empathy towards other community members
 ## Contacting The Maintainer
-The best way is currently via gitlab issues. [Contact the Lead Developer on Discord](https://discord.gg/tn4hThVS). 
+The best way is currently via discord. [Contact the Lead Developer on Discord.](https://discordapp.com/invite/tn4hThV). 
 Please allow 2-3 days for a response before pinging a thread.

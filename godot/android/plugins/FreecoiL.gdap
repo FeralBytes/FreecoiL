@@ -1,0 +1,6 @@
+[config]
+
+name="FreecoiL"
+binary_type="local"
+binary="FreecoiL.debug.aar"
+

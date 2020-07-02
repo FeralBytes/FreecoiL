@@ -1,0 +1,358 @@
+[gd_scene load_steps=11 format=2]
+
+[ext_resource path="res://assets/images/icons/menu_sandwich.png" type="Texture" id=1]
+[ext_resource path="res://assets/images/icons/menu_battery_0.png" type="Texture" id=2]
+[ext_resource path="res://assets/images/icons/menu_wlan_good.png" type="Texture" id=3]
+[ext_resource path="res://assets/images/icons/menu_gps_poor.png" type="Texture" id=4]
+[ext_resource path="res://assets/images/icons/menu_recoil.png" type="Texture" id=5]
+[ext_resource path="res://assets/images/icons/menu_gun.png" type="Texture" id=6]
+[ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=7]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+
+export(String) var my_menu = \"0,0\"
+export(bool) var on_mainmenu_scene = true
+export(bool) var allow_main_menu = true
+export(bool) var allow_preferences = true
+var menu_is_visible = false
+var settings_menu_is_poped_up = false
+var batt_0 = preload(\"res://assets/images/icons/menu_battery_0.png\")
+var batt_25 = preload(\"res://assets/images/icons/menu_battery_25.png\")
+var batt_50 = preload(\"res://assets/images/icons/menu_battery_50.png\")
+var batt_75 = preload(\"res://assets/images/icons/menu_battery_75.png\")
+var batt_100 = preload(\"res://assets/images/icons/menu_battery_100.png\")
+
+onready var SettingsMenu = get_node(\"HBoxContainer/MenuBtn/SettingsMenu\")
+onready var MainMenuBtn = get_node(\"HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/MainMenu\")
+onready var PrefrencesBtn = get_node(\"HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Preferences\")
+onready var GunBtn = get_node(\"HBoxContainer/GunBtn\")
+onready var MenuBtn = get_node(\"HBoxContainer/MenuBtn\")
+onready var GpsBtn = get_node(\"HBoxContainer/GPSBtn\")
+onready var RecoilBtn = get_node(\"HBoxContainer/RecoilBtn\")
+onready var WifiBtn = get_node(\"HBoxContainer/WifiBtn\")
+onready var BatteryBtn = get_node(\"HBoxContainer/BatteryBtn\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_is_connected\"), self, \"update_gun\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_recoil\"), self, \"update_recoil\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_battery_lvl\"), self, \"update_battery\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"connection_status\"), self, \"update_wifi\")
+    Settings.InGame.connect(Settings.InGame.monitor_data(\"force_recoil\"), self, \"update_recoil_force_mode\")
+    SettingsMenu.color = Color(Settings.Session.get_data(\"ThemeMenuBackground\"))
+    MenuBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeFontColor\"))
+
+
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        menu_is_visible = true
+        update_buttons()
+    else:
+        menu_is_visible = false
+      
+func update_buttons():
+    update_menu()
+    update_gun()
+    update_battery()
+    update_recoil()
+    update_wifi(Settings.Session.get_data(\"connection_status\"))
+    update_gps()
+
+func update_menu():
+    if menu_is_visible:
+        if allow_main_menu:
+            if my_menu == \"0,0\":
+                if on_mainmenu_scene:
+                    MainMenuBtn.disabled = true
+                else:
+                    MainMenuBtn.disabled = false
+            else:
+                MainMenuBtn.disabled = false
+        else:
+            MainMenuBtn.disabled = true
+        if allow_preferences:
+            PrefrencesBtn.disabled = false
+        else:
+            PrefrencesBtn.disabled = true
+    
+func update_gps(gps_status=0):
+    if menu_is_visible:
+        if gps_status == 0:
+            GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+    
+func update_recoil(recoil=-1):
+    if menu_is_visible:
+        if recoil == -1:
+            recoil = Settings.Session.get_data(\"fi_laser_recoil\")
+            if recoil == null:
+                recoil = 0
+        if recoil == 0:
+            RecoilBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+        elif recoil == 1:
+            RecoilBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+        elif recoil == 2:
+            RecoilBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+    
+func update_wifi(wifi_conn=0):
+    if menu_is_visible:
+        if wifi_conn == \"do_not_connect\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+        elif wifi_conn == \"disconnected\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+        elif wifi_conn == \"connecting\" or wifi_conn == \"reconnecting\" or wifi_conn == \"identifying\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+        elif wifi_conn == \"connected\" or wifi_conn == \"reconnected\":
+            WifiBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+    
+func update_battery(battery_lvl=-1):
+    # We fudge the percentages here, because recoil guns aren't useable below a certian chage level.
+    if menu_is_visible:
+        if battery_lvl == -1:
+            battery_lvl = Settings.Session.get_data(\"fi_laser_battery_lvl\")
+            if battery_lvl == null:
+                battery_lvl = 0
+        if battery_lvl == 0:
+            BatteryBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+            BatteryBtn.texture_normal = batt_0
+        elif battery_lvl > 0 && battery_lvl < 30:
+            BatteryBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+            BatteryBtn.texture_normal = batt_25
+        elif battery_lvl >= 30 && battery_lvl < 60:
+            BatteryBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+            BatteryBtn.texture_normal = batt_50
+        elif battery_lvl >= 60 && battery_lvl < 85:
+            BatteryBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+            BatteryBtn.texture_normal = batt_75
+        elif battery_lvl >= 85:
+            BatteryBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            BatteryBtn.texture_normal = batt_100
+    
+func update_gun(gun_connected=-1):
+    if menu_is_visible:
+        if gun_connected == -1:
+            gun_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+            if gun_connected == null:
+                gun_connected = 0
+        if gun_connected == 0:
+            GunBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+        elif gun_connected == 1:
+            GunBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeCautionState\"))
+        elif gun_connected == 2:
+            GunBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+        elif gun_connected == 3:
+            GunBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeBadState\"))
+
+func hide_settings_menu_popup():
+    SettingsMenu.hide()
+    settings_menu_is_poped_up = false
+    
+func show_settings_menu_popup():
+    update_menu()
+    SettingsMenu.rect_min_size = SettingsMenu.get_node(\"VBoxContainer\").rect_size
+    SettingsMenu.set_global_position(rect_global_position + Vector2(30, 70))
+    SettingsMenu.show()
+    settings_menu_is_poped_up = true
+    
+func update_recoil_force_mode(force_mode):
+    var gun_connected = Settings.Session.get_data(\"fi_laser_is_connected\")
+    if gun_connected == null:
+        gun_connected = 0
+    if gun_connected == 2:
+        if force_mode == \"on\":
+            update_recoil(1)
+        elif force_mode == \"off\":
+            update_recoil(2)
+        # else: pass.
+
+func _on_MenuBtn_pressed():
+    if settings_menu_is_poped_up:
+        hide_settings_menu_popup()
+    else:
+        show_settings_menu_popup()
+        
+func _on_MainMenu_pressed():
+    if on_mainmenu_scene:
+        get_tree().call_group(\"Network\", \"reset_networking\")
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    else:
+        var maybe_ingame = get_parent().get_parent()
+        if maybe_ingame.name == \"InGame\":
+            maybe_ingame.catch_up_active = true  # InGame Node.
+            yield(get_tree(), \"idle_frame\")
+        get_tree().call_group(\"Network\", \"reset_networking\")
+        get_tree().call_group(\"Container\", \"goto_scene\", \"res://scenes/MainMenu/MainMenu.tscn\")
+    hide_settings_menu_popup()
+
+
+func _on_GunBtn_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,-1\")
+
+
+func _on_RecoilBtn_pressed():
+    var force_recoil = Settings.InGame.get_data(\"force_recoil\")
+    if force_recoil == null or force_recoil == \"dont\":
+        FreecoiLInterface.toggle_recoil()
+    else:
+        pass
+
+
+func _on_Preferences_pressed():
+    get_tree().call_group(\"Container\", \"next_menu\", \"2,-1\")
+    hide_settings_menu_popup()
+
+
+func _on_Exit_pressed():
+    print(\"Settings.__signals_used = \" + str(Settings.__signals_used))
+    hide_settings_menu_popup()
+    get_tree().quit()
+
+
+func _on_Recoil_pressed():
+    var force_recoil = Settings.InGame.get_date(\"force_recoil\")
+    if force_recoil == null or force_recoil == \"dont\":
+        FreecoiLInterface.toggle_recoil()
+    else:
+        pass
+    hide_settings_menu_popup()
+"
+
+[sub_resource type="DynamicFont" id=2]
+font_data = ExtResource( 7 )
+
+[sub_resource type="GDScript" id=3]
+script/source = "tool
+extends Label
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    text = \" Ver: \" + Settings.VERSION + \" \"
+
+"
+
+[node name="Header2" type="Control"]
+margin_right = 540.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 540, 70 )
+script = SubResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false,
+"_editor_description_": "NOTE: \"Header 2\" Must be below other items in a menu reference rect or else the popup menu could be blocked."
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_top = 10.0
+margin_right = 540.0
+margin_bottom = 70.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 20
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MenuBtn" type="TextureButton" parent="HBoxContainer"]
+margin_left = 4.0
+margin_right = 64.0
+margin_bottom = 60.0
+texture_normal = ExtResource( 1 )
+
+[node name="SettingsMenu" type="ColorRect" parent="HBoxContainer/MenuBtn"]
+visible = false
+margin_left = 15.0
+margin_top = 75.0
+margin_right = 415.0
+margin_bottom = 95.0
+rect_min_size = Vector2( 400, 0 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MenuBtn/SettingsMenu"]
+margin_right = 40.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 400, 0 )
+custom_constants/separation = 30
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="MainMenu" type="Button" parent="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 20.0
+text = "Main Menu"
+
+[node name="Preferences" type="Button" parent="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer"]
+margin_top = 50.0
+margin_right = 400.0
+margin_bottom = 70.0
+text = "Edit Preferences"
+
+[node name="Recoil" type="Button" parent="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer"]
+margin_top = 100.0
+margin_right = 400.0
+margin_bottom = 120.0
+text = "Toggle Recoil"
+
+[node name="Control" type="Control" parent="HBoxContainer"]
+margin_left = 84.0
+margin_right = 129.0
+margin_bottom = 60.0
+rect_min_size = Vector2( 45, 0 )
+
+[node name="GPSBtn" type="TextureButton" parent="HBoxContainer"]
+modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
+margin_left = 149.0
+margin_right = 209.0
+margin_bottom = 60.0
+hint_tooltip = "GPS not impleneted yet."
+disabled = true
+texture_normal = ExtResource( 4 )
+
+[node name="RecoilBtn" type="TextureButton" parent="HBoxContainer"]
+modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
+margin_left = 229.0
+margin_right = 289.0
+margin_bottom = 60.0
+texture_normal = ExtResource( 5 )
+
+[node name="WifiBtn" type="TextureButton" parent="HBoxContainer"]
+modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
+margin_left = 309.0
+margin_right = 369.0
+margin_bottom = 60.0
+disabled = true
+texture_normal = ExtResource( 3 )
+
+[node name="BatteryBtn" type="TextureButton" parent="HBoxContainer"]
+modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
+margin_left = 389.0
+margin_right = 430.0
+margin_bottom = 60.0
+hint_tooltip = "0%"
+texture_normal = ExtResource( 2 )
+
+[node name="GunBtn" type="TextureButton" parent="HBoxContainer"]
+modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
+margin_left = 450.0
+margin_right = 536.0
+margin_bottom = 60.0
+texture_normal = ExtResource( 6 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 40.0
+margin_bottom = 14.0
+custom_fonts/font = SubResource( 2 )
+text = " Ver: 0.3.0-rc1 "
+script = SubResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="pressed" from="HBoxContainer/MenuBtn" to="." method="_on_MenuBtn_pressed" flags=3]
+[connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/MainMenu" to="." method="_on_MainMenu_pressed" flags=3]
+[connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Preferences" to="." method="_on_Preferences_pressed" flags=3]
+[connection signal="pressed" from="HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/Recoil" to="." method="_on_Recoil_pressed" flags=3]
+[connection signal="pressed" from="HBoxContainer/RecoilBtn" to="." method="_on_RecoilBtn_pressed" flags=3]
+[connection signal="pressed" from="HBoxContainer/GunBtn" to="." method="_on_GunBtn_pressed" flags=3]
