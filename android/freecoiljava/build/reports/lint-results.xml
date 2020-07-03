@@ -2,22 +2,6 @@
 <issues format="5" by="lint 3.6.1">
 
     <issue
-        id="GradleCompatible"
-        severity="Fatal"
-        message="Version 28 (intended for Android Pie and below) is the last version of the legacy support library, so we recommend that you migrate to AndroidX libraries when using Android Q and moving forward. The IDE can help with this: Refactor > Migrate to AndroidX..."
-        category="Correctness"
-        priority="8"
-        summary="Incompatible Gradle Versions"
-        explanation="There are some combinations of libraries, or tools and libraries, that are incompatible, or can lead to bugs. One such incompatibility is compiling with a version of the Android support libraries that is not the latest version (or in particular, a version lower than your `targetSdkVersion`)."
-        errorLine1="    implementation &apos;com.android.support:appcompat-v7:28.0.0&apos;"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/build.gradle"
-            line="33"
-            column="5"/>
-    </issue>
-
-    <issue
         id="InflateParams"
         severity="Warning"
         message="Avoid passing `null` as the view root (needed to resolve layout parameters on the inflated layout&apos;s root element)"
@@ -27,12 +11,12 @@
         explanation="When inflating a layout, avoid passing in null as the parent view, since otherwise any layout parameters on the root of the inflated layout will be ignored."
         url="http://www.doubleencore.com/2013/05/layout-inflation-as-intended"
         urls="http://www.doubleencore.com/2013/05/layout-inflation-as-intended"
-        errorLine1="        View view = activity.getLayoutInflater().inflate(R.layout.freecoil_view, null);"
-        errorLine2="                                                                                 ~~~~">
+        errorLine1="        val view = activity.layoutInflater.inflate(R.layout.freecoil_view, null)"
+        errorLine2="                                                                           ~~~~">
         <location
-            file="/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.java"
-            line="671"
-            column="82"/>
+            file="/home/wolfrage/0.Projects/5.FreecoiL/src/android/freecoiljava/src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.kt"
+            line="529"
+            column="76"/>
     </issue>
 
     <issue

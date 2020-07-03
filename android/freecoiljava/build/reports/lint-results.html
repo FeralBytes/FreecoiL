@@ -173,17 +173,16 @@ document.getElementById(id).style.display = 'none';
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout-title">Lint Report: 1 error and 2 warnings</span>
+      <span class="mdl-layout-title">Lint Report: 2 warnings</span>
       <div class="mdl-layout-spacer"></div>
       <nav class="mdl-navigation mdl-layout--large-screen-only">
-Check performed at Fri May 15 23:22:29 AKDT 2020      </nav>
+Check performed at Thu Jul 02 12:35:48 AKDT 2020      </nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
     <span class="mdl-layout-title">Issue Types</span>
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link" href="#overview"><i class="material-icons">dashboard</i>Overview</a>
-      <a class="mdl-navigation__link" href="#GradleCompatible"><i class="material-icons error-icon">error</i>Incompatible Gradle Versions (1)</a>
       <a class="mdl-navigation__link" href="#InflateParams"><i class="material-icons warning-icon">warning</i>Layout Inflation without a Parent (1)</a>
       <a class="mdl-navigation__link" href="#GradleDependency"><i class="material-icons warning-icon">warning</i>Obsolete Gradle Dependency (1)</a>
     </nav>
@@ -201,9 +200,6 @@ Check performed at Fri May 15 23:22:29 AKDT 2020      </nav>
 <tr><td class="countColumn"></td><td class="categoryColumn"><a href="#Correctness">Correctness</a>
 </td></tr>
 <tr>
-<td class="countColumn">1</td><td class="issueColumn"><i class="material-icons error-icon">error</i>
-<a href="#GradleCompatible">GradleCompatible</a>: Incompatible Gradle Versions</td></tr>
-<tr>
 <td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#InflateParams">InflateParams</a>: Layout Inflation without a Parent</td></tr>
 <tr>
@@ -218,52 +214,7 @@ Dismiss</button>            </div>
             </div>
           </section>
 <a name="Correctness"></a>
-<a name="GradleCompatible"></a>
-<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" id="GradleCompatibleCard" style="display: block;">
-            <div class="mdl-card mdl-cell mdl-cell--12-col">
-  <div class="mdl-card__title">
-    <h2 class="mdl-card__title-text">Incompatible Gradle Versions</h2>
-  </div>
-              <div class="mdl-card__supporting-text">
-<div class="issue">
-<div class="warningslist">
-<span class="location"><a href="../../build.gradle">../../build.gradle</a>:33</span>: <span class="message">Version 28 (intended for Android Pie and below) is the last version of the legacy support library, so we recommend that you migrate to AndroidX libraries when using Android Q and moving forward. The IDE can help with this: Refactor > Migrate to AndroidX...</span><br /><pre class="errorlines">
-<span class="lineno"> 30 </span>dependencies {
-<span class="lineno"> 31 </span>    implementation fileTree(dir: <span class="string">'libs'</span>, include: [<span class="string">'*.jar'</span>])
-<span class="lineno"> 32 </span>
-<span class="caretline"><span class="lineno"> 33 </span>    <span class="error">implementation <span class="string">'com.android.support:appcompat-v7:28.0.0'</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 34 </span>    testImplementation <span class="string">'junit:junit:4.12'</span>
-<span class="lineno"> 35 </span>    androidTestImplementation <span class="string">'com.android.support.test:runner:1.0.2'</span>
-<span class="lineno"> 36 </span>    androidTestImplementation <span class="string">'com.android.support.test.espresso:espresso-core:3.0.2'</span></pre>
-
-</div>
-<div class="metadata"><div class="explanation" id="explanationGradleCompatible" style="display: none;">
-There are some combinations of libraries, or tools and libraries, that are incompatible, or can lead to bugs. One such incompatibility is compiling with a version of the Android support libraries that is not the latest version (or in particular, a version lower than your <code>targetSdkVersion</code>).<br/>Note: This issue has an associated quickfix operation in Android Studio and IntelliJ IDEA.<br>
-To suppress this error, use the issue id "GradleCompatible" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
-<br/></div>
-</div>
-</div>
-<div class="chips">
-<span class="mdl-chip">
-    <span class="mdl-chip__text">GradleCompatible</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Correctness</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Fatal</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Priority 8/10</span>
-</span>
-</div>
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-<button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="explanationGradleCompatibleLink" onclick="reveal('explanationGradleCompatible');">
-Explain</button><button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="GradleCompatibleCardLink" onclick="hideid('GradleCompatibleCard');">
-Dismiss</button>            </div>
-            </div>
-          </section><a name="InflateParams"></a>
+<a name="InflateParams"></a>
 <section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" id="InflateParamsCard" style="display: block;">
             <div class="mdl-card mdl-cell mdl-cell--12-col">
   <div class="mdl-card__title">
@@ -272,14 +223,14 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.java">../../src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.java</a>:671</span>: <span class="message">Avoid passing <code>null</code> as the view root (needed to resolve layout parameters on the inflated layout's root element)</span><br /><pre class="errorlines">
-<span class="lineno"> 668 </span>    <span class="annotation">@Override</span>
-<span class="lineno"> 669 </span>    <span class="keyword">public</span> View onMainCreateView(Activity activity) {
-<span class="lineno"> 670 </span>        <span class="keyword">this</span>.appActivity = activity;
-<span class="caretline"><span class="lineno"> 671 </span>        View view = activity.getLayoutInflater().inflate(R.layout.freecoil_view, <span class="warning"><span class="keyword">null</span></span>);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 672 </span>        Log.i(TAG, <span class="string">"Got the appActivity."</span>);
-<span class="lineno"> 673 </span>        <span class="keyword">return</span> view;
-<span class="lineno"> 674 </span>    }
+<span class="location"><a href="../../src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.kt">../../src/main/java/com/feralbytes/games/freecoiljava/FreecoiLPlugin.kt</a>:529</span>: <span class="message">Avoid passing <code>null</code> as the view root (needed to resolve layout parameters on the inflated layout's root element)</span><br /><pre class="errorlines">
+<span class="lineno"> 526 </span>    override <span class="keyword">fun</span> onMainCreateView(activity: Activity): View? {
+<span class="lineno"> 527 </span>        appActivity = activity
+<span class="lineno"> 528 </span>        appContext = appActivity!!.applicationContext
+<span class="caretline"><span class="lineno"> 529 </span>        <span class="keyword">val</span> view = activity.layoutInflater.inflate(R.layout.freecoil_view, <span class="warning"><span class="keyword">null</span></span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 530 </span>        Log.i(TAG, <span class="string">"Got the appActivity."</span>)
+<span class="lineno"> 531 </span>        <span class="keyword">return</span> view
+<span class="lineno"> 532 </span>    }
 </pre>
 
 </div>
