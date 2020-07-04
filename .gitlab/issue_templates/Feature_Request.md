@@ -1,5 +1,5 @@
 ## Summary
-<!-- Sumarize the feature request in one sentence below. -->
+<!-- Summarize the feature request in one sentence below. -->
 
 ### What is the Feature Request in Detail?
 <!-- Explain Below. -->

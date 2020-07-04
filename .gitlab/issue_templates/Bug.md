@@ -1,5 +1,5 @@
 ## Summary
-<!-- Sumarize the issue in one sentence, below. -->
+<!-- Summarize the issue in one sentence, below. -->
 
 ### FreecoiL version
 <!-- Specify commit hash or development version if not an official release version, below. -->
