@@ -2,8 +2,8 @@ package fhuyakou.godot.plugin.android.hellosignals
 
 import android.util.Log
 import org.godotengine.godot.Godot
+import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
-import org.godotengine.godot.plugin.SignalInfo
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit

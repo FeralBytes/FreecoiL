@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.0"
+const VERSION = "0.3.1-dev0"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -16,7 +16,7 @@ const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signa
 
 var DEBUG_GUI = false
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
-var DEBUG_LEVEL = 3  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
+var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable

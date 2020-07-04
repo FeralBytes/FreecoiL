@@ -150,7 +150,7 @@ func _ready():
 func _on_delay_loading():
     if Engine.has_singleton("FreecoiL"):
         FreecoiL = Engine.get_singleton("FreecoiL")
-        FreecoiL.hello()
+        print(" ************* " + str(FreecoiL.hello()))
         FreecoiL.init(get_instance_id())
     
 func init_vars():
