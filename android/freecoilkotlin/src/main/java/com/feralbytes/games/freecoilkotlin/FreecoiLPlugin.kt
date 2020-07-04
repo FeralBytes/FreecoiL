@@ -105,7 +105,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     override fun getPluginMethods(): List<String> {
         return Arrays.asList("hello", "init", "bluetoothStatus",
                 "enableBluetooth", "fineAccessPermissionStatus", "enableFineAccess", "startBluetoothScan",
-                "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode", "enableRecoil")
+                "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode",
+                "enableRecoil")
     }
 
     fun hello(): String {
@@ -118,11 +119,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             instanceId = pInstanceId
             bluetoothService = BluetoothLeService()
             if (!bluetoothService!!.initialize(appInstance)) {
-                logger("Unable to initialize BluetoothLeService!", 4)
+                logger("Unable to initialize Bluetooth Low Energy Service!", 4)
             }
             vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
             GodotLib.calldeferred(instanceId.toLong(), "_on_mod_init", arrayOf())
-            logger("FreecoiL module initialized.", 1)
+            logger("FreecoiL Kotlin module initialized.", 1)
             initialized = true
         }
     }
@@ -434,14 +435,15 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             val shotCounter1: Int = (data[RECOIL_OFFSET_HIT_BY1_SHOTID] and 0x07).toInt()
             val shotCounter2: Int = (data[RECOIL_OFFSET_HIT_BY2_SHOTID] and 0x07).toInt()
             val sensorsHit = data[RECOIL_OFFSET_SENSORS_HIT_BITMASK].toInt()
+            val sensorsHit2 = data[RECOIL_OFFSET_SENSORS_HIT_BITMASK_2].toInt()
             if (shotById1 != 0) {
                 /* We can not use a PlayerId of 0 because it is the default for shotById1 and shotById2.
                 It is impossible to distinguish a real shot by this player from regular telemetry data
                 any time that shotCounter rolls back to 0.
                 shotById2 is only non-zero if the gun recieves 2 shots at the same time and thus
                 shotById1 will also have to be non-zero. */
-                GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shotById1, shotCounter1, shotById2, shotCounter2))
-                logger("sesorsHit = $sensorsHit", 1)
+                GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2))
+                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1)
             }
             val shotsRemaining: Int = data[RECOIL_OFFSET_SHOTS_REMAINING].toInt() and 0xFF
             if (shotsRemaining != trackedShotsRemaining) {

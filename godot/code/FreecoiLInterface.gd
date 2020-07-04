@@ -307,15 +307,17 @@ func _laser_telem_batteryLvl(batteryLvl):
     # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
     _on_laser_gun_still_connected()
     
-func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2):
+func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2):
     if shotCounter1 != shot_counter_1:
         shot_counter_1 = shotCounter1
         shot_by_id_1 = shotById1
         get_tree().call_group("FreecoiL", "fi_got_shot", shotById1)
+        print("sensorsHit = " + str(sensorsHit))
     if shotCounter2 != shot_counter_2:
         shot_counter_2 = shotCounter2
         shot_by_id_2 = shotById2
         get_tree().call_group("FreecoiL", "fi_got_shot", shotById2)
+        print("sensorsHit2 = " + str(sensorsHit2))
 
 # warning-ignore:unused_argument
 func _changed_telem_button_pressed(buttonsPressed):
