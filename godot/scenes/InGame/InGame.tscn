@@ -4,10 +4,10 @@
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
 [ext_resource path="res://addons/regular_polygon2d_node/RegularPolygon2D.gd" type="Script" id=3]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=4]
-[ext_resource path="res://assets/images/skull.png" type="Texture" id=5]
+[ext_resource path="res://assets/images/pistol_ammo.png" type="Texture" id=5]
 [ext_resource path="res://assets/images/target_person.png" type="Texture" id=6]
 [ext_resource path="res://assets/images/heart.png" type="Texture" id=7]
-[ext_resource path="res://assets/images/pistol_ammo.png" type="Texture" id=8]
+[ext_resource path="res://assets/images/skull.png" type="Texture" id=8]
 [ext_resource path="res://assets/sounds/mag_change.wav" type="AudioStream" id=9]
 [ext_resource path="res://assets/sounds/empty_gun_shot.wav" type="AudioStream" id=10]
 [ext_resource path="res://assets/sounds/gun_shot_fast.wav" type="AudioStream" id=11]
@@ -812,7 +812,7 @@ modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
 position = Vector2( 493, 394 )
 scale = Vector2( 0.9, 0.9 )
 skew = 4.37114e-08
-texture = ExtResource( 5 )
+texture = ExtResource( 8 )
 
 [node name="target_person" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
 modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
@@ -977,7 +977,7 @@ modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
 margin_left = 259.0
 margin_right = 285.0
 margin_bottom = 67.0
-texture = ExtResource( 8 )
+texture = ExtResource( 5 )
 patch_margin_right = 26
 
 [node name="ProgressBar" type="ProgressBar" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
@@ -1126,8 +1126,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
+margin_left = 2.0
 margin_top = 4.0
-margin_right = 540.0
+margin_right = 542.0
 margin_bottom = 852.0
 rect_min_size = Vector2( 540, 0 )
 

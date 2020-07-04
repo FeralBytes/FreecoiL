@@ -98,7 +98,7 @@ initializer.
         -->
         <meta-data
             android:name="org.godotengine.plugin.v1.FreecoiL"
-            android:value="com.feralbytes.games.freecoiljava.FreecoiLPlugin" />
+            android:value="com.feralbytes.games.freecoilkotlin.FreecoiLPlugin" />
     </application>
 
 </manifest>

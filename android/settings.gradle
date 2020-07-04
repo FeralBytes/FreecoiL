@@ -1,3 +1,2 @@
+include ':freecoilkotlin'
 rootProject.name='Godot Android Plugins'
-
-include ':freecoiljava'
