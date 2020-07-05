@@ -414,26 +414,25 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             val shotById2: Int = data[RECOIL_OFFSET_HIT_BY2].toInt() and 0xFF shr 2
             /* The first 2 most significant bits of RECOIL_OFFSET_HIT_BY1 are the
                 least 2 significant bits of the weapon profile ID*/
-            val wpnProfileLeast: Int = data[RECOIL_OFFSET_HIT_BY1].toInt() and -0x1000000
+            val wpnProfileLeast: Int = data[RECOIL_OFFSET_HIT_BY1].toInt() and 0b11
             /* The 2 least significant bits of RECOIL_OFFSET_HIT_BY2 are the 2 most
                significant bits of the weapon profile ID being used (combine with
                2 most significant bits from byte 8 which is RECOIL_OFFSET_HIT_BY1_SHOTID )*/
-            val wpnProfileMost: Int = data[RECOIL_OFFSET_HIT_BY2].toInt() and 0x000000FF
+            val wpnProfileMost: Int = data[RECOIL_OFFSET_HIT_BY2].toInt() and 0b11
             /* Commented out until we are ready to implement it.
             logger("*** wpnProfileLeast = " + wpnProfileLeast + "  | wpnProfileMost = "
                 + wpnProfileMost, 1);
             */
             /* Trying to extract the charge level. It is the middle 3 bits.*/
-            val chargeLevel: Int = data[RECOIL_OFFSET_HIT_BY1_SHOTID].toInt() and 0x00FFF000
-            val chargeLevel2 = chargeLevel shr 3
-            val chargeLevel3 = chargeLevel shl 2
+            val chargeLevel: Int = data[RECOIL_OFFSET_HIT_BY1_SHOTID].toInt() shr 2
+            val chargeLevel2 = chargeLevel and 0b111
             /* Commented out until we are ready to implement it.
             logger("chargeLevel = " + chargeLevel + "  | chargeLevel2 = " +
                 chargeLevel2 + "  | chargeLevel3 = " + chargeLevel3, 1);
             */
             // Only the right-most or least significant 3 bits make up the shot Counter, octal.
-            val shotCounter1: Int = (data[RECOIL_OFFSET_HIT_BY1_SHOTID] and 0x07).toInt()
-            val shotCounter2: Int = (data[RECOIL_OFFSET_HIT_BY2_SHOTID] and 0x07).toInt()
+            val shotCounter1: Int = (data[RECOIL_OFFSET_HIT_BY1_SHOTID] and 0b111).toInt()
+            val shotCounter2: Int = (data[RECOIL_OFFSET_HIT_BY2_SHOTID] and 0b111).toInt()
             val sensorsHit = data[RECOIL_OFFSET_SENSORS_HIT_BITMASK].toInt()
             val sensorsHit2 = data[RECOIL_OFFSET_SENSORS_HIT_BITMASK_2].toInt()
             if (shotById1 != 0) {
@@ -443,7 +442,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 shotById2 is only non-zero if the gun recieves 2 shots at the same time and thus
                 shotById1 will also have to be non-zero. */
                 GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2))
-                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1)
+                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1
             }
             val shotsRemaining: Int = data[RECOIL_OFFSET_SHOTS_REMAINING].toInt() and 0xFF
             if (shotsRemaining != trackedShotsRemaining) {
