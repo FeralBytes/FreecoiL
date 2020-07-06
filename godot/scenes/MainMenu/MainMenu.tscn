@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=2]
+[gd_scene load_steps=52 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -7,6 +7,70 @@
 [ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=5]
 [ext_resource path="res://scenes/MainMenu/Tests.tscn" type="PackedScene" id=6]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=7]
+[ext_resource path="res://assets/images/pistol.png" type="Texture" id=8]
+
+[sub_resource type="GDScript" id=42]
+script/source = "extends RichTextLabel
+
+
+var tracked_power_btn = 0
+var tracked_trigger_btn = 0
+var tracked_thumb_btn = 0
+var tracked_reload_btn = 0
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    add_to_group(\"FreecoiL\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"weapon_ammo_changed\")
+
+
+func fi_command_accepted():
+    text += \"Command Accepted.\\n\"
+
+func fi_player_id_changed():
+    text += \"Player Laser ID Changed to \" + str(FreecoiLInterface.laser_gun_id) + \".\\n\"
+
+func weapon_ammo_changed(new_val):
+    text += \"Weapon Ammo is now \" + str(new_val) + \".\\n\"
+
+func fi_buttons_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
+    if tracked_power_btn != powerBtnPressed:
+        tracked_power_btn = powerBtnPressed
+        text += \"Power button state = \" + str(tracked_power_btn) + \".\\n\"
+    if tracked_trigger_btn != triggerBtnPressed:
+        tracked_trigger_btn = triggerBtnPressed
+        text += \"Trigger button state = \" + str(tracked_trigger_btn) + \".\\n\"
+    if tracked_thumb_btn != thumbBtnPressed:
+        tracked_thumb_btn = thumbBtnPressed
+        text += \"Thumb button state = \" + str(tracked_thumb_btn) + \".\\n\"
+    if tracked_reload_btn != reloadBtnPressed:
+        tracked_reload_btn = reloadBtnPressed
+        text += \"Reload button state = \" + str(tracked_reload_btn) + \".\\n\"
+"
+
+[sub_resource type="GDScript" id=43]
+script/source = "extends Button
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#    pass
+
+
+func _on_Button5_pressed():
+    Settings.Session.set_data(\"game_player_alive\", true)
+"
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends ReferenceRect
@@ -1041,6 +1105,70 @@ __meta__ = {
 
 [node name="Tests" parent="-1,0-Tests" instance=ExtResource( 6 )]
 
+[node name="-1,-1-Tests2" type="ReferenceRect" parent="."]
+margin_left = -540.0
+margin_top = -960.0
+margin_bottom = -6.10352e-05
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="GunTester" type="Control" parent="-1,-1-Tests2"]
+margin_right = 540.0
+margin_bottom = 960.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Sprite" type="Sprite" parent="-1,-1-Tests2/GunTester"]
+position = Vector2( 265, 430 )
+rotation = 4.71239
+scale = Vector2( 1.3, 1.2 )
+texture = ExtResource( 8 )
+
+[node name="Button" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 69.2964
+margin_top = 214.96
+margin_right = 181.296
+margin_bottom = 258.96
+text = "Power"
+
+[node name="Button2" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 403.051
+margin_top = 60.8111
+margin_right = 515.051
+margin_bottom = 104.811
+text = "Reload"
+
+[node name="Button3" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 65.0538
+margin_top = 50.2836
+margin_right = 181.054
+margin_bottom = 94.2836
+text = "Thumb"
+
+[node name="Button4" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 190.919
+margin_top = 298.399
+margin_right = 306.919
+margin_bottom = 342.399
+text = "Trigger"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="-1,-1-Tests2/GunTester"]
+margin_left = 2.0
+margin_top = 750.0
+margin_right = 538.0
+margin_bottom = 950.0
+rect_min_size = Vector2( 536, 200 )
+script = SubResource( 42 )
+
+[node name="Button5" type="Button" parent="-1,-1-Tests2/GunTester"]
+margin_right = 12.0
+margin_bottom = 44.0
+text = "Start Testing"
+script = SubResource( 43 )
+
 [node name="1,-1-ConnectGun" parent="." instance=ExtResource( 5 )]
 
 [node name="Header2" parent="1,-1-ConnectGun" instance=ExtResource( 7 )]
@@ -1195,9 +1323,9 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer"]
-margin_top = 144.0
+margin_top = 107.0
 margin_right = 540.0
-margin_bottom = 316.0
+margin_bottom = 353.0
 custom_constants/separation = 8
 
 [node name="Label" type="Label" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
@@ -1219,7 +1347,7 @@ align = 1
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Options/CenterContainer/VBoxContainer"]
 margin_top = 128.0
 margin_right = 540.0
-margin_bottom = 172.0
+margin_bottom = 246.0
 rect_min_size = Vector2( 540, 0 )
 custom_constants/separation = 30
 
@@ -1246,7 +1374,6 @@ disabled = true
 text = "Start A No Network Game"
 
 [node name="Button4" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
-visible = false
 margin_top = 74.0
 margin_right = 540.0
 margin_bottom = 118.0
@@ -2318,8 +2445,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,6-Custom Setup 6/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2411,8 +2537,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,6-Custom Setup 7/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2506,8 +2631,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,6-Custom Setup 8/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2601,8 +2725,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,6-Custom Setup 9/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2810,6 +2933,7 @@ script = SubResource( 41 )
 
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
+[connection signal="pressed" from="-1,-1-Tests2/GunTester/Button5" to="-1,-1-Tests2/GunTester/Button5" method="_on_Button5_pressed"]
 [connection signal="text_entered" from="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" to="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" method="_on_PlayerName_text_entered" flags=3]
 [connection signal="pressed" from="2,-1-Preferences/CenterContainer/VBoxContainer/Button" to="2,-1-Preferences/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]

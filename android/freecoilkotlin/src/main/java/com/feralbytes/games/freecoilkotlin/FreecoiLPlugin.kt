@@ -369,9 +369,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_playerId", arrayOf<Any>(trackedPlayerId))
             }
             val buttonsPressed = data[RECOIL_OFFSET_BUTTONS_BITMASK].toInt()
-            if (buttonsPressed != 0) {
-                GodotLib.calldeferred(instanceId.toLong(), "_changed_telem_button_pressed", arrayOf<Any>(buttonsPressed))
-            }
+            val powerBtnPressed = buttonsPressed shr 4
+            val triggerBtnPressed = buttonsPressed and 0b1
+            val reloadBtnPressed = buttonsPressed shr 1 and 0b1
+            val thumbBtnPressed = buttonsPressed shr 2 and 0b1
+            GodotLib.calldeferred(instanceId.toLong(), "_changed_telem_button_pressed", arrayOf<Any>(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed))
             /* Rather than monitor if a button is currently pressed, we monitor the counter. Usually
                when the player presses a button, we see many packets showing that the button is
                pressed. We don't want to toggle recoil or modes with every packet we receive so it
@@ -382,7 +384,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 trackedTriggerBtnCounter = triggerBtnCounter
                 GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_triggerBtnCounter", arrayOf<Any>(trackedTriggerBtnCounter))
             }
-            /* NOTE: Below is a conversion performed on the nibble (last/low 4-bits) to make it act
+            /* NOTE: Below is a conversion performed on the 1st nibble (last/low 4-bits/ least significant) to make it act
             * as a proper 4-bit int which counts 0-15. */
             val reloadBtnCounter: Int = (data[RECOIL_OFFSET_RELOAD_TRIGGER_COUNTER].toInt() shr 4 and 0x0F).toInt()
             if (reloadBtnCounter != trackedReloadBtnCounter) {
@@ -442,7 +444,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 shotById2 is only non-zero if the gun recieves 2 shots at the same time and thus
                 shotById1 will also have to be non-zero. */
                 GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2))
-                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1
+                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1)
             }
             val shotsRemaining: Int = data[RECOIL_OFFSET_SHOTS_REMAINING].toInt() and 0xFF
             if (shotsRemaining != trackedShotsRemaining) {

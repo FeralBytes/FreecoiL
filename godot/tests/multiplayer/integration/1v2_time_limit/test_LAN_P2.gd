@@ -158,7 +158,7 @@ func test_p2_can_be_killed_by_p3_friendly_fire():
             shot_counter = 0
         Settings.Session.set_data("game_player_health", 1)
         yield(get_tree(), 'idle_frame')
-        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["3"], shot_counter, 0, 0)
+        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["3"], shot_counter, 0, 0, 0, 0)
         yield(get_tree().create_timer(2.0), "timeout")
         shot_counter += 1
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 0)

@@ -255,7 +255,7 @@ func _changed_laser_telem_commandId(commandId):
 func _changed_laser_telem_playerId(playerId):
     get_tree().call_group("FreecoiL", "fi_player_id_changed")
     # TODO: Set or update player id.
-    playerId = null
+    laser_gun_id = playerId
 
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
     if Settings.Session.get_data("game_player_alive"):
@@ -320,7 +320,7 @@ func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCoun
         print("sensorsHit2 = " + str(sensorsHit2))
 
 # warning-ignore:unused_argument
-func _changed_telem_button_pressed(buttonsPressed):
+func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
     # buttonsPressed Values:
     #default = 0
     #trigger = 1
@@ -338,8 +338,7 @@ func _changed_telem_button_pressed(buttonsPressed):
     #trigger + power + back = 21
     #reload + back + power = 22
     #triger + reload + back + power = 23
-    pass
-    buttonsPressed = null
+    get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
 
 func _new_status(status, level):
     # Debug Levels:

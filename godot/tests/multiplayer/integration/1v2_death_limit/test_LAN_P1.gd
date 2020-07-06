@@ -197,7 +197,7 @@ func test_p1_can_be_eliminated():
     yield(get_tree().create_timer(1.0), "timeout")
     Settings.Session.set_data("game_player_health", 1)
     yield(get_tree(), 'idle_frame')
-    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0)
+    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0, 0, 0)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("game_player_alive"), false)
     yield(get_tree(), 'idle_frame')
