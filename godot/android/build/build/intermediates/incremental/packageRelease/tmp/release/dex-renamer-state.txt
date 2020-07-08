@@ -1,4 +1,4 @@
-#Sun Jul 05 16:19:30 AKDT 2020
+#Wed Jul 08 15:10:15 AKDT 2020
 base.0=/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/dex/release/mergeDexRelease/out/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex

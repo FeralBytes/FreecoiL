@@ -45,14 +45,14 @@
 30-->[godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:15:9-54
 31
 32    <uses-permission android:name="android.permission.BLUETOOTH" />
-32-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:11:5-68
-32-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:11:22-65
+32-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:5-68
+32-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:22-65
 33    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-33-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:12:5-74
-33-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:12:22-71
+33-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:5-74
+33-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:22-71
 34    <uses-permission android:name="android.permission.VIBRATE" /> <!-- Custom user permissions XML added by add-ons. It's recommended to add them from the export preset, though. -->
-34-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:13:5-66
-34-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:13:22-63
+34-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:5-66
+34-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:22-63
 35    <!-- CHUNK_USER_PERMISSIONS_BEGIN -->
 36    <!-- CHUNK_USER_PERMISSIONS_END -->
 37    <!-- Any tag in this line after android:icon will be erased when doing custom builds. -->
@@ -148,11 +148,11 @@
 97initializer.
 98        -->
 99        <meta-data
-99-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
+99-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
 100            android:name="org.godotengine.plugin.v1.FreecoiL"
-100-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:29:13-62
+100-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:29:13-62
 101            android:value="com.feralbytes.games.freecoilkotlin.FreecoiLPlugin" />
-101-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:30:13-79
+101-->[FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:30:13-79
 102    </application>
 103
 104</manifest>

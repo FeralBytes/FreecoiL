@@ -5,7 +5,7 @@ INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/Andro
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 MERGED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:2:1-22:12
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:2:1-33:12
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:2:1-33:12
 MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5debf09d2541e0ccacc6adc6a4fdd105/fragment-1.0.0/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3a2f8d614676183a411d5d0a5ccffd59/legacy-support-core-ui-1.0.0/AndroidManifest.xml:17:1-22:12
@@ -72,8 +72,8 @@ application
 ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:30:5-68:19
 MERGED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:18:5-20:19
 MERGED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:18:5-20:19
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
 MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:22:5-89
 MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:22:5-89
 MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:22:5-23:19
@@ -142,8 +142,8 @@ INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/Andro
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 MERGED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:7:5-9:41
 MERGED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:7:5-9:41
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
 MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5debf09d2541e0ccacc6adc6a4fdd105/fragment-1.0.0/AndroidManifest.xml:20:5-44
@@ -219,20 +219,20 @@ ADDED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/file
 	android:name
 		ADDED from [godot-lib.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/cd42ca44f1bce7f58ff14cf3c8c29167/godot-lib.debug/AndroidManifest.xml:19:18-77
 uses-permission#android.permission.BLUETOOTH
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:11:5-68
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:5-68
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:11:22-65
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:22-65
 uses-permission#android.permission.BLUETOOTH_ADMIN
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:12:5-74
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:5-74
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:12:22-71
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:22-71
 uses-permission#android.permission.VIBRATE
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:13:5-66
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:5-66
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:13:22-63
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:22-63
 meta-data#org.godotengine.plugin.v1.FreecoiL
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
 	android:value
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:30:13-79
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:30:13-79
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5bd7a222ab324d67abd1957609ff5a3a/FreecoiL.debug/AndroidManifest.xml:29:13-62
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:29:13-62

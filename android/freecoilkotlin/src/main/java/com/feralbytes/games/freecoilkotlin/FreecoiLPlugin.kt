@@ -70,7 +70,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     private var commandId = 0
 
     @Volatile
-    private var trackedShotsRemaining = 0
+    private var shotsRemaining = 0
 
     private val trackedHitById1 = 0
 
@@ -183,8 +183,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     fun setLaserId(player_id: Int) {
         playerId = player_id
         val command = ByteArray(20)
-        commandId = (commandId + COMMAND_ID_INCREMENT).toByte()
-        command[0] = commandId
+        commandId += COMMAND_ID_INCREMENT
+        command[0] = commandId.toByte()
         command[2] = 0x80.toByte()
         command[4] = playerId.toByte()
         commandCharacteristic!!.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
@@ -199,8 +199,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         if (commandCharacteristic == null || bluetoothService == null) return
         logger("Started reloading.", 1)
         val command = ByteArray(20)
-        commandId = (commandId + COMMAND_ID_INCREMENT).toByte()
-        command[0] = commandId
+        commandId += COMMAND_ID_INCREMENT
+        command[0] = commandId.toByte()
         command[2] = 0x02.toByte() // Start reload.
         command[4] = playerId.toByte()
         /*command[5] = WEAPON_PROFILE; // changing profiles during the first stage of reload doesn't
@@ -215,8 +215,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         if (commandCharacteristic == null || bluetoothService == null) return
         logger("Finishing reloading.", 1)
         val command = ByteArray(20)
-        commandId = (commandId + COMMAND_ID_INCREMENT).toByte()
-        command[0] = commandId
+        commandId +=COMMAND_ID_INCREMENT
+        command[0] = commandId.toByte()
         command[2] = 0x04.toByte() // Finish reload.
         command[4] = playerId.toByte()
         command[5] = WEAPON_PROFILE
@@ -364,16 +364,16 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         val data = telemetryCharacteristic!!.value
         if (data != null && data.size > 0) {
             val continuousCounter: Int = (data[TELEM_COMMAND_ID_N_COUNTER] and 0x0F.toByte()).toInt()
-            commandId = (data[TELEM_COMMAND_ID_N_COUNTER].toInt() shr 4 and 0x0F).toInt()
+            commandId = (data[TELEM_COMMAND_ID_N_COUNTER].toInt() shr 4).toInt()
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_commandId", arrayOf<Any>(commandId))*/
             playerId = data[TELEM_PLAYER_ID].toInt()
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_playerId", arrayOf<Any>(playerId))*/
             buttonsPressed = data[TELEM_BUTTONS_PRESSED].toInt()
-            /*val powerBtnPressed = buttonsPressed shr 4
+            val powerBtnPressed = buttonsPressed shr 4
             val triggerBtnPressed = buttonsPressed and 0b1
             val reloadBtnPressed = buttonsPressed shr 1 and 0b1
             val thumbBtnPressed = buttonsPressed shr 2 and 0b1
-            GodotLib.calldeferred(instanceId.toLong(), "_changed_telem_button_pressed", arrayOf<Any>(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed))*/
+            /*GodotLib.calldeferred(instanceId.toLong(), "_changed_telem_button_pressed", arrayOf<Any>(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed))*/
             /* Rather than monitor if a button is currently pressed, we monitor the counter. Usually
                when the player presses a button, we see many packets showing that the button is
                pressed. We don't want to toggle recoil or modes with every packet we receive so it
@@ -383,7 +383,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_triggerBtnCounter", arrayOf<Any>(triggerBtnCounter))*/
             /* NOTE: Below is a conversion performed on the 1st nibble (last/low 4-bits/ least significant) to make it act
             * as a proper 4-bit int which counts 0-15. */
-            reloadBtnCounter = (data[TELEM_TRIGGER_N_RELOAD_COUNTER].toInt() shr 4 and 0x0F).toInt()
+            reloadBtnCounter = (data[TELEM_TRIGGER_N_RELOAD_COUNTER].toInt() shr 4).toInt()
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_reloadBtnCounter", arrayOf<Any>(reloadBtnCounter))*/
             thumbBtnCounter = data[TELEM_THUMB_COUNTER].toInt()
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_thumbBtnCounter", arrayOf<Any>(thumbBtnCounter))*/
@@ -400,8 +400,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                result in missing every 8th shot even with complex logic.
                shooter1LaserId is only the left most or most significant 6 bytes. So a max of 0-63.
                So 62 players max, because we do not use 0 since it is default for no shot.*/
-            val shooter1LaserId: Int = data[TELEM_SHOOTER_1_LASER_ID_N_WPN].toInt() and 0xFF shr 2
-            val shooter2LaserId: Int = data[TELEM_SHOOTER_2_LASER_ID_N_WPN].toInt() and 0xFF shr 2
+            val shooter1LaserId: Int = data[TELEM_SHOOTER_1_LASER_ID_N_WPN].toInt() shr 2
+            val shooter2LaserId: Int = data[TELEM_SHOOTER_2_LASER_ID_N_WPN].toInt() shr 2
             /* The first 2 most significant bits of TELEM_SHOOTER_1_LASER_ID_N_WPN are the
                 least 2 significant bits of the weapon profile ID*/
             val shooter1WpnProfileMost: Int = data[TELEM_SHOOTER_1_LASER_ID_N_WPN].toInt() and 0b11
@@ -412,26 +412,24 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             val shooter2WpnProfileLeast: Int = data[TELEM_SHOOTER_2_WPN_N_CHARGE].toInt() and 0b11
             val shooter2charge: Int = data[TELEM_SHOOTER_2_WPN_N_CHARGE].toInt() shr 2 and 0b111
             val shooter2check: Int = data[TELEM_SHOOTER_2_WPN_N_CHARGE].toInt() shr 5 and 0b111
-            val shooter1WpnProfile = (shooter1WpnProfileLeast and shl 2) 
-            // Only the right-most or least significant 3 bits make up the shot Counter, octal.
-            val shotCounter1: Int = (data[TELEM_SHOOTER_1_WPN_N_CHARGE] and 0b111).toInt()
-            val shotCounter2: Int = (data[TELEM_SHOOTER_2_WPN_N_CHARGE] and 0b111).toInt()
-            val sensorsHit = data[TELEM_SENSORS_1_N_HIT_COUNTER].toInt()
-            val sensorsHit2 = data[TELEM_SENSORS_2_N_HIT_COUNTER].toInt()
-            if (shooter1LaserId != 0) {
-                /* We can not use a playerId of 0 because it is the default for shooter1LaserId and shooter2LaserId.
-                It is impossible to distinguish a real shot by this player from regular telemetry data
-                any time that shotCounter rolls back to 0.
-                shooter2LaserId is only non-zero if the gun recieves 2 shots at the same time and thus
-                shooter1LaserId will also have to be non-zero. */
-                GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shooter1LaserId, shotCounter1, shooter2LaserId, shotCounter2, sensorsHit, sensorsHit2))
-                logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1)
-            }
-            val shotsRemaining: Int = data[TELEM_AMMO_REMAINING].toInt() and 0xFF
-            if (shotsRemaining != trackedShotsRemaining) {
-                trackedShotsRemaining = shotsRemaining
-                GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shotsRemaining", arrayOf<Any>(trackedShotsRemaining))
-            }
+            val shooter1WpnProfile = (shooter1WpnProfileLeast shl 2) + shooter1WpnProfileMost
+            val shooter2WpnProfile = (shooter2WpnProfileLeast shl 2) + shooter2WpnProfileMost
+            val shotCounter1: Int = (data[TELEM_SENSORS_1_N_HIT_COUNTER] and 0b1111).toInt()
+            val shotCounter2: Int = (data[TELEM_SENSORS_2_N_HIT_COUNTER] and 0b1111).toInt()
+            val sensorsHit1 = data[TELEM_SENSORS_1_N_HIT_COUNTER].toInt() shr 4
+            val sensorsHit2 = data[TELEM_SENSORS_2_N_HIT_COUNTER].toInt() shr 4
+            val clipSensor1 = sensorsHit1 and 0b1
+            val frontSensor1 = sensorsHit1 and 0b01
+            val leftSensor1 = sensorsHit1 and 0b001
+            val rightSensor1 = sensorsHit1 and 0b0001
+            val clipSensor2 = sensorsHit2 and 0b1
+            val frontSensor2 = sensorsHit2 and 0b01
+            val leftSensor2 = sensorsHit2 and 0b001
+            val rightSensor2 = sensorsHit2 and 0b0001
+            /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shot_data", arrayOf<Any>(shooter1LaserId, shotCounter1, shooter2LaserId, shotCounter2, sensorsHit, sensorsHit2))
+            logger("sensorsHit = " + sensorsHit + "  | sensorsHit2 = " + sensorsHit2, 1)*/
+            shotsRemaining = data[TELEM_AMMO_REMAINING].toInt()
+            /*GodotLib.calldeferred(instanceId.toLong(), "_changed_laser_telem_shotsRemaining", arrayOf<Any>(shotsRemaining))*/
             val status = data[TELEM_STATUS_FLAGS].toInt()
             val playerIdAccepted = data[TELEM_PLAYER_ID_ACCEPT].toInt()
             /* Just to be clear the Weapon Profile below is the guns current profile.
@@ -444,10 +442,14 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 wpnProfileAgain, 1);
             */
             // TODO: Grenade Pairing.
-            GodotLib.calldeferred(instanceId.toLong(), "processed_laser_telemetry", arrayOf<Any>(
+            GodotLib.calldeferred(instanceId.toLong(), "_processed_laser_telemetry2", arrayOf<Any>(arrayOf<Any>(
                 commandId, playerId, buttonsPressed, triggerBtnCounter, reloadBtnCounter,
-                thumbBtnCounter, powerBtnCounter, batteryLvlHigh, batteryLvlLow,
-                shooter1LaserId, ))
+                thumbBtnCounter, powerBtnCounter, batteryLvlHigh, batteryLvlLow, powerBtnPressed,
+                triggerBtnPressed, reloadBtnPressed, thumbBtnPressed, shotsRemaining, shooter1LaserId,
+                shooter2LaserId, shooter1WpnProfile, shooter2WpnProfile, shooter1charge, shooter1check,
+                shooter2charge, shooter2check, shotCounter1, shotCounter2, sensorsHit1, sensorsHit2,
+                clipSensor1, frontSensor1, leftSensor1, rightSensor1, clipSensor2, frontSensor2, leftSensor2,
+                rightSensor2, status, playerIdAccepted, wpnProfileAgain)))
         }
     }
 
@@ -541,7 +543,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         /* We run a single handler to check and see if we have connected to a weapon within 30 seconds */
         private const val CONNECTION_FAIL_TEST_INTERVAL_MILLISECONDS = 30000
         private const val TAG = "FreecoiLKotlinPlugin"
-        private var commandId = 0x00.toByte()
+        private var commandId: Byte = 0x00.toByte()
         private const val COMMAND_ID_INCREMENT = 0x10.toByte()
         private const val BLASTER_TYPE_PISTOL = 2.toByte()
         private const val BLASTER_TYPE_RIFLE = 1.toByte()

@@ -304,8 +304,6 @@ func _laser_telem_batteryLvl(batteryLvl):
             # If full batteries for a pistol are a charge of 16 then 100 / 16 == 6.25
             Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
             prev_battery_lvl_avg = battery_lvl_avg
-    # Battery Telemetry is called every Telemetry, so we also use this to ensure connected still.
-    _on_laser_gun_still_connected()
     
 func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2):
     if shotCounter1 != shot_counter_1:
@@ -339,6 +337,47 @@ func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnP
     #reload + back + power = 22
     #triger + reload + back + power = 23
     get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
+
+func _processed_laser_telemetry2(array_of_args):
+    print("Telemetry:  " + str(array_of_args))
+    print("commandId = " + str(array_of_args[0]) + " | playerId = " + str(array_of_args[1]) + 
+        " | buttonsPressed = " + str(array_of_args[2]) + " | triggerBtnCounter = " + str(array_of_args[3]) + 
+        " | reloadBtnCounter = " + str(array_of_args[4]) + " | thumbBtnCounter = " + str(array_of_args[5]) + 
+        " | powerBtnCounter = " + str(array_of_args[6]) + " | batteryLvlHigh = " + str(array_of_args[7]) + 
+        " | batteryLvlLow = " + str(array_of_args[8]) + " | powerBtnPressed = " + str(array_of_args[9]) + 
+        " | triggerBtnPressed = " + str(array_of_args[10]) + " | reloadBtnPressed = " + str(array_of_args[11]) + 
+        " | thumbBtnPressed = " + str(array_of_args[12]) + " | shotsRemaining = " + str(array_of_args[13]) + 
+        " | shooter1LaserId = " + str(array_of_args[14]) + 
+        " | shooter2LaserId = " + str(array_of_args[15]) + " | shooter1WpnProfile = " + str(array_of_args[16]) + 
+        " | shooter2WpnProfile = " + str(array_of_args[17]) + " | shooter1charge = " + str(array_of_args[18]) + 
+        " | shooter1check = " + str(array_of_args[19]) + " | shooter2charge = " + str(array_of_args[20]) + 
+        " | shooter2check = " + str(array_of_args[21]) + " | shotCounter1 = " + str(array_of_args[22]) + 
+        " | shotCounter2 = " + str(array_of_args[23]) + " | sensorsHit1 = " + str(array_of_args[24]) + 
+        " | sensorsHit2 = " + str(array_of_args[25]) + " | clipSensor1 = " + str(array_of_args[26]) + 
+        " | frontSensor1 = " + str(array_of_args[27]) + " | leftSensor1 = " + str(array_of_args[28]) + 
+        " | rightSensor1 = " + str(array_of_args[29]) + " | clipSensor2 = " + str(array_of_args[30]) + 
+        " | frontSensor2 = " + str(array_of_args[31]) + " | leftSensor2 = " + str(array_of_args[32]) + 
+        " | rightSensor2 = " + str(array_of_args[33]) + 
+        " | status = " + str(array_of_args[34]) + 
+        " | PlayerIdAccepted = " + str(array_of_args[35]) + " | wpnProfileAgain = " + str(array_of_args[36]))
+    _on_laser_gun_still_connected()
+
+#func _processed_laser_telemetry(commandId, playerId, buttonsPressed, triggerBtnCounter, reloadBtnCounter,
+#                thumbBtnCounter, powerBtnCounter, batteryLvlHigh, batteryLvlLow, powerBtnPressed,
+#                triggerBtnPressed, reloadBtnPressed, thumbBtnPressed, shotsRemaining, shooter1LaserId,
+#                shooter2LaserId, shooter1WpnProfile, shooter2WpnProfile, shooter1charge, shooter1check,
+#                shooter2charge, shooter2check, shotCounter1, shotCounter2, sensorsHit1, sensorsHit2,
+#                clipSensor1, frontSensor1, leftSensor1, rightSensor1, clipSensor2, frontSensor2, leftSensor2,
+#                rightSensor2, status, playerIdAccepted, wpnProfileAgain):
+#    print("Telemetry: " + str(commandId) + " | " + str(playerId) + " | " + str(triggerBtnCounter) 
+#        + " | " + str(reloadBtnCounter) + " | " + str(thumbBtnCounter) + " | " + str(powerBtnCounter) + " | " + str(batteryLvlHigh) + " | " + 
+#        str(batteryLvlLow) + " | " + str(powerBtnPressed) + " | " + str(triggerBtnPressed) + " | " + str(reloadBtnPressed) + " | " + 
+#        str(thumbBtnPressed) + " | " + str(shooter1LaserId) + " | " + str(shooter2LaserId) + " | " + str(shooter1WpnProfile) + " | " + 
+#        str(shooter2WpnProfile) + " | " + str(shooter1charge) + " | " + str(shooter2charge) + " | " + 
+#        str(shotCounter1) + " | " + str(shotCounter2) + " | " + str(sensorsHit1) + " | " + str(sensorsHit2))
+#    _laser_telem_batteryLvl(batteryLvlHigh)
+#    _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, reloadBtnPressed, thumbBtnPressed)
+#    _on_laser_gun_still_connected()
 
 func _new_status(status, level):
     # Debug Levels:
