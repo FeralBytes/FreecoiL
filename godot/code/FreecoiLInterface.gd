@@ -248,35 +248,43 @@ func _on_laser_gun_still_connected():
 
 # NEW CHANGE ONLY Oriented Callbacks From Java.
 func _changed_laser_telem_commandId(commandId):
-    command_id = commandId
-    get_tree().call_group("FreecoiL", "fi_command_accepted")
+    if commandId != command_id:
+        command_id = commandId
+        get_tree().call_group("FreecoiL", "fi_command_accepted")
 
 # warning-ignore:unused_argument
 func _changed_laser_telem_playerId(playerId):
-    get_tree().call_group("FreecoiL", "fi_player_id_changed")
-    # TODO: Set or update player id.
-    laser_gun_id = playerId
+    if playerId != laser_gun_id:
+        get_tree().call_group("FreecoiL", "fi_player_id_changed")
+        # TODO: Set or update player id.
+        laser_gun_id = playerId
 
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
-    if Settings.Session.get_data("game_player_alive"):
-        Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
-    else:
-        reload_start()
+    if Settings.Session.get_data("game_weapon_magazine_ammo") != shotsRemaining:
+        if Settings.Session.get_data("game_player_alive"):
+            Settings.Session.set_data("game_weapon_magazine_ammo", shotsRemaining)
+        else:
+            reload_start()
+            Settings.Session.set_data("game_weapon_magazine_ammo", 0)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
-    Settings.Session.set_data("fi_trigger_btn_pushed", triggerBtnCounter)
+    if Settings.Session.get_data("fi_trigger_btn_pushed") != triggerBtnCounter:
+        Settings.Session.set_data("fi_trigger_btn_pushed", triggerBtnCounter)
 
 func _changed_laser_telem_reloadBtnCounter(reloadBtnCounter):
-    reload_btn_counter = reloadBtnCounter
-    get_tree().call_group("FreecoiL", "fi_reload_btn_pushed")
+    if reloadBtnCounter != reload_btn_counter:
+        reload_btn_counter = reloadBtnCounter
+        get_tree().call_group("FreecoiL", "fi_reload_btn_pushed")
 
 func _changed_laser_telem_thumbBtnCounter(thumbBtnCounter):
-    thumb_btn_counter = thumbBtnCounter
-    get_tree().call_group("FreecoiL", "fi_thumb_btn_pushed")
+    if thumbBtnCounter != thumb_btn_counter:
+        thumb_btn_counter = thumbBtnCounter
+        get_tree().call_group("FreecoiL", "fi_thumb_btn_pushed")
 
 func _changed_laser_telem_powerBtnCounter(powerBtnCounter):
-    power_btn_counter = powerBtnCounter
-    get_tree().call_group("FreecoiL", "fi_power_btn_pushed")
+    if powerBtnCounter != power_btn_counter:
+        power_btn_counter = powerBtnCounter
+        get_tree().call_group("FreecoiL", "fi_power_btn_pushed")
 
 func _laser_telem_batteryLvl(batteryLvl):
     # 0x10 = 00010000 = 16 = Brand New Alkalines
@@ -305,17 +313,15 @@ func _laser_telem_batteryLvl(batteryLvl):
             Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
             prev_battery_lvl_avg = battery_lvl_avg
     
-func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2, sensorsHit, sensorsHit2):
+func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2):
     if shotCounter1 != shot_counter_1:
         shot_counter_1 = shotCounter1
         shot_by_id_1 = shotById1
         get_tree().call_group("FreecoiL", "fi_got_shot", shotById1)
-        print("sensorsHit = " + str(sensorsHit))
     if shotCounter2 != shot_counter_2:
         shot_counter_2 = shotCounter2
         shot_by_id_2 = shotById2
         get_tree().call_group("FreecoiL", "fi_got_shot", shotById2)
-        print("sensorsHit2 = " + str(sensorsHit2))
 
 # warning-ignore:unused_argument
 func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
@@ -339,7 +345,6 @@ func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnP
     get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
 
 func _processed_laser_telemetry2(array_of_args):
-    print("Telemetry:  " + str(array_of_args))
     print("commandId = " + str(array_of_args[0]) + " | playerId = " + str(array_of_args[1]) + 
         " | buttonsPressed = " + str(array_of_args[2]) + " | triggerBtnCounter = " + str(array_of_args[3]) + 
         " | reloadBtnCounter = " + str(array_of_args[4]) + " | thumbBtnCounter = " + str(array_of_args[5]) + 
@@ -359,9 +364,19 @@ func _processed_laser_telemetry2(array_of_args):
         " | leftSensor2 = " + str(array_of_args[32]) + " | rightSensor2 = " + str(array_of_args[33]) + 
         " | status = " + str(array_of_args[34]) + " | PlayerIdAccepted = " + str(array_of_args[35]) + 
         " | wpnProfileAgain = " + str(array_of_args[36]))
+    
+    _changed_laser_telem_shot_data(str(array_of_args[14]), array_of_args[15], array_of_args[22], array_of_args[23])
+    _changed_laser_telem_shotsRemaining(array_of_args[13])
+    _changed_laser_telem_triggerBtnCounter(array_of_args[3])
     _on_laser_gun_still_connected()
-    _laser_telem_batteryLvl(batteryLvlHigh)
-    _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, reloadBtnPressed, thumbBtnPressed)
+    _laser_telem_batteryLvl(array_of_args[7])
+    _changed_telem_button_pressed(array_of_args[9], array_of_args[10], array_of_args[11], array_of_args[12])
+    _changed_laser_telem_reloadBtnCounter(array_of_args[4])
+    _changed_laser_telem_thumbBtnCounter(array_of_args[5])
+    _changed_laser_telem_powerBtnCounter(array_of_args[6])
+    _changed_laser_telem_playerId(array_of_args[1])
+    _changed_laser_telem_commandId(array_of_args[0])
+    
 
 func _new_status(status, level):
     # Debug Levels:

@@ -4,33 +4,33 @@ ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidM
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:2:1-33:12
-MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:2:1-22:12
-MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5debf09d2541e0ccacc6adc6a4fdd105/fragment-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3a2f8d614676183a411d5d0a5ccffd59/legacy-support-core-ui-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0cb8e9b70eb18e6366ea818d50894e47/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3ae307e411008a5abe35b795699599f8/loader-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1d849761628829d2295b320ffc5152e0/media-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa1cda0d762347a9cb7d79eaeeb289e8/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/366555e0658123cedccaf0883b3651bc/coordinatorlayout-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dab48ee8d761a62192a7c0c78bc8a1aa/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/850bf142cefab6ec1f243621257bf44e/slidingpanelayout-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f6f80dc4871d749a0cd888fb14aba5f3/customview-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7d767b2deaf02a4aa041ae0685eb6b5e/swiperefreshlayout-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/263114587795ce3a15b18060381f86be/asynclayoutinflater-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:17:1-24:12
-MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bc6997ad05a1af84d78303dcea3eae39/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/58990e31d8d4b533b7ff983aa60b00fc/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/53bf8556c8b730ae1255779c2895d59b/print-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:17:1-25:12
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/041f24b39a6e5bfd79a1db377c03d8b1/lifecycle-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bbd5c89acb3086548b6dfeb7a06e205e/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1f0eea5572e817d886a572edc39d8e7d/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/157e39bb99c978d081f37e13d2ab360e/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7f304c13f8d08f7c389d2cae44e8a25c/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/9180283ae214e030164cb294841a7487/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0530fd952fd1ec33fcda9664c94741cf/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:2:1-33:12
+MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:2:1-22:12
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/67d949fd85d8be01c6b0e4c8e74e97ea/legacy-support-v4-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5d7fed3c7a7fde7d2d2d4741df0b87eb/fragment-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f515309cc8dbd44e178eb75e596ab75f/legacy-support-core-ui-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f04a8c183601caacc96b824a6f519df9/legacy-support-core-utils-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6691ef9619d31d010ef1c9531c126147/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/af8f60acb97d685bfe8826598751b073/media-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dd7353a199d4f00c3ede7de39f7f5e71/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0261d748317f39b5d99dcc3d3c583318/coordinatorlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/e1730d82d25d2fb44bbe35379ec0c52a/drawerlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/47a40764217633fbe0ef06a6962c5fac/slidingpanelayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5719adb07fee1829eb14de5e7f1d32c9/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/ddca37b3f6a421139e0d579eac80ba13/swiperefreshlayout-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/be2dd9804d4f5db6fc5f0f9b19e50834/asynclayoutinflater-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/54f5e6d32f682c7b10405655d25d76a9/documentfile-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/625ffde959813c0824a7659f9bee16e5/localbroadcastmanager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f71fd00143bc7c398b43f5dcd3f12a64/print-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/eb6c22b72d414a283d79c69c99dcc5f9/versionedparcelable-1.0.0/AndroidManifest.xml:17:1-25:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa2314cd401d835522e045ae28a80b8b/lifecycle-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8bdcc6a00ae573755ed2f4d21f536449/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/42e6f3f0e4dd418bd834ad6aaec1b200/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8d29cde4228523d1522fff9e02ceabf0/cursoradapter-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/639a06f7df2ee72118834181895d3767/lifecycle-livedata-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f2c95d0984fb5b0005b0101349d51836/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/40087872e2bfe87b57fda13e39dcf480/core-runtime-2.0.0/AndroidManifest.xml:17:1-22:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:2:1-70:12
@@ -70,18 +70,18 @@ ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidM
 		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:21:9-32
 application
 ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:30:5-68:19
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
-MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:18:5-20:19
-MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:18:5-20:19
-MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:22:5-89
-MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:22:5-89
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:22:5-23:19
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:15:5-31:19
+MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:18:5-20:19
+MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:18:5-20:19
+MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:22:5-89
+MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:22:5-89
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/eb6c22b72d414a283d79c69c99dcc5f9/versionedparcelable-1.0.0/AndroidManifest.xml:22:5-23:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/eb6c22b72d414a283d79c69c99dcc5f9/versionedparcelable-1.0.0/AndroidManifest.xml:22:5-23:19
 	android:requestLegacyExternalStorage
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:18:18-61
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:18:18-61
 	android:appComponentFactory
-		ADDED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:22:18-86
+		ADDED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:22:18-86
 	android:label
 		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml:30:18-67
 	tools:ignore
@@ -140,60 +140,60 @@ uses-sdk
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
-MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
-MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:7:5-9:41
-MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:7:5-9:41
-MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/72b4d95a0e8b43ee4215c0c4e8b0fb72/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5debf09d2541e0ccacc6adc6a4fdd105/fragment-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5debf09d2541e0ccacc6adc6a4fdd105/fragment-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3a2f8d614676183a411d5d0a5ccffd59/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3a2f8d614676183a411d5d0a5ccffd59/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0cb8e9b70eb18e6366ea818d50894e47/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0cb8e9b70eb18e6366ea818d50894e47/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3ae307e411008a5abe35b795699599f8/loader-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/3ae307e411008a5abe35b795699599f8/loader-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1d849761628829d2295b320ffc5152e0/media-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1d849761628829d2295b320ffc5152e0/media-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa1cda0d762347a9cb7d79eaeeb289e8/viewpager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa1cda0d762347a9cb7d79eaeeb289e8/viewpager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/366555e0658123cedccaf0883b3651bc/coordinatorlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/366555e0658123cedccaf0883b3651bc/coordinatorlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dab48ee8d761a62192a7c0c78bc8a1aa/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dab48ee8d761a62192a7c0c78bc8a1aa/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/850bf142cefab6ec1f243621257bf44e/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/850bf142cefab6ec1f243621257bf44e/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f6f80dc4871d749a0cd888fb14aba5f3/customview-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f6f80dc4871d749a0cd888fb14aba5f3/customview-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7d767b2deaf02a4aa041ae0685eb6b5e/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7d767b2deaf02a4aa041ae0685eb6b5e/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/263114587795ce3a15b18060381f86be/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/263114587795ce3a15b18060381f86be/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bc6997ad05a1af84d78303dcea3eae39/documentfile-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bc6997ad05a1af84d78303dcea3eae39/documentfile-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/58990e31d8d4b533b7ff983aa60b00fc/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/58990e31d8d4b533b7ff983aa60b00fc/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/53bf8556c8b730ae1255779c2895d59b/print-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/53bf8556c8b730ae1255779c2895d59b/print-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/619de63d53cf935c91c581371b6a6faa/versionedparcelable-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/041f24b39a6e5bfd79a1db377c03d8b1/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/041f24b39a6e5bfd79a1db377c03d8b1/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bbd5c89acb3086548b6dfeb7a06e205e/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/bbd5c89acb3086548b6dfeb7a06e205e/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1f0eea5572e817d886a572edc39d8e7d/interpolator-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/1f0eea5572e817d886a572edc39d8e7d/interpolator-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/157e39bb99c978d081f37e13d2ab360e/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/157e39bb99c978d081f37e13d2ab360e/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7f304c13f8d08f7c389d2cae44e8a25c/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/7f304c13f8d08f7c389d2cae44e8a25c/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/9180283ae214e030164cb294841a7487/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/9180283ae214e030164cb294841a7487/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0530fd952fd1ec33fcda9664c94741cf/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
-MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0530fd952fd1ec33fcda9664c94741cf/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
+MERGED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:7:5-9:41
+MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:7:5-9:41
+MERGED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:7:5-9:41
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/67d949fd85d8be01c6b0e4c8e74e97ea/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-v4:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/67d949fd85d8be01c6b0e4c8e74e97ea/legacy-support-v4-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5d7fed3c7a7fde7d2d2d4741df0b87eb/fragment-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.fragment:fragment:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5d7fed3c7a7fde7d2d2d4741df0b87eb/fragment-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f515309cc8dbd44e178eb75e596ab75f/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-ui:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f515309cc8dbd44e178eb75e596ab75f/legacy-support-core-ui-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f04a8c183601caacc96b824a6f519df9/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.legacy:legacy-support-core-utils:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f04a8c183601caacc96b824a6f519df9/legacy-support-core-utils-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6691ef9619d31d010ef1c9531c126147/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6691ef9619d31d010ef1c9531c126147/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/af8f60acb97d685bfe8826598751b073/media-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.media:media:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/af8f60acb97d685bfe8826598751b073/media-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dd7353a199d4f00c3ede7de39f7f5e71/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/dd7353a199d4f00c3ede7de39f7f5e71/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0261d748317f39b5d99dcc3d3c583318/coordinatorlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.coordinatorlayout:coordinatorlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/0261d748317f39b5d99dcc3d3c583318/coordinatorlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/e1730d82d25d2fb44bbe35379ec0c52a/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.drawerlayout:drawerlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/e1730d82d25d2fb44bbe35379ec0c52a/drawerlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/47a40764217633fbe0ef06a6962c5fac/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.slidingpanelayout:slidingpanelayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/47a40764217633fbe0ef06a6962c5fac/slidingpanelayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5719adb07fee1829eb14de5e7f1d32c9/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/5719adb07fee1829eb14de5e7f1d32c9/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/ddca37b3f6a421139e0d579eac80ba13/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/ddca37b3f6a421139e0d579eac80ba13/swiperefreshlayout-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/be2dd9804d4f5db6fc5f0f9b19e50834/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.asynclayoutinflater:asynclayoutinflater:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/be2dd9804d4f5db6fc5f0f9b19e50834/asynclayoutinflater-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/54f5e6d32f682c7b10405655d25d76a9/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.documentfile:documentfile:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/54f5e6d32f682c7b10405655d25d76a9/documentfile-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/625ffde959813c0824a7659f9bee16e5/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/625ffde959813c0824a7659f9bee16e5/localbroadcastmanager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f71fd00143bc7c398b43f5dcd3f12a64/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.print:print:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f71fd00143bc7c398b43f5dcd3f12a64/print-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/eb6c22b72d414a283d79c69c99dcc5f9/versionedparcelable-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/eb6c22b72d414a283d79c69c99dcc5f9/versionedparcelable-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa2314cd401d835522e045ae28a80b8b/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/fa2314cd401d835522e045ae28a80b8b/lifecycle-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8bdcc6a00ae573755ed2f4d21f536449/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8bdcc6a00ae573755ed2f4d21f536449/lifecycle-viewmodel-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/42e6f3f0e4dd418bd834ad6aaec1b200/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/42e6f3f0e4dd418bd834ad6aaec1b200/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8d29cde4228523d1522fff9e02ceabf0/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.cursoradapter:cursoradapter:1.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8d29cde4228523d1522fff9e02ceabf0/cursoradapter-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/639a06f7df2ee72118834181895d3767/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/639a06f7df2ee72118834181895d3767/lifecycle-livedata-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f2c95d0984fb5b0005b0101349d51836/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/f2c95d0984fb5b0005b0101349d51836/lifecycle-livedata-core-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/40087872e2bfe87b57fda13e39dcf480/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.0.0] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/40087872e2bfe87b57fda13e39dcf480/core-runtime-2.0.0/AndroidManifest.xml:20:5-44
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 	android:targetSdkVersion
@@ -205,34 +205,34 @@ INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/Andro
 		ADDED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 		INJECTED from /home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/AndroidManifest.xml
 uses-permission#android.permission.BLUETOOTH
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:5-68
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:11:5-68
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:11:22-65
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:11:22-65
 uses-permission#android.permission.BLUETOOTH_ADMIN
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:5-74
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:12:5-74
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:12:22-71
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:12:22-71
 uses-permission#android.permission.VIBRATE
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:5-66
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:13:5-66
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:13:22-63
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:13:22-63
 meta-data#org.godotengine.plugin.v1.FreecoiL
-ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
+ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:28:9-30:82
 	android:value
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:30:13-79
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:30:13-79
 	android:name
-		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/2128ff34b4c8e76a093b83c420ec02ac/FreecoiL.debug/AndroidManifest.xml:29:13-62
+		ADDED from [FreecoiL.debug.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/29ebbf97f6806d873590bf2e5e320dd3/FreecoiL.debug/AndroidManifest.xml:29:13-62
 instrumentation
-ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:11:5-15:57
+ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:11:5-15:57
 	android:label
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:14:9-58
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:14:9-58
 	android:icon
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:13:9-36
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:13:9-36
 	android:targetPackage
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:15:9-54
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:15:9-54
 	android:name
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:12:9-45
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:12:9-45
 service#org.godotengine.godot.GodotDownloaderService
-ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:19:9-80
+ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:19:9-80
 	android:name
-		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/AndroidManifest.xml:19:18-77
+		ADDED from [godot-lib.release.aar] /home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/AndroidManifest.xml:19:18-77

@@ -371,8 +371,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             buttonsPressed = data[TELEM_BUTTONS_PRESSED].toInt()
             val powerBtnPressed = buttonsPressed shr 4
             val triggerBtnPressed = buttonsPressed and 0b1
-            val reloadBtnPressed = buttonsPressed shr 1 and 0b1
-            val thumbBtnPressed = buttonsPressed shr 2 and 0b1
+            val thumbBtnPressed = buttonsPressed shr 1 and 0b1
+            val reloadBtnPressed = buttonsPressed shr 2 and 0b1
             /*GodotLib.calldeferred(instanceId.toLong(), "_changed_telem_button_pressed", arrayOf<Any>(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed))*/
             /* Rather than monitor if a button is currently pressed, we monitor the counter. Usually
                when the player presses a button, we see many packets showing that the button is

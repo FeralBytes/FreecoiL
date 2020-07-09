@@ -4,7 +4,17 @@
             "outputFile": "/home/wolfrage/0.Projects/5.FreecoiL/src/godot/android/build/build/intermediates/incremental/mergeReleaseResources/merged.dir/values-sv/values-sv.xml",
             "map": [
                 {
-                    "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/947833f03979c6d84fcd9a8feba7ce42/core-1.0.0/res/values-sv/values-sv.xml",
+                    "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/8cdc50d936302fae9b3dd1244b287c0a/godot-lib.release/res/values-sv/values-sv.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "75",
+                        "endOffsets": "126"
+                    }
+                },
+                {
+                    "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/6701a4cdf5d2b04f941fe50e220e339f/core-1.0.0/res/values-sv/values-sv.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
@@ -18,16 +28,6 @@
                         "startOffsets": "131",
                         "endColumns": "100",
                         "endOffsets": "227"
-                    }
-                },
-                {
-                    "source": "/home/wolfrage/.gradle/caches/transforms-2/files-2.1/81dbe69b96383aaae7f851d7be1db76b/godot-lib.release/res/values-sv/values-sv.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "55",
-                        "endColumns": "75",
-                        "endOffsets": "126"
                     }
                 }
             ]
