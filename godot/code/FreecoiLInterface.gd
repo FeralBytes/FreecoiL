@@ -246,18 +246,17 @@ func _on_activity_result_fine_access():
 func _on_laser_gun_still_connected():
     bt_connection_timed_out.start()  # resets the timer.
 
-# NEW CHANGE ONLY Oriented Callbacks From Java.
 func _changed_laser_telem_commandId(commandId):
     if commandId != command_id:
         command_id = commandId
         get_tree().call_group("FreecoiL", "fi_command_accepted")
 
 # warning-ignore:unused_argument
-func _changed_laser_telem_playerId(playerId):
-    if playerId != laser_gun_id:
+func _changed_laser_telem_playerId(laser_id):
+    if Settings.Session.get_data("fi_laser_id") != laser_id:
         get_tree().call_group("FreecoiL", "fi_player_id_changed")
-        # TODO: Set or update player id.
-        laser_gun_id = playerId
+        Settings.Session.set_data("fi_laser_id", laser_id)
+        laser_gun_id = laser_id
 
 func _changed_laser_telem_shotsRemaining(shotsRemaining):
     if Settings.Session.get_data("game_weapon_magazine_ammo") != shotsRemaining:
@@ -268,23 +267,20 @@ func _changed_laser_telem_shotsRemaining(shotsRemaining):
             Settings.Session.set_data("game_weapon_magazine_ammo", 0)
 
 func _changed_laser_telem_triggerBtnCounter(triggerBtnCounter):
-    if Settings.Session.get_data("fi_trigger_btn_pushed") != triggerBtnCounter:
-        Settings.Session.set_data("fi_trigger_btn_pushed", triggerBtnCounter)
+    if Settings.Session.get_data("fi_trigger_btn_counter") != triggerBtnCounter:
+        Settings.Session.set_data("fi_trigger_btn_counter", triggerBtnCounter)
 
-func _changed_laser_telem_reloadBtnCounter(reloadBtnCounter):
-    if reloadBtnCounter != reload_btn_counter:
-        reload_btn_counter = reloadBtnCounter
-        get_tree().call_group("FreecoiL", "fi_reload_btn_pushed")
+func _changed_laser_telem_reloadBtnCounter(reload_btn_counter):
+    if Settings.Session.get_data("fi_reload_btn_counter") != reload_btn_counter:
+        Settings.Session.set_data("fi_reload_btn_counter", reload_btn_counter)
 
-func _changed_laser_telem_thumbBtnCounter(thumbBtnCounter):
-    if thumbBtnCounter != thumb_btn_counter:
-        thumb_btn_counter = thumbBtnCounter
-        get_tree().call_group("FreecoiL", "fi_thumb_btn_pushed")
+func _changed_laser_telem_thumbBtnCounter(thumb_btn_counter):
+    if Settings.Session.get_data("fi_thumb_btn_counter") != thumb_btn_counter:
+        Settings.Session.set_data("fi_thumb_btn_counter", thumb_btn_counter)
 
-func _changed_laser_telem_powerBtnCounter(powerBtnCounter):
-    if powerBtnCounter != power_btn_counter:
-        power_btn_counter = powerBtnCounter
-        get_tree().call_group("FreecoiL", "fi_power_btn_pushed")
+func _changed_laser_telem_powerBtnCounter(power_btn_counter):
+    if Settings.Session.get_data("fi_power_btn_counter") != power_btn_counter:
+        Settings.Session.set_data("fi_power_btn_counter", power_btn_counter)
 
 func _laser_telem_batteryLvl(batteryLvl):
     # 0x10 = 00010000 = 16 = Brand New Alkalines
