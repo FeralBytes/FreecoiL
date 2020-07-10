@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=2]
+[gd_scene load_steps=53 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -53,9 +53,7 @@ func fi_buttons_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, rel
 script/source = "extends Button
 
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
+onready var PlusMinus = get_parent().get_node(\"PlusMinusWidget\")
 
 
 # Called when the node enters the scene tree for the first time.
@@ -69,7 +67,32 @@ func _ready():
 
 
 func _on_Button5_pressed():
+    FreecoiLInterface.enable_recoil(false)
+    FreecoiLInterface.reload_start()
     Settings.Session.set_data(\"game_player_alive\", true)
+    FreecoiLInterface.reload_finish(20)
+
+
+func _on_PlusMinusWidget_PMWidChanged(__):
+    FreecoiLInterface.set_laser_id(PlusMinus.current_val)
+"
+
+[sub_resource type="GDScript" id=44]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_weapon_magazine_ammo\"), self, \"weapon_ammo_changed\")
+
+
+func weapon_ammo_changed(new_val):
+    text = \"AmmoRemaining=\" + str(new_val)
 "
 
 [sub_resource type="GDScript" id=3]
@@ -170,8 +193,11 @@ func force_player_name(__):
         Settings.Preferences.set_data(\"player_name\", \"No Name\")
         if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
+            yield(get_tree(), 'idle_frame')
             CallSignLineEdit.grab_focus()
+            yield(get_tree(), 'idle_frame')
             if LoginPlayerAudio.playing == false:
+                # TODO background load this.
                 LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
                 LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
@@ -1128,42 +1154,53 @@ scale = Vector2( 1.3, 1.2 )
 texture = ExtResource( 8 )
 
 [node name="Button" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 69.2964
-margin_top = 214.96
-margin_right = 181.296
-margin_bottom = 258.96
-text = "Power"
+margin_left = 95.4092
+margin_top = 222.247
+margin_right = 155.409
+margin_bottom = 258.247
+text = "00"
+align = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Button2" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 403.051
-margin_top = 60.8111
-margin_right = 515.051
-margin_bottom = 104.811
-text = "Reload"
+margin_left = 437.847
+margin_top = 54.0763
+margin_right = 497.847
+margin_bottom = 90.0763
+rect_min_size = Vector2( 60, 0 )
+text = "00"
+align = 1
 
 [node name="Button3" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 65.0538
 margin_top = 50.2836
-margin_right = 181.054
-margin_bottom = 94.2836
-text = "Thumb"
+margin_right = 119.054
+margin_bottom = 86.2836
+rect_min_size = Vector2( 60, 0 )
+text = "00"
+align = 1
 
 [node name="Button4" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 190.919
-margin_top = 298.399
-margin_right = 306.919
-margin_bottom = 342.399
-text = "Trigger"
+margin_left = 256.022
+margin_top = 283.807
+margin_right = 316.022
+margin_bottom = 319.807
+rect_min_size = Vector2( 60, 0 )
+text = "00"
+align = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="RichTextLabel" type="RichTextLabel" parent="-1,-1-Tests2/GunTester"]
 margin_left = 2.0
-margin_top = 750.0
+margin_top = 758.0
 margin_right = 538.0
-margin_bottom = 950.0
+margin_bottom = 958.0
 rect_min_size = Vector2( 536, 200 )
+scroll_following = true
 script = SubResource( 1 )
 
 [node name="Button5" type="Button" parent="-1,-1-Tests2/GunTester"]
@@ -1171,6 +1208,138 @@ margin_right = 12.0
 margin_bottom = 44.0
 text = "Start Testing"
 script = SubResource( 2 )
+
+[node name="PlusMinusWidget" parent="-1,-1-Tests2/GunTester" instance=ExtResource( 4 )]
+margin_left = 221.125
+margin_top = 110.001
+margin_right = 370.125
+margin_bottom = 157.001
+
+[node name="Label" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 188.574
+margin_top = 68.4702
+margin_right = 390.574
+margin_bottom = 104.47
+text = "Laser ID=00"
+
+[node name="Label10" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 267.146
+margin_top = 8.97968
+margin_right = 407.146
+margin_bottom = 44.9797
+text = "CommandId=00"
+
+[node name="Label11" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 181.839
+margin_top = 163.879
+margin_right = 509.839
+margin_bottom = 199.879
+text = "AmmoRemaining=000"
+script = SubResource( 44 )
+
+[node name="Label2" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.1225
+margin_top = 285.105
+margin_right = 248.122
+margin_bottom = 321.105
+text = "Shooter1ID=00"
+
+[node name="Label4" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -5.61224
+margin_top = 322.146
+margin_right = 378.388
+margin_bottom = 358.146
+text = "Shooter1WpnProfile=00"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label12" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -1.12238
+margin_top = 556.741
+margin_right = 382.878
+margin_bottom = 592.741
+text = "Shooter2WpnProfile=00"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label5" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -2.24487
+margin_top = 354.698
+margin_right = 381.755
+margin_bottom = 390.698
+text = "Shooter1ChargeLvl=00"
+
+[node name="Label13" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.12256
+margin_top = 591.537
+margin_right = 385.123
+margin_bottom = 627.537
+text = "Shooter2ChargeLvl=00"
+
+[node name="Label6" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -2.36743
+margin_top = 385.183
+margin_right = 319.633
+margin_bottom = 421.183
+text = "Shooter1SensorClip"
+
+[node name="Label14" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -0.122498
+margin_top = 624.268
+margin_right = 321.878
+margin_bottom = 660.268
+text = "Shooter2SensorClip"
+
+[node name="Label7" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -3.48987
+margin_top = 418.857
+margin_right = 348.51
+margin_bottom = 454.857
+text = "Shooter1SensorFront"
+
+[node name="Label15" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.0
+margin_top = 660.187
+margin_right = 353.0
+margin_bottom = 696.187
+text = "Shooter2SensorFront"
+
+[node name="Label8" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.0
+margin_top = 455.898
+margin_right = 326.0
+margin_bottom = 491.898
+text = "Shooter1SensorLeft"
+
+[node name="Label16" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.0
+margin_top = 690.493
+margin_right = 326.0
+margin_bottom = 726.493
+text = "Shooter2SensorLeft"
+
+[node name="Label9" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -4.6123
+margin_top = 492.94
+margin_right = 338.388
+margin_bottom = 528.94
+text = "Shooter1SensorRight"
+
+[node name="Label17" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = -2.36737
+margin_top = 721.922
+margin_right = 340.633
+margin_bottom = 757.922
+text = "Shooter2SensorRight"
+
+[node name="Label3" type="Label" parent="-1,-1-Tests2/GunTester"]
+margin_left = 1.0
+margin_top = 524.0
+margin_right = 252.0
+margin_bottom = 560.0
+text = "Shooter2ID=00"
 
 [node name="1,-1-ConnectGun" parent="." instance=ExtResource( 5 )]
 
@@ -2941,6 +3110,7 @@ script = SubResource( 43 )
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
 [connection signal="pressed" from="-1,-1-Tests2/GunTester/Button5" to="-1,-1-Tests2/GunTester/Button5" method="_on_Button5_pressed"]
+[connection signal="PMWidChanged" from="-1,-1-Tests2/GunTester/PlusMinusWidget" to="-1,-1-Tests2/GunTester/Button5" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
 [connection signal="text_entered" from="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" to="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" method="_on_PlayerName_text_entered" flags=3]
 [connection signal="pressed" from="2,-1-Preferences/CenterContainer/VBoxContainer/Button" to="2,-1-Preferences/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]
