@@ -1,4 +1,4 @@
-image: myood/godot-ci-android-export:godot-3.2.2-beta4
+image: myood/godot-ci-android-export:godot-3.2.2
 
 #https://github.com/myood/godot-ci-android-export
 #https://github.com/myood/godot-ci-android-export/blob/master/.gitlab-ci.yml
@@ -59,7 +59,7 @@ build_apk:
     - ls -l /root/android/debug.keystore
     - ls -l /root/android/platform-tools/adb
     - ls -l /root/android/build-tools
-    - ls -l /root/.local/share/godot/templates/3.2.2.beta4
+    - ls -l /root/.local/share/godot/templates/3.2.2
     # Add the right build tools
     - set +o pipefail
     - yes | ~/android/tools/bin/sdkmanager "build-tools;29.0.3" > /dev/null
