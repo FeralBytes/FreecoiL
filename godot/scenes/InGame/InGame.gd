@@ -468,7 +468,8 @@ func reload_finish():
     else:
         Settings.Session.set_data("game_weapon_magazine_ammo", Settings.Session.get_data("game_weapon_total_ammo"))
     Settings.Session.set_data("game_weapon_total_ammo", remove_magazine_ammo)
-    FreecoiLInterface.reload_finish(Settings.Session.get_data("game_weapon_magazine_ammo"))
+    FreecoiLInterface.reload_finish(Settings.Session.get_data("game_weapon_magazine_ammo"),
+        Settings.Session.get_data("game_player_laser_id"))
 
 func eliminated(laser_id):
     if Settings.Session.get_data("game_started") == 1:

@@ -135,12 +135,9 @@ func new_set_shot_mode(shot_mode, narrow_beam_pwr, wide_beam_pwr, custom_rate_of
         shot_mode = 2 # Custom Shot Mode.
     if FreecoiL != null:
         if Settings.Session.get_data("fi_laser_is_connected") == 2:
-            print("*** here 0")
             if shot_mode == 2:
-                print("***** Here 2")
                 FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, custom_rate_of_fire)
             else:
-                print("****** Here 1")
                 FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, 0)
 
 func enable_recoil(enabled):
