@@ -1120,16 +1120,14 @@ __meta__ = {
 [node name="CenterContainer" type="CenterContainer" parent="-1,1-Scoreboard"]
 margin_top = 100.0
 margin_right = 540.0
-margin_bottom = 956.0
+margin_bottom = 948.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
-margin_left = 2.0
-margin_top = 4.0
-margin_right = 542.0
-margin_bottom = 852.0
+margin_right = 540.0
+margin_bottom = 848.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Label" type="Label" parent="-1,1-Scoreboard/CenterContainer/VBoxContainer"]

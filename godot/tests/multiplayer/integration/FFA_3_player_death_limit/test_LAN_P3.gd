@@ -110,13 +110,13 @@ func test_p3_can_disconnect_from_game():
     
 func test_p3_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
     yield(get_tree().create_timer(8.0), "timeout")
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(2)
     yield(get_tree().create_timer(1.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(1)
     yield(get_tree().create_timer(1.0), "timeout")
     
 func test_p3_can_be_eliminated():
@@ -125,17 +125,17 @@ func test_p3_can_be_eliminated():
     while Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
         yield(get_tree(), 'idle_frame')
     yield(get_tree().create_timer(3.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(3)
     yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(4)
     yield(get_tree().create_timer(1.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(2)
     yield(get_tree().create_timer(1.0), "timeout")
     Settings.Session.set_data("game_player_health", 1)
     yield(get_tree(), 'idle_frame')
-    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 0, 0, 0, 0)
+    FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["2"], 0, 1, 0)
     yield(get_tree(), 'idle_frame')
     assert_eq(Settings.Session.get_data("game_player_alive"), false)
     yield(get_tree(), 'idle_frame')

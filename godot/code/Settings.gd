@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev0"
+const VERSION = "0.3.1-dev1"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -12,7 +12,7 @@ const NETWORK_LAN_PORT = 8818
 const MAX_PLAYERS = 62
 const MIN_PLAYERS = 2
 const MAX_OBSERVERS = 1
-const __MAX_SIGNALS = 127  #  + 1 is the real max because S0 is a possible signal.
+const __MAX_SIGNALS = 191  #  + 1 is the real max because S0 is a possible signal.
 
 var DEBUG_GUI = false
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
@@ -422,6 +422,134 @@ class Data:
     signal S126
     # warning-ignore:unused_signal
     signal S127
+    # warning-ignore:unused_signal
+    signal S128
+    # warning-ignore:unused_signal
+    signal S129
+    # warning-ignore:unused_signal
+    signal S130
+    # warning-ignore:unused_signal
+    signal S131
+    # warning-ignore:unused_signal
+    signal S132
+    # warning-ignore:unused_signal
+    signal S133
+    # warning-ignore:unused_signal
+    signal S134
+    # warning-ignore:unused_signal
+    signal S135
+    # warning-ignore:unused_signal
+    signal S136
+    # warning-ignore:unused_signal
+    signal S137
+    # warning-ignore:unused_signal
+    signal S138
+    # warning-ignore:unused_signal
+    signal S139
+    # warning-ignore:unused_signal
+    signal S140
+    # warning-ignore:unused_signal
+    signal S141
+    # warning-ignore:unused_signal
+    signal S142
+    # warning-ignore:unused_signal
+    signal S143
+    # warning-ignore:unused_signal
+    signal S144
+    # warning-ignore:unused_signal
+    signal S145
+    # warning-ignore:unused_signal
+    signal S146
+    # warning-ignore:unused_signal
+    signal S147
+    # warning-ignore:unused_signal
+    signal S148
+    # warning-ignore:unused_signal
+    signal S149
+    # warning-ignore:unused_signal
+    signal S150
+    # warning-ignore:unused_signal
+    signal S151
+    # warning-ignore:unused_signal
+    signal S152
+    # warning-ignore:unused_signal
+    signal S153
+    # warning-ignore:unused_signal
+    signal S154
+    # warning-ignore:unused_signal
+    signal S155
+    # warning-ignore:unused_signal
+    signal S156
+    # warning-ignore:unused_signal
+    signal S157
+    # warning-ignore:unused_signal
+    signal S158
+    # warning-ignore:unused_signal
+    signal S159
+    # warning-ignore:unused_signal
+    signal S160
+    # warning-ignore:unused_signal
+    signal S161
+    # warning-ignore:unused_signal
+    signal S162
+    # warning-ignore:unused_signal
+    signal S163
+    # warning-ignore:unused_signal
+    signal S164
+    # warning-ignore:unused_signal
+    signal S165
+    # warning-ignore:unused_signal
+    signal S166
+    # warning-ignore:unused_signal
+    signal S167
+    # warning-ignore:unused_signal
+    signal S168
+    # warning-ignore:unused_signal
+    signal S169
+    # warning-ignore:unused_signal
+    signal S170
+    # warning-ignore:unused_signal
+    signal S171
+    # warning-ignore:unused_signal
+    signal S172
+    # warning-ignore:unused_signal
+    signal S173
+    # warning-ignore:unused_signal
+    signal S174
+    # warning-ignore:unused_signal
+    signal S175
+    # warning-ignore:unused_signal
+    signal S176
+    # warning-ignore:unused_signal
+    signal S177
+    # warning-ignore:unused_signal
+    signal S178
+    # warning-ignore:unused_signal
+    signal S179
+    # warning-ignore:unused_signal
+    signal S180
+    # warning-ignore:unused_signal
+    signal S181
+    # warning-ignore:unused_signal
+    signal S182
+    # warning-ignore:unused_signal
+    signal S183
+    # warning-ignore:unused_signal
+    signal S184
+    # warning-ignore:unused_signal
+    signal S185
+    # warning-ignore:unused_signal
+    signal S186
+    # warning-ignore:unused_signal
+    signal S187
+    # warning-ignore:unused_signal
+    signal S188
+    # warning-ignore:unused_signal
+    signal S189
+    # warning-ignore:unused_signal
+    signal S190
+    # warning-ignore:unused_signal
+    signal S191
         ######## END SIGNALS ########
 
 func _ready():

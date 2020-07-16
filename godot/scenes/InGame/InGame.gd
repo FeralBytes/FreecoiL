@@ -54,7 +54,10 @@ func _ready():
         FreecoiLInterface.enable_recoil(false)
     FreecoiLInterface.set_laser_id(Settings.InGame.get_data("player_laser_by_id")[Settings.Session.get_data("mup_id")])
     # Make Connections
-    Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_pushed"), self, "fi_trigger_btn_pushed")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_trigger_btn_counter"), self, "fi_trigger_btn_counter")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_reload_btn_counter"), self, "fi_reload_btn_counter")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_power_btn_counter"), self, "fi_power_btn_counter")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_thumb_btn_counter"), self, "fi_thumb_btn_counter")
     Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "connection_status_event")
     rng.randomize()
     if Settings.InGame.get_data("game_limit_mode") == "time":
@@ -551,7 +554,7 @@ func change_weapon(wpn_name=null):
 ###############################################################################
 # FreecoiL group callback Functions
 ###############################################################################  
-func fi_trigger_btn_pushed(__):
+func fi_trigger_btn_counter(__):
     if Settings.Session.get_data("game_player_alive"):
         if Settings.Session.get_data("game_weapon_magazine_ammo") == 0:
             EmptyShotSound.volume_db = 0
@@ -564,7 +567,7 @@ func fi_trigger_btn_pushed(__):
         #else your dead so pass.
             
     
-func fi_reload_btn_pushed():
+func fi_reload_btn_counter(__):
     if Settings.Session.get_data("game_player_alive"):
         reload_start()
 
@@ -592,7 +595,7 @@ func fi_got_shot(laser_id):
             else:
                 respawn_start(laser_id)
     
-func fi_power_btn_pushed():
+func fi_power_btn_counter(__):
     var force_recoil = Settings.InGame.get_data("force_recoil")
     if force_recoil == null or force_recoil == "dont":
         if FreecoiLInterface.recoil_enabled:
@@ -600,7 +603,7 @@ func fi_power_btn_pushed():
         else:
             FreecoiLInterface.enable_recoil(true)
 
-func fi_thumb_btn_pushed():
+func fi_thumb_btn_counter(__):
     change_weapon(null)
 
 func _on_RespawnButton_pressed():

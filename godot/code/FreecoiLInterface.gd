@@ -83,33 +83,65 @@ func reload_start():
         if Settings.Session.get_data("fi_laser_is_connected") == 2:
             FreecoiL.startReload()
 
-func reload_finish(new_rounds):
+func reload_finish(new_rounds, new_player_id=null, wpn_prfl=null):
     if FreecoiL != null:
         if Settings.Session.get_data("fi_laser_is_connected") == 2:
-            FreecoiL.finishReload(new_rounds)
+            if new_player_id == null:
+                if wpn_prfl == null:
+                    FreecoiL.finishReload(new_rounds, Settings.Session.get_data("fi_laser_id"), 0)
+                else:
+                    FreecoiL.finishReload(new_rounds, Settings.Session.get_data("fi_laser_id"), wpn_prfl)
+            else:
+                if wpn_prfl == null:
+                    FreecoiL.finishReload(new_rounds, new_player_id, 0)
+                else:
+                    FreecoiL.finishReload(new_rounds, new_player_id, wpn_prfl)
 
 func set_shot_mode(shot_mode, indoor_outdoor_mode):
-    # SHOT_MODE_FULL_AUTO = 1
-    # SHOT_MODE_SINGLE = 2
-    # SHOT_MODE_BURST = 4
-    # FIRING_MODE_OUTDOOR_NO_CONE = 0;
-    # FIRING_MODE_OUTDOOR_WITH_CONE = 1;
-    # FIRING_MODE_INDOOR_NO_CONE = 2;
+    var narrow_beam_pwr = 0
+    var wide_beam_pwr = 0
     if shot_mode == "single":
-        shot_mode = 2
+        shot_mode = 0
     elif shot_mode == "burst":
-        shot_mode = 4
-    else:  # shot_mode == "auto"
+        shot_mode = 3
+    elif shot_mode == "auto":
         shot_mode = 1
+    else:
+        shot_mode = 2 # Custom Shot Mode.
     if indoor_outdoor_mode == "outdoor_no_cone":
-        indoor_outdoor_mode = 0
+        narrow_beam_pwr = 255  # 255 == 0xFF
+        wide_beam_pwr = 0
     elif indoor_outdoor_mode == "outdoor_with_cone":
-        indoor_outdoor_mode = 1
+        narrow_beam_pwr = 255
+        wide_beam_pwr = 200  # 200 == 0xC8
     else:  # "indoor_no_cone"
-        indoor_outdoor_mode = 2
+        narrow_beam_pwr = 25  # 25 = 0x19
+        wide_beam_pwr = 0
     if FreecoiL != null:
         if Settings.Session.get_data("fi_laser_is_connected") == 2:
-            FreecoiL.setShotMode(shot_mode, indoor_outdoor_mode)
+            if shot_mode == 2:
+                FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, 0)
+            else:
+                FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, 0)
+            
+func new_set_shot_mode(shot_mode, narrow_beam_pwr, wide_beam_pwr, custom_rate_of_fire=0):
+    if shot_mode == "single":
+        shot_mode = 0
+    elif shot_mode == "burst":
+        shot_mode = 3
+    elif shot_mode == "auto":
+        shot_mode = 1
+    else:
+        shot_mode = 2 # Custom Shot Mode.
+    if FreecoiL != null:
+        if Settings.Session.get_data("fi_laser_is_connected") == 2:
+            print("*** here 0")
+            if shot_mode == 2:
+                print("***** Here 2")
+                FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, custom_rate_of_fire)
+            else:
+                print("****** Here 1")
+                FreecoiL.setShotMode(shot_mode, narrow_beam_pwr, wide_beam_pwr, 0)
 
 func enable_recoil(enabled):
     if FreecoiL != null:
@@ -250,6 +282,7 @@ func _changed_laser_telem_commandId(commandId):
     if commandId != command_id:
         command_id = commandId
         get_tree().call_group("FreecoiL", "fi_command_accepted")
+        Settings.Session.set_data("fi_command_id", commandId)
 
 # warning-ignore:unused_argument
 func _changed_laser_telem_playerId(laser_id):
@@ -309,61 +342,72 @@ func _laser_telem_batteryLvl(batteryLvl):
             Settings.Session.set_data("fi_laser_battery_lvl", battery_lvl_avg * 6.25)
             prev_battery_lvl_avg = battery_lvl_avg
     
-func _changed_laser_telem_shot_data(shotById1, shotCounter1, shotById2, shotCounter2):
+func _changed_laser_telem_shot_data(shooter1LaserId, shooter2LaserId, shotCounter1, shotCounter2):
     if shotCounter1 != shot_counter_1:
         shot_counter_1 = shotCounter1
-        shot_by_id_1 = shotById1
-        get_tree().call_group("FreecoiL", "fi_got_shot", shotById1)
+        shot_by_id_1 = shooter1LaserId
+        Settings.Session.set_data("fi_shooter1_laser_id", shooter1LaserId)
+        Settings.Session.set_data("fi_shot_counter_1", shotCounter1)
+        get_tree().call_group("FreecoiL", "fi_got_shot", shooter1LaserId)
     if shotCounter2 != shot_counter_2:
         shot_counter_2 = shotCounter2
-        shot_by_id_2 = shotById2
-        get_tree().call_group("FreecoiL", "fi_got_shot", shotById2)
+        shot_by_id_2 = shooter1LaserId
+        Settings.Session.set_data("fi_shooter2_laser_id", shooter2LaserId)
+        Settings.Session.set_data("fi_shot_counter_2", shotCounter2)
+        get_tree().call_group("FreecoiL", "fi_got_shot", shooter2LaserId)
 
 # warning-ignore:unused_argument
 func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
-    # buttonsPressed Values:
-    #default = 0
-    #trigger = 1
-    #reload = 2
-    #trigger + reload = 3
-    #back = 4
-    #trigger + back = 5
-    #reload + back = 6
-    #triger + reload + back = 7
-    #power = 16
-    #trigger + power = 17
-    #reload + power = 18
-    #trigger + reload + power = 19
-    #back + power = 20
-    #trigger + power + back = 21
-    #reload + back + power = 22
-    #triger + reload + back + power = 23
-    get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
+    if Settings.Session.get_data("fi_power_btn_pressed") != powerBtnPressed:
+        Settings.Session.set_data("fi_power_btn_pressed", powerBtnPressed)
+    if Settings.Session.get_data("fi_trigger_btn_pressed") != triggerBtnPressed:
+        Settings.Session.set_data("fi_trigger_btn_pressed", triggerBtnPressed)
+    if Settings.Session.get_data("fi_thumb_btn_pressed") != thumbBtnPressed:
+        Settings.Session.set_data("fi_thumb_btn_pressed", thumbBtnPressed)
+    if Settings.Session.get_data("fi_reload_btn_pressed") != reloadBtnPressed:
+        Settings.Session.set_data("fi_reload_btn_pressed", reloadBtnPressed)
+    #get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
 
 func _processed_laser_telemetry2(array_of_args):
-    print("commandId = " + str(array_of_args[0]) + " | playerId = " + str(array_of_args[1]) + 
-        " | buttonsPressed = " + str(array_of_args[2]) + " | triggerBtnCounter = " + str(array_of_args[3]) + 
-        " | reloadBtnCounter = " + str(array_of_args[4]) + " | thumbBtnCounter = " + str(array_of_args[5]) + 
-        " | powerBtnCounter = " + str(array_of_args[6]) + " | batteryLvlHigh = " + str(array_of_args[7]) + 
-        " | batteryLvlLow = " + str(array_of_args[8]) + " | powerBtnPressed = " + str(array_of_args[9]) + 
-        " | triggerBtnPressed = " + str(array_of_args[10]) + " | reloadBtnPressed = " + str(array_of_args[11]) + 
-        " | thumbBtnPressed = " + str(array_of_args[12]) + " | shotsRemaining = " + str(array_of_args[13]) + 
-        " | shooter1LaserId = " + str(array_of_args[14]) + " | shooter2LaserId = " + str(array_of_args[15]) + 
-        " | shooter1WpnProfile = " + str(array_of_args[16]) + " | shooter2WpnProfile = " + str(array_of_args[17]) + 
-        " | shooter1charge = " + str(array_of_args[18]) + " | shooter1check = " + str(array_of_args[19]) + 
-        " | shooter2charge = " + str(array_of_args[20]) + " | shooter2check = " + str(array_of_args[21]) + 
-        " | shotCounter1 = " + str(array_of_args[22]) + " | shotCounter2 = " + str(array_of_args[23]) + 
-        " | sensorsHit1 = " + str(array_of_args[24]) + " | sensorsHit2 = " + str(array_of_args[25]) + 
-        " | clipSensor1 = " + str(array_of_args[26]) + " | frontSensor1 = " + str(array_of_args[27]) + 
-        " | leftSensor1 = " + str(array_of_args[28]) + " | rightSensor1 = " + str(array_of_args[29]) + 
-        " | clipSensor2 = " + str(array_of_args[30]) + " | frontSensor2 = " + str(array_of_args[31]) + 
-        " | leftSensor2 = " + str(array_of_args[32]) + " | rightSensor2 = " + str(array_of_args[33]) + 
-        " | status = " + str(array_of_args[34]) + " | PlayerIdAccepted = " + str(array_of_args[35]) + 
-        " | wpnProfileAgain = " + str(array_of_args[36]))
-    
-    _changed_laser_telem_shot_data(str(array_of_args[14]), array_of_args[15], array_of_args[22], array_of_args[23])
-    _changed_laser_telem_shotsRemaining(array_of_args[13])
+#    if Settings.Session.get_data("fi_shot_counter_1") != array_of_args[22]:
+#        print("commandId = " + str(array_of_args[0]) + " | playerId = " + str(array_of_args[1]) + 
+#            " | buttonsPressed = " + str(array_of_args[2]) + " | triggerBtnCounter = " + str(array_of_args[3]) + 
+#            " | reloadBtnCounter = " + str(array_of_args[4]) + " | thumbBtnCounter = " + str(array_of_args[5]) + 
+#            " | powerBtnCounter = " + str(array_of_args[6]) + " | batteryLvlHigh = " + str(array_of_args[7]) + 
+#            " | batteryLvlLow = " + str(array_of_args[8]) + " | powerBtnPressed = " + str(array_of_args[9]) + 
+#            " | triggerBtnPressed = " + str(array_of_args[10]) + " | reloadBtnPressed = " + str(array_of_args[11]) + 
+#            " | thumbBtnPressed = " + str(array_of_args[12]) + " | shotsRemaining = " + str(array_of_args[13]) + 
+#            " | shooter1LaserId = " + str(array_of_args[14]) + " | shooter2LaserId = " + str(array_of_args[15]) + 
+#            " | shooter1WpnProfile = " + str(array_of_args[16]) + " | shooter2WpnProfile = " + str(array_of_args[17]) + 
+#            " | shooter1charge = " + str(array_of_args[18]) + " | shooter1check = " + str(array_of_args[19]) + 
+#            " | shooter2charge = " + str(array_of_args[20]) + " | shooter2check = " + str(array_of_args[21]) + 
+#            " | shotCounter1 = " + str(array_of_args[22]) + " | shotCounter2 = " + str(array_of_args[23]) + 
+#            " | sensorsHit1 = " + str(array_of_args[24]) + " | sensorsHit2 = " + str(array_of_args[25]) + 
+#            " | clipSensor1 = " + str(array_of_args[26]) + " | frontSensor1 = " + str(array_of_args[27]) + 
+#            " | leftSensor1 = " + str(array_of_args[28]) + " | rightSensor1 = " + str(array_of_args[29]) + 
+#            " | clipSensor2 = " + str(array_of_args[30]) + " | frontSensor2 = " + str(array_of_args[31]) + 
+#            " | leftSensor2 = " + str(array_of_args[32]) + " | rightSensor2 = " + str(array_of_args[33]) + 
+#            " | status = " + str(array_of_args[34]) + " | PlayerIdAccepted = " + str(array_of_args[35]) + 
+#            " | wpnProfileAgain = " + str(array_of_args[36]))
     _changed_laser_telem_triggerBtnCounter(array_of_args[3])
+    _changed_laser_telem_shot_data(array_of_args[14], array_of_args[15], array_of_args[22], array_of_args[23])
+    if Settings.Session.get_data("fi_shooter1_wpn_prfl") != array_of_args[16]:
+        Settings.Session.set_data("fi_shooter1_wpn_prfl", array_of_args[16])
+    if Settings.Session.get_data("fi_shooter1_charge") != array_of_args[18]:
+        Settings.Session.set_data("fi_shooter1_charge", array_of_args[18])
+    if Settings.Session.get_data("fi_shooter1_sensor_clip") != array_of_args[26]:
+        Settings.Session.set_data("fi_shooter1_sensor_clip", array_of_args[26])
+    if Settings.Session.get_data("fi_shooter1_sensor_front") != array_of_args[27]:
+        Settings.Session.set_data("fi_shooter1_sensor_front", array_of_args[27])
+    if Settings.Session.get_data("fi_shooter1_sensor_left") != array_of_args[28]:
+        Settings.Session.set_data("fi_shooter1_sensor_left", array_of_args[28])
+    if Settings.Session.get_data("fi_shooter1_sensor_right") != array_of_args[29]:
+        Settings.Session.set_data("fi_shooter1_sensor_right", array_of_args[29])
+    _changed_laser_telem_shotsRemaining(array_of_args[13])
+    if Settings.Session.get_data("fi_laser_status") != array_of_args[34]:
+        Settings.Session.set_data("fi_laser_status", array_of_args[34])
+    if Settings.Session.get_data("fi_wpn_prfl") != array_of_args[36]:
+        Settings.Session.set_data("fi_wpn_prfl", array_of_args[36])
     _on_laser_gun_still_connected()
     _laser_telem_batteryLvl(array_of_args[7])
     _changed_telem_button_pressed(array_of_args[9], array_of_args[10], array_of_args[11], array_of_args[12])

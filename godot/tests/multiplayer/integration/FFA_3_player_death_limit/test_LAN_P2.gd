@@ -107,13 +107,13 @@ func test_p2_can_disconnect_from_game():
     
 func test_p2_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
     yield(get_tree(), 'idle_frame')
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(2)
     yield(get_tree().create_timer(2.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(1)
     yield(get_tree().create_timer(10.0), "timeout")
     
 func test_p2_can_reconnect_to_game():

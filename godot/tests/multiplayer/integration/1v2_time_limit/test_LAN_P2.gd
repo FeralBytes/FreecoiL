@@ -119,13 +119,13 @@ func test_p2_can_disconnect_from_game():
     
 func test_p2_can_log_offline_events():
     yield(get_tree().create_timer(1.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(0)
-    yield(get_tree().create_timer(8.0), "timeout")
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    yield(get_tree().create_timer(4.0), "timeout")
     FreecoiLInterface._changed_laser_telem_shotsRemaining(0)
     yield(get_tree().create_timer(0.1), "timeout")
-    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(1)
+    FreecoiLInterface._changed_laser_telem_triggerBtnCounter(2)
     yield(get_tree().create_timer(2.0), "timeout")
-    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(0)
+    FreecoiLInterface._changed_laser_telem_reloadBtnCounter(1)
     yield(get_tree().create_timer(2.0), "timeout")
     
 func test_p2_can_reconnect_to_game():
@@ -158,7 +158,7 @@ func test_p2_can_be_killed_by_p3_friendly_fire():
             shot_counter = 0
         Settings.Session.set_data("game_player_health", 1)
         yield(get_tree(), 'idle_frame')
-        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["3"], shot_counter, 0, 0, 0, 0)
+        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["3"], 0, shot_counter, 0)
         yield(get_tree().create_timer(2.0), "timeout")
         shot_counter += 1
     assert_eq(Settings.InGame.get_data("player_deaths_by_id")[Settings.Session.get_data("mup_id")], 0)
