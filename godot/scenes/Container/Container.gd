@@ -163,7 +163,8 @@ func finished_loading_thread2():
 func next_menu(menu):
     var xy = menu.split_floats(",")
     get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
-    Settings.Session.set_data("previous_menu", Settings.Session.get_data("current_menu"))
+    if Settings.Session.get_data("previous_menu") != Settings.Session.get_data("current_menu"):
+        Settings.Session.set_data("previous_menu", Settings.Session.get_data("current_menu"))
     Settings.Session.set_data("current_menu", menu)
     
 func load_lobby():

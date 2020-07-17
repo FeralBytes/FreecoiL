@@ -142,7 +142,6 @@ __meta__ = {
 modulate = Color( 0.627451, 0.627451, 0.627451, 1 )
 position = Vector2( 273.752, 305.865 )
 scale = Vector2( 0.7, 0.7 )
-skew = 4.37114e-08
 texture = ExtResource( 2 )
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
