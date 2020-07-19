@@ -12,7 +12,7 @@ const NETWORK_LAN_PORT = 8818
 const MAX_PLAYERS = 62
 const MIN_PLAYERS = 2
 const MAX_OBSERVERS = 1
-const __MAX_SIGNALS = 191  #  + 1 is the real max because S0 is a possible signal.
+const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signal.
 
 var DEBUG_GUI = false
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
@@ -550,6 +550,134 @@ class Data:
     signal S190
     # warning-ignore:unused_signal
     signal S191
+    # warning-ignore:unused_signal
+    signal S192
+    # warning-ignore:unused_signal
+    signal S193
+    # warning-ignore:unused_signal
+    signal S194
+    # warning-ignore:unused_signal
+    signal S195
+    # warning-ignore:unused_signal
+    signal S196
+    # warning-ignore:unused_signal
+    signal S197
+    # warning-ignore:unused_signal
+    signal S198
+    # warning-ignore:unused_signal
+    signal S199
+    # warning-ignore:unused_signal
+    signal S200
+    # warning-ignore:unused_signal
+    signal S201
+    # warning-ignore:unused_signal
+    signal S202
+    # warning-ignore:unused_signal
+    signal S203
+    # warning-ignore:unused_signal
+    signal S204
+    # warning-ignore:unused_signal
+    signal S205
+    # warning-ignore:unused_signal
+    signal S206
+    # warning-ignore:unused_signal
+    signal S207
+    # warning-ignore:unused_signal
+    signal S208
+    # warning-ignore:unused_signal
+    signal S209
+    # warning-ignore:unused_signal
+    signal S210
+    # warning-ignore:unused_signal
+    signal S211
+    # warning-ignore:unused_signal
+    signal S212
+    # warning-ignore:unused_signal
+    signal S213
+    # warning-ignore:unused_signal
+    signal S214
+    # warning-ignore:unused_signal
+    signal S215
+    # warning-ignore:unused_signal
+    signal S216
+    # warning-ignore:unused_signal
+    signal S217
+    # warning-ignore:unused_signal
+    signal S218
+    # warning-ignore:unused_signal
+    signal S219
+    # warning-ignore:unused_signal
+    signal S220
+    # warning-ignore:unused_signal
+    signal S221
+    # warning-ignore:unused_signal
+    signal S222
+    # warning-ignore:unused_signal
+    signal S223
+    # warning-ignore:unused_signal
+    signal S224
+    # warning-ignore:unused_signal
+    signal S225
+    # warning-ignore:unused_signal
+    signal S226
+    # warning-ignore:unused_signal
+    signal S227
+    # warning-ignore:unused_signal
+    signal S228
+    # warning-ignore:unused_signal
+    signal S229
+    # warning-ignore:unused_signal
+    signal S230
+    # warning-ignore:unused_signal
+    signal S231
+    # warning-ignore:unused_signal
+    signal S232
+    # warning-ignore:unused_signal
+    signal S233
+    # warning-ignore:unused_signal
+    signal S234
+    # warning-ignore:unused_signal
+    signal S235
+    # warning-ignore:unused_signal
+    signal S236
+    # warning-ignore:unused_signal
+    signal S237
+    # warning-ignore:unused_signal
+    signal S238
+    # warning-ignore:unused_signal
+    signal S239
+    # warning-ignore:unused_signal
+    signal S240
+    # warning-ignore:unused_signal
+    signal S241
+    # warning-ignore:unused_signal
+    signal S242
+    # warning-ignore:unused_signal
+    signal S243
+    # warning-ignore:unused_signal
+    signal S244
+    # warning-ignore:unused_signal
+    signal S245
+    # warning-ignore:unused_signal
+    signal S246
+    # warning-ignore:unused_signal
+    signal S247
+    # warning-ignore:unused_signal
+    signal S248
+    # warning-ignore:unused_signal
+    signal S249
+    # warning-ignore:unused_signal
+    signal S250
+    # warning-ignore:unused_signal
+    signal S251
+    # warning-ignore:unused_signal
+    signal S252
+    # warning-ignore:unused_signal
+    signal S253
+    # warning-ignore:unused_signal
+    signal S254
+    # warning-ignore:unused_signal
+    signal S255
         ######## END SIGNALS ########
 
 func _ready():
