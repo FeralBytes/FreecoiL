@@ -1,4 +1,4 @@
-[gd_scene load_steps=72 format=2]
+[gd_scene load_steps=74 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -8,8 +8,27 @@
 [ext_resource path="res://scenes/MainMenu/Tests.tscn" type="PackedScene" id=6]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=7]
 [ext_resource path="res://assets/images/pistol.png" type="Texture" id=8]
+[ext_resource path="res://assets/sounds/empty_gun_shot.wav" type="AudioStream" id=9]
 
 [sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+
+onready var EmptyGunShotSound = get_node(\"EmptyGunShotSound\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_trigger_btn_pressed\"), self, \"update_trigger_pressed\")
+
+
+func update_trigger_pressed(new_val):
+    if new_val != 0:
+        if not EmptyGunShotSound.playing:
+            EmptyGunShotSound.play()
+            Input.vibrate_handheld(200)"
+
+[sub_resource type="GDScript" id=2]
 script/source = "extends Label
 
 
@@ -34,7 +53,7 @@ func update_pressed(pressed):
         self_modulate = Color(\"db0101\")
 "
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=3]
 script/source = "extends Label
 
 
@@ -59,7 +78,7 @@ func update_pressed(pressed):
         self_modulate = Color(\"db0101\")
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Label
 
 
@@ -85,7 +104,7 @@ func update_pressed(pressed):
     
 "
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Label
 
 
@@ -110,7 +129,7 @@ func update_pressed(pressed):
         self_modulate = Color(\"db0101\")
 "
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=6]
 script/source = "extends RichTextLabel
 
 
@@ -150,7 +169,7 @@ func fi_buttons_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, rel
         text += \"Reload button state = \" + str(tracked_reload_btn) + \".\\n\"
 "
 
-[sub_resource type="GDScript" id=6]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Button
 
 var count = 0
@@ -213,7 +232,7 @@ func _on_PlusMinusWidget_PMWidChanged(__):
     pass
 "
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=8]
 script/source = "extends Label
 
 
@@ -231,7 +250,7 @@ func update_val(new_val):
     text = \"Laser ID=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=9]
 script/source = "extends Label
 
 
@@ -249,7 +268,7 @@ func update_val(new_val):
     text = \"Status=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=9]
+[sub_resource type="GDScript" id=10]
 script/source = "extends Label
 
 
@@ -267,7 +286,7 @@ func update_command_id(new_val):
     text = \"Command ID=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=10]
+[sub_resource type="GDScript" id=11]
 script/source = "extends Label
 
 
@@ -285,7 +304,7 @@ func weapon_ammo_changed(new_val):
     text = \"AmmoRemaining=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=11]
+[sub_resource type="GDScript" id=12]
 script/source = "extends Label
 
 
@@ -302,7 +321,7 @@ func update_val(new_val):
 
 "
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=13]
 script/source = "extends Label
 
 
@@ -321,7 +340,7 @@ func update_val(new_val):
         text = \"Shooter1ID=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=13]
+[sub_resource type="GDScript" id=14]
 script/source = "extends Label
 
 
@@ -340,7 +359,7 @@ func update_val(new_val):
         text = \"ShotCounter1=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=15]
 script/source = "extends Label
 
 
@@ -359,7 +378,7 @@ func update_val(new_val):
         text = \"Shooter1WpnProfile=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=16]
 script/source = "extends Label
 
 
@@ -378,7 +397,7 @@ func update_val(new_val):
         text = \"Shooter1Charge=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Label
 
 
@@ -403,7 +422,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=18]
 script/source = "extends Label
 
 
@@ -428,7 +447,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Label
 
 
@@ -453,7 +472,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Label
 
 
@@ -478,7 +497,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=21]
 script/source = "extends Button
 
 onready var RateOfFire = get_parent().get_node(\"PlusMinusWidget5\")
@@ -498,7 +517,7 @@ func _on_Button6_pressed():
     RateOfFire.current_val = 0
 "
 
-[sub_resource type="GDScript" id=62]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Button
 
 
@@ -519,7 +538,7 @@ func _on_Button7_pressed():
     RateOfFire.current_val = 3
 "
 
-[sub_resource type="GDScript" id=63]
+[sub_resource type="GDScript" id=23]
 script/source = "extends Button
 
 
@@ -540,7 +559,7 @@ func _on_Button8_pressed():
     RateOfFire.current_val = 1
 "
 
-[sub_resource type="GDScript" id=21]
+[sub_resource type="GDScript" id=24]
 script/source = "extends ReferenceRect
 
 
@@ -561,11 +580,11 @@ func update_player_name(new_name):
         PlayerName.text = new_name
 "
 
-[sub_resource type="DynamicFont" id=22]
+[sub_resource type="DynamicFont" id=25]
 size = 48
 font_data = ExtResource( 2 )
 
-[sub_resource type="GDScript" id=23]
+[sub_resource type="GDScript" id=26]
 script/source = "extends LineEdit
 
 
@@ -595,7 +614,7 @@ func _on_PlayerName_text_entered(new_text):
         get_tree().call_group(\"Network\", \"set_player_name\")
 "
 
-[sub_resource type="GDScript" id=24]
+[sub_resource type="GDScript" id=27]
 script/source = "extends Button
 
 
@@ -617,7 +636,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", Settings.Session.get_data(\"previous_menu\"))
 "
 
-[sub_resource type="GDScript" id=25]
+[sub_resource type="GDScript" id=28]
 script/source = "extends ReferenceRect
 
 
@@ -655,7 +674,7 @@ func force_gun_connection(__):
             get_tree().call_group(\"Container\", \"next_menu\", \"1,-1\")
 "
 
-[sub_resource type="GDScript" id=26]
+[sub_resource type="GDScript" id=29]
 script/source = "extends LineEdit
 
 
@@ -689,11 +708,11 @@ func _on_Button_pressed():
         get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
-[sub_resource type="DynamicFont" id=27]
+[sub_resource type="DynamicFont" id=30]
 size = 60
 font_data = ExtResource( 2 )
 
-[sub_resource type="GDScript" id=28]
+[sub_resource type="GDScript" id=31]
 script/source = "extends Button
 
 
@@ -717,7 +736,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,1\")
 "
 
-[sub_resource type="GDScript" id=29]
+[sub_resource type="GDScript" id=32]
 script/source = "extends Button
 
 
@@ -740,7 +759,7 @@ func _on_Button4_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"-1,0\")
 "
 
-[sub_resource type="GDScript" id=30]
+[sub_resource type="GDScript" id=33]
 script/source = "extends Button
 
 
@@ -764,7 +783,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Network\", \"search_for_peers\")
 "
 
-[sub_resource type="GDScript" id=31]
+[sub_resource type="GDScript" id=34]
 script/source = "extends Button
 
 
@@ -788,7 +807,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Network\", \"setup_server_part1\")
 "
 
-[sub_resource type="GDScript" id=32]
+[sub_resource type="GDScript" id=35]
 script/source = "extends Button
 
 
@@ -797,7 +816,7 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"new_user_mode\", true)
 "
 
-[sub_resource type="GDScript" id=33]
+[sub_resource type="GDScript" id=36]
 script/source = "extends Button
 
 
@@ -809,7 +828,7 @@ func _on_Button2_pressed():
     Settings.InGame.set_data(\"new_user_mode\", false)
 "
 
-[sub_resource type="GDScript" id=34]
+[sub_resource type="GDScript" id=37]
 script/source = "extends Button
 
 
@@ -820,7 +839,7 @@ func _on_Button_pressed():
     
 "
 
-[sub_resource type="GDScript" id=35]
+[sub_resource type="GDScript" id=38]
 script/source = "extends Button
 
 
@@ -831,7 +850,7 @@ func _on_Button2_pressed():
     Settings.InGame.set_data(\"force_recoil\", \"off\")
 "
 
-[sub_resource type="GDScript" id=36]
+[sub_resource type="GDScript" id=39]
 script/source = "extends Button
 
 
@@ -842,7 +861,7 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"force_recoil\", \"dont\")
 "
 
-[sub_resource type="GDScript" id=37]
+[sub_resource type="GDScript" id=40]
 script/source = "extends Button
 
 
@@ -866,7 +885,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,3\")
 "
 
-[sub_resource type="GDScript" id=38]
+[sub_resource type="GDScript" id=41]
 script/source = "extends Button
 
 
@@ -891,7 +910,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"0,4\")
 "
 
-[sub_resource type="GDScript" id=39]
+[sub_resource type="GDScript" id=42]
 script/source = "extends Button
 
 
@@ -915,7 +934,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"1,3\")
 "
 
-[sub_resource type="GDScript" id=40]
+[sub_resource type="GDScript" id=43]
 script/source = "extends Button
 
 func _on_Button_pressed():
@@ -930,7 +949,7 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
     get_parent().get_node(\"HSlider\").value = new_value
 "
 
-[sub_resource type="GDScript" id=41]
+[sub_resource type="GDScript" id=44]
 script/source = "extends Button
 
 
@@ -963,7 +982,7 @@ func _on_PlusMinusWidget_PMWidChanged(new_value):
     get_parent().get_node(\"HSlider\").value = new_value
 "
 
-[sub_resource type="GDScript" id=42]
+[sub_resource type="GDScript" id=45]
 script/source = "extends Button
 
 
@@ -975,7 +994,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"1,3\")
 "
 
-[sub_resource type="GDScript" id=43]
+[sub_resource type="GDScript" id=46]
 script/source = "extends Button
 
 func _on_Button2_pressed():
@@ -983,7 +1002,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"1,3\")
 "
 
-[sub_resource type="GDScript" id=44]
+[sub_resource type="GDScript" id=47]
 script/source = "extends Button
 
 
@@ -1014,7 +1033,7 @@ func _on_HSlider_value_changed(value):
     get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
-[sub_resource type="GDScript" id=45]
+[sub_resource type="GDScript" id=48]
 script/source = "extends Button
 
 
@@ -1047,7 +1066,7 @@ func _on_HSlider_value_changed(value):
     get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
-[sub_resource type="GDScript" id=46]
+[sub_resource type="GDScript" id=49]
 script/source = "extends Button
 
 
@@ -1071,7 +1090,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=47]
+[sub_resource type="GDScript" id=50]
 script/source = "extends Button
 
 
@@ -1095,7 +1114,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,3\")
 "
 
-[sub_resource type="GDScript" id=48]
+[sub_resource type="GDScript" id=51]
 script/source = "extends Button
 
 
@@ -1119,7 +1138,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,4\")
 "
 
-[sub_resource type="GDScript" id=49]
+[sub_resource type="GDScript" id=52]
 script/source = "extends Button
 
 
@@ -1143,7 +1162,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,5\")
 "
 
-[sub_resource type="GDScript" id=50]
+[sub_resource type="GDScript" id=53]
 script/source = "extends Button
 
 
@@ -1152,7 +1171,7 @@ func _on_Button_pressed():
     Settings.InGame.set_data(\"game_respawn_delay\", -1)
 "
 
-[sub_resource type="GDScript" id=51]
+[sub_resource type="GDScript" id=54]
 script/source = "extends Button
 
 
@@ -1160,7 +1179,7 @@ func _on_Button2_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"4,4\")
 "
 
-[sub_resource type="GDScript" id=52]
+[sub_resource type="GDScript" id=55]
 script/source = "extends Button
 
 
@@ -1179,7 +1198,7 @@ func _on_HSlider_value_changed(value):
     get_parent().get_node(\"PlusMinusWidget\").set_current_val(value, false)
 "
 
-[sub_resource type="GDScript" id=53]
+[sub_resource type="GDScript" id=56]
 script/source = "extends ReferenceRect
 
 const my_menu = \"0,6\"
@@ -1286,7 +1305,7 @@ func on_wpn_available_toggled(on, weapon, btn_ref):
     Settings.InGame.set_data(\"game_weapon_types\", wpns_available) 
 "
 
-[sub_resource type="GDScript" id=54]
+[sub_resource type="GDScript" id=57]
 script/source = "extends Button
 
 
@@ -1309,7 +1328,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"1,6\")
 "
 
-[sub_resource type="GDScript" id=55]
+[sub_resource type="GDScript" id=58]
 script/source = "extends ReferenceRect
 
 
@@ -1369,7 +1388,7 @@ func on_ammo_lineedit_entered(new_val, weapon, lineedit_ref, slider_ref):
     slider_ref.value = int(new_val)
 "
 
-[sub_resource type="GDScript" id=56]
+[sub_resource type="GDScript" id=59]
 script/source = "extends Button
 
 
@@ -1392,7 +1411,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"2,6\")
 "
 
-[sub_resource type="GDScript" id=57]
+[sub_resource type="GDScript" id=60]
 script/source = "extends ReferenceRect
 
 
@@ -1453,7 +1472,7 @@ func on_ammo_lineedit_entered(new_val, weapon, lineedit_ref, slider_ref):
     slider_ref.value = int(new_val)
 "
 
-[sub_resource type="GDScript" id=58]
+[sub_resource type="GDScript" id=61]
 script/source = "extends Button
 
 
@@ -1476,7 +1495,7 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"3,6\")
 "
 
-[sub_resource type="GDScript" id=59]
+[sub_resource type="GDScript" id=62]
 script/source = "extends ReferenceRect
 
 
@@ -1503,7 +1522,7 @@ func clear_grid():
         child.queue_free()
 "
 
-[sub_resource type="GDScript" id=60]
+[sub_resource type="GDScript" id=63]
 script/source = "extends OptionButton
 
 
@@ -1534,7 +1553,7 @@ func _on_OptionButton_item_selected(index):
     get_tree().call_group(\"Container\", \"next_menu\", \"1,1\")
 "
 
-[sub_resource type="GDScript" id=61]
+[sub_resource type="GDScript" id=64]
 script/source = "extends RichTextLabel
 
 
@@ -1561,6 +1580,7 @@ func _on_RichTextLabel_meta_clicked(meta):
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource( 1 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1605,7 +1625,7 @@ margin_right = 155.409
 margin_bottom = 258.247
 text = "00"
 align = 1
-script = SubResource( 1 )
+script = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1618,7 +1638,7 @@ margin_bottom = 153.0
 rect_min_size = Vector2( 60, 0 )
 text = "00"
 align = 1
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="Button3" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 65.0538
@@ -1628,7 +1648,7 @@ margin_bottom = 86.2836
 rect_min_size = Vector2( 60, 0 )
 text = "00"
 align = 1
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="Button4" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 252.45
@@ -1638,7 +1658,7 @@ margin_bottom = 311.133
 rect_min_size = Vector2( 60, 0 )
 text = "00"
 align = 1
-script = SubResource( 4 )
+script = SubResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1649,13 +1669,13 @@ margin_top = 846.0
 margin_right = 538.0
 margin_bottom = 958.0
 scroll_following = true
-script = SubResource( 5 )
+script = SubResource( 6 )
 
 [node name="Button5" type="Button" parent="-1,-1-Tests2/GunTester"]
 margin_right = 12.0
 margin_bottom = 44.0
 text = "Start Testing"
-script = SubResource( 6 )
+script = SubResource( 7 )
 
 [node name="PlusMinusWidget" parent="-1,-1-Tests2/GunTester" instance=ExtResource( 4 )]
 margin_left = 278.125
@@ -1681,7 +1701,7 @@ margin_top = 87.0
 margin_right = 463.0
 margin_bottom = 123.0
 text = "Laser ID=00"
-script = SubResource( 7 )
+script = SubResource( 8 )
 
 [node name="Label20" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 381.637
@@ -1689,7 +1709,7 @@ margin_top = 46.021
 margin_right = 534.637
 margin_bottom = 82.021
 text = "Status=0"
-script = SubResource( 8 )
+script = SubResource( 9 )
 
 [node name="Label10" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 267.146
@@ -1698,7 +1718,7 @@ margin_right = 407.146
 margin_bottom = 44.9797
 rect_min_size = Vector2( 263, 0 )
 text = "Command Id=00"
-script = SubResource( 9 )
+script = SubResource( 10 )
 
 [node name="Label11" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 186.0
@@ -1707,7 +1727,7 @@ margin_right = 535.0
 margin_bottom = 215.0
 rect_min_size = Vector2( 349, 0 )
 text = "AmmoRemaining=000"
-script = SubResource( 10 )
+script = SubResource( 11 )
 
 [node name="Label21" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 235.0
@@ -1715,7 +1735,7 @@ margin_top = 223.0
 margin_right = 533.0
 margin_bottom = 259.0
 text = "WeaponProfile=00"
-script = SubResource( 11 )
+script = SubResource( 12 )
 
 [node name="Label2" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 1.1225
@@ -1723,7 +1743,7 @@ margin_top = 302.105
 margin_right = 248.122
 margin_bottom = 338.105
 text = "Shooter1ID=00"
-script = SubResource( 12 )
+script = SubResource( 13 )
 
 [node name="Label18" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = -2.24487
@@ -1731,7 +1751,7 @@ margin_top = 337.514
 margin_right = 282.755
 margin_bottom = 373.514
 text = "ShotCounter1=00"
-script = SubResource( 13 )
+script = SubResource( 14 )
 
 [node name="Label4" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = -5.61224
@@ -1739,7 +1759,7 @@ margin_top = 374.146
 margin_right = 378.388
 margin_bottom = 410.146
 text = "Shooter1WpnProfile=00"
-script = SubResource( 14 )
+script = SubResource( 15 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1760,7 +1780,7 @@ margin_top = 406.698
 margin_right = 381.755
 margin_bottom = 442.698
 text = "Shooter1Charge=00"
-script = SubResource( 15 )
+script = SubResource( 16 )
 
 [node name="Label13" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = -2.87744
@@ -1775,7 +1795,7 @@ margin_top = 437.183
 margin_right = 319.633
 margin_bottom = 473.183
 text = "Shooter1SensorClip"
-script = SubResource( 16 )
+script = SubResource( 17 )
 
 [node name="Label14" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = -0.122498
@@ -1790,7 +1810,7 @@ margin_top = 470.857
 margin_right = 348.51
 margin_bottom = 506.857
 text = "Shooter1SensorFront"
-script = SubResource( 17 )
+script = SubResource( 18 )
 
 [node name="Label15" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 1.0
@@ -1805,7 +1825,7 @@ margin_top = 505.898
 margin_right = 321.0
 margin_bottom = 541.898
 text = "Shooter1SensorLeft"
-script = SubResource( 18 )
+script = SubResource( 19 )
 
 [node name="Label16" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = 1.0
@@ -1820,7 +1840,7 @@ margin_top = 541.94
 margin_right = 338.388
 margin_bottom = 577.94
 text = "Shooter1SensorRight"
-script = SubResource( 19 )
+script = SubResource( 20 )
 
 [node name="Label17" type="Label" parent="-1,-1-Tests2/GunTester"]
 margin_left = -2.36737
@@ -1899,7 +1919,7 @@ margin_top = 672.855
 margin_right = 540.337
 margin_bottom = 716.855
 text = "SingleShot"
-script = SubResource( 20 )
+script = SubResource( 21 )
 
 [node name="Button7" type="Button" parent="-1,-1-Tests2/GunTester"]
 margin_left = 366.337
@@ -1907,7 +1927,7 @@ margin_top = 736.855
 margin_right = 543.337
 margin_bottom = 780.855
 text = "3RndBurst"
-script = SubResource( 62 )
+script = SubResource( 22 )
 
 [node name="Button8" type="Button" parent="-1,-1-Tests2/GunTester"]
 margin_left = 365.337
@@ -1915,7 +1935,7 @@ margin_top = 799.855
 margin_right = 542.337
 margin_bottom = 843.855
 text = "Full Auto"
-script = SubResource( 63 )
+script = SubResource( 23 )
 
 [node name="1,-1-ConnectGun" parent="." instance=ExtResource( 5 )]
 
@@ -1928,7 +1948,7 @@ margin_top = -960.0
 margin_right = 1620.0
 margin_bottom = -920.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 21 )
+script = SubResource( 24 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -1952,7 +1972,7 @@ custom_constants/separation = 30
 [node name="Label" type="Label" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 61.0
-custom_fonts/font = SubResource( 22 )
+custom_fonts/font = SubResource( 25 )
 text = "Player Preferences"
 align = 1
 
@@ -1977,14 +1997,14 @@ margin_bottom = 40.0
 rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 3 )
 max_length = 13
-script = SubResource( 23 )
+script = SubResource( 26 )
 
 [node name="Button" type="Button" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
 margin_top = 161.0
 margin_right = 540.0
 margin_bottom = 205.0
 text = "Return To Previous Menu"
-script = SubResource( 24 )
+script = SubResource( 27 )
 
 [node name="Header2" parent="2,-1-Preferences" instance=ExtResource( 7 )]
 my_menu = "2,-1"
@@ -1994,7 +2014,7 @@ allow_preferences = false
 margin_top = -960.0
 margin_right = 540.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 25 )
+script = SubResource( 28 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2039,7 +2059,7 @@ context_menu_enabled = false
 placeholder_text = "Callsign?"
 placeholder_alpha = 0.15
 caret_blink = true
-script = SubResource( 26 )
+script = SubResource( 29 )
 
 [node name="Button" type="Button" parent="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 70.0
@@ -2080,7 +2100,7 @@ custom_constants/separation = 8
 margin_right = 540.0
 margin_bottom = 76.0
 rect_min_size = Vector2( 540, 0 )
-custom_fonts/font = SubResource( 27 )
+custom_fonts/font = SubResource( 30 )
 text = "FREECOIL"
 align = 1
 autowrap = true
@@ -2111,7 +2131,7 @@ text = "Quick Start Game"
 margin_right = 540.0
 margin_bottom = 44.0
 text = "Start A Networked Game"
-script = SubResource( 28 )
+script = SubResource( 31 )
 
 [node name="Button3" type="Button" parent="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer"]
 visible = false
@@ -2126,7 +2146,7 @@ margin_top = 74.0
 margin_right = 540.0
 margin_bottom = 118.0
 text = "Test Mode"
-script = SubResource( 29 )
+script = SubResource( 32 )
 
 [node name="Header2" parent="0,0-Game Options" instance=ExtResource( 7 )]
 allow_main_menu = false
@@ -2183,14 +2203,14 @@ margin_left = 148.0
 margin_right = 249.0
 margin_bottom = 44.0
 text = "Client"
-script = SubResource( 30 )
+script = SubResource( 33 )
 
 [node name="Button2" type="Button" parent="0,1-Networked Game 1/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 309.0
 margin_right = 392.0
 margin_bottom = 44.0
 text = "Host"
-script = SubResource( 31 )
+script = SubResource( 34 )
 
 [node name="Header2" parent="0,1-Networked Game 1" instance=ExtResource( 7 )]
 my_menu = "0,1"
@@ -2246,14 +2266,14 @@ margin_left = 121.0
 margin_right = 235.0
 margin_bottom = 44.0
 text = "Enable"
-script = SubResource( 32 )
+script = SubResource( 35 )
 
 [node name="Button2" type="Button" parent="1,1-Networked Game 2/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 295.0
 margin_right = 418.0
 margin_bottom = 44.0
 text = "Disable"
-script = SubResource( 33 )
+script = SubResource( 36 )
 
 [node name="Header2" parent="1,1-Networked Game 2" instance=ExtResource( 7 )]
 my_menu = "1,1"
@@ -2310,14 +2330,14 @@ margin_left = 23.0
 margin_right = 235.0
 margin_bottom = 44.0
 text = "Force Enable"
-script = SubResource( 34 )
+script = SubResource( 37 )
 
 [node name="Button2" type="Button" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 295.0
 margin_right = 516.0
 margin_bottom = 44.0
 text = "Force Disable"
-script = SubResource( 35 )
+script = SubResource( 38 )
 
 [node name="HSeparator" type="HSeparator" parent="2,1-Networked Game 3/CenterContainer/VBoxContainer"]
 margin_top = 218.0
@@ -2337,7 +2357,7 @@ margin_left = 165.0
 margin_right = 374.0
 margin_bottom = 44.0
 text = "Do Not Force"
-script = SubResource( 36 )
+script = SubResource( 39 )
 
 [node name="Header2" parent="2,1-Networked Game 3" instance=ExtResource( 7 )]
 my_menu = "2,1"
@@ -2385,7 +2405,7 @@ margin_top = 88.0
 margin_right = 540.0
 margin_bottom = 132.0
 text = "Custom Match Setup"
-script = SubResource( 37 )
+script = SubResource( 40 )
 
 [node name="Button2" type="Button" parent="3,1-Networked Game 4/CenterContainer/VBoxContainer"]
 visible = false
@@ -2522,7 +2542,7 @@ margin_left = 181.0
 margin_right = 247.0
 margin_bottom = 44.0
 text = "Yes"
-script = SubResource( 38 )
+script = SubResource( 41 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2532,7 +2552,7 @@ margin_left = 307.0
 margin_right = 359.0
 margin_bottom = 44.0
 text = "No"
-script = SubResource( 39 )
+script = SubResource( 42 )
 
 [node name="Header2" parent="0,3-Custom Setup 1" instance=ExtResource( 7 )]
 my_menu = "0,3"
@@ -2609,7 +2629,7 @@ margin_top = 147.0
 margin_right = 540.0
 margin_bottom = 191.0
 text = "Submit"
-script = SubResource( 40 )
+script = SubResource( 43 )
 
 [node name="Header2" parent="1,3-Custom Setup 2" instance=ExtResource( 7 )]
 my_menu = "1,3"
@@ -2685,7 +2705,7 @@ margin_top = 147.0
 margin_right = 540.0
 margin_bottom = 191.0
 text = "Submit"
-script = SubResource( 41 )
+script = SubResource( 44 )
 
 [node name="Header2" parent="0,4-Custom Setup 1,1" instance=ExtResource( 7 )]
 my_menu = "0,4"
@@ -2740,7 +2760,7 @@ margin_left = 181.0
 margin_right = 247.0
 margin_bottom = 44.0
 text = "Yes"
-script = SubResource( 42 )
+script = SubResource( 45 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -2750,7 +2770,7 @@ margin_left = 307.0
 margin_right = 359.0
 margin_bottom = 44.0
 text = "No"
-script = SubResource( 43 )
+script = SubResource( 46 )
 
 [node name="Header2" parent="0,5-Custom Setup 1,2" instance=ExtResource( 7 )]
 my_menu = "0,5"
@@ -2827,7 +2847,7 @@ margin_top = 147.0
 margin_right = 540.0
 margin_bottom = 191.0
 text = "Submit"
-script = SubResource( 44 )
+script = SubResource( 47 )
 
 [node name="Header2" parent="3,4-Custom Setup 4,1" instance=ExtResource( 7 )]
 my_menu = "3,4"
@@ -2905,7 +2925,7 @@ margin_top = 147.0
 margin_right = 540.0
 margin_bottom = 191.0
 text = "Submit"
-script = SubResource( 45 )
+script = SubResource( 48 )
 
 [node name="Header2" parent="3,5-Custom Setup 4,2" instance=ExtResource( 7 )]
 my_menu = "3,5"
@@ -2960,14 +2980,14 @@ margin_left = 94.0
 margin_right = 230.0
 margin_bottom = 44.0
 text = "Indoors"
-script = SubResource( 46 )
+script = SubResource( 49 )
 
 [node name="Button2" type="Button" parent="2,3-Custom Setup 3/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 290.0
 margin_right = 446.0
 margin_bottom = 44.0
 text = "Outdoors"
-script = SubResource( 47 )
+script = SubResource( 50 )
 
 [node name="Header2" parent="2,3-Custom Setup 3" instance=ExtResource( 7 )]
 my_menu = "2,3"
@@ -3023,14 +3043,14 @@ margin_right = 247.0
 margin_bottom = 44.0
 custom_constants/hseparation = 60
 text = "Death Limit"
-script = SubResource( 48 )
+script = SubResource( 51 )
 
 [node name="Button2" type="Button" parent="3,3-Custom Setup 4/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 307.0
 margin_right = 474.0
 margin_bottom = 44.0
 text = "Time Limit"
-script = SubResource( 49 )
+script = SubResource( 52 )
 
 [node name="Header2" parent="3,3-Custom Setup 4" instance=ExtResource( 7 )]
 my_menu = "3,3"
@@ -3085,14 +3105,14 @@ margin_right = 257.0
 margin_bottom = 44.0
 custom_constants/hseparation = 60
 text = "Respawn Button"
-script = SubResource( 50 )
+script = SubResource( 53 )
 
 [node name="Button2" type="Button" parent="4,3-Custom Setup 5/CenterContainer/VBoxContainer/HBoxContainer"]
 margin_left = 295.0
 margin_right = 540.0
 margin_bottom = 44.0
 text = "Respawn Timer"
-script = SubResource( 51 )
+script = SubResource( 54 )
 
 [node name="Header2" parent="4,3-Custom Setup 5" instance=ExtResource( 7 )]
 my_menu = "3,3"
@@ -3168,7 +3188,7 @@ margin_top = 147.0
 margin_right = 540.0
 margin_bottom = 191.0
 text = "Submit"
-script = SubResource( 52 )
+script = SubResource( 55 )
 
 [node name="Header2" parent="4,4-Custom Setup 5,1" instance=ExtResource( 7 )]
 my_menu = "4,4"
@@ -3178,7 +3198,7 @@ margin_top = 5760.0
 margin_right = 540.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 53 )
+script = SubResource( 56 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -3260,7 +3280,7 @@ margin_top = 794.0
 margin_right = 540.0
 margin_bottom = 838.0
 text = "Submit Settings"
-script = SubResource( 54 )
+script = SubResource( 57 )
 
 [node name="Header2" parent="0,6-Custom Setup 6" instance=ExtResource( 7 )]
 my_menu = "0,6"
@@ -3271,7 +3291,7 @@ margin_top = 5760.0
 margin_right = 1080.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 55 )
+script = SubResource( 58 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -3355,7 +3375,7 @@ margin_top = 794.0
 margin_right = 540.0
 margin_bottom = 838.0
 text = "Submit Settings"
-script = SubResource( 56 )
+script = SubResource( 59 )
 
 [node name="Header2" parent="1,6-Custom Setup 7" instance=ExtResource( 7 )]
 my_menu = "1,6"
@@ -3366,7 +3386,7 @@ margin_top = 5760.0
 margin_right = 1620.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 57 )
+script = SubResource( 60 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -3450,7 +3470,7 @@ margin_top = 794.0
 margin_right = 540.0
 margin_bottom = 838.0
 text = "Submit Settings"
-script = SubResource( 58 )
+script = SubResource( 61 )
 
 [node name="Header2" parent="2,6-Custom Setup 8" instance=ExtResource( 7 )]
 my_menu = "2,6"
@@ -3461,7 +3481,7 @@ margin_top = 5760.0
 margin_right = 2160.0
 margin_bottom = 6720.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 59 )
+script = SubResource( 62 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -3663,7 +3683,7 @@ margin_top = 127.0
 margin_right = 540.0
 margin_bottom = 171.0
 align = 1
-script = SubResource( 60 )
+script = SubResource( 63 )
 
 [node name="Label3" type="Label" parent="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer"]
 margin_top = 179.0
@@ -3681,10 +3701,13 @@ rect_min_size = Vector2( 540, 40 )
 bbcode_enabled = true
 bbcode_text = "[center][url=https://discordapp.com/invite/tn4hThV]FreecoiL Discord Link[/url][/center]"
 text = "FreecoiL Discord Link"
-script = SubResource( 61 )
+script = SubResource( 64 )
 
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
+
+[node name="EmptyGunShotSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 9 )
 [connection signal="pressed" from="-1,-1-Tests2/GunTester/Button5" to="-1,-1-Tests2/GunTester/Button5" method="_on_Button5_pressed"]
 [connection signal="PMWidChanged" from="-1,-1-Tests2/GunTester/PlusMinusWidget" to="-1,-1-Tests2/GunTester/Button5" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
 [connection signal="pressed" from="-1,-1-Tests2/GunTester/Button6" to="-1,-1-Tests2/GunTester/Button6" method="_on_Button6_pressed" flags=3]

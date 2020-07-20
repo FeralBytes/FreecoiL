@@ -42,9 +42,7 @@ import kotlin.experimental.and
 
 //import androidx.fragment.app.FragmentActivity;
 class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
-    @JvmField
     var appActivity: Activity? = null
-    @JvmField
     var appContext: Context? = null
     var appInstance: FreecoiLPlugin
     private var instanceId = 0

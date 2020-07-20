@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=27 format=2]
 
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=1]
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=2]
@@ -8,8 +8,27 @@
 [ext_resource path="res://assets/themes/default/default_LineEdit.theme" type="Theme" id=6]
 [ext_resource path="res://scenes/ConnectWeapon/1,-1-ConnectGun.tscn" type="PackedScene" id=7]
 [ext_resource path="res://assets/voices/EN_MV_lobby.wav" type="AudioStream" id=8]
+[ext_resource path="res://assets/sounds/empty_gun_shot.wav" type="AudioStream" id=9]
 
 [sub_resource type="GDScript" id=1]
+script/source = "extends Control
+
+
+onready var EmptyGunShotSound = get_node(\"EmptyGunShotSound\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_trigger_btn_pressed\"), self, \"update_pressed\")
+
+
+func update_trigger_pressed(new_val):
+    if new_val != 0:
+        if not EmptyGunShotSound.playing:
+            EmptyGunShotSound.play()
+            Input.vibrate_handheld(200)"
+
+[sub_resource type="GDScript" id=2]
 script/source = "extends ReferenceRect
 
 onready var WelcomeLobbyAudio = get_parent().get_node(\"WelcomeLobbyAudio\")
@@ -67,7 +86,7 @@ func set_player_laser_ids(all_ready):
             get_tree().call_group(\"Container\", \"do_remote_goto_scene\", \"res://scenes/InGame/InGame.tscn\")
 "
 
-[sub_resource type="GDScript" id=2]
+[sub_resource type="GDScript" id=3]
 script/source = "extends OptionButton
 
 
@@ -107,7 +126,7 @@ func _on_LobbyDropDown_pressed():
     get_child(0).rect_global_position = rect_global_position + Vector2(0, rect_size.y)
 "
 
-[sub_resource type="GDScript" id=3]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Label
 
 
@@ -127,7 +146,7 @@ func update_host_status(__):
     text = \"The Host has joined the lobby.\"
 "
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Label
 
 
@@ -149,7 +168,7 @@ func update_teams(teams):
         text = 'Teams are turned \"OFF\".'
 "
 
-[sub_resource type="GDScript" id=5]
+[sub_resource type="GDScript" id=6]
 script/source = "extends Button
 
 
@@ -189,11 +208,11 @@ func _on_Button_pressed():
     
 "
 
-[sub_resource type="DynamicFont" id=6]
+[sub_resource type="DynamicFont" id=7]
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=8]
 script/source = "extends VBoxContainer
 
 
@@ -332,11 +351,11 @@ func _on_RightBtn_pressed():
     Settings.Session.set_data(\"ui_team_being_viewed\", new_team)
 "
 
-[sub_resource type="DynamicFont" id=8]
+[sub_resource type="DynamicFont" id=9]
 size = 50
 font_data = ExtResource( 1 )
 
-[sub_resource type="StyleBoxFlat" id=9]
+[sub_resource type="StyleBoxFlat" id=10]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -346,7 +365,7 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_left = 50
 corner_radius_bottom_left = 50
 
-[sub_resource type="StyleBoxFlat" id=10]
+[sub_resource type="StyleBoxFlat" id=11]
 bg_color = Color( 0.14902, 0.172549, 0.231373, 1 )
 border_width_left = 2
 border_width_top = 2
@@ -356,7 +375,7 @@ border_color = Color( 0.913725, 0.329412, 0.129412, 1 )
 corner_radius_top_right = 50
 corner_radius_bottom_right = 50
 
-[sub_resource type="GDScript" id=11]
+[sub_resource type="GDScript" id=12]
 script/source = "extends LineEdit
 
 
@@ -376,7 +395,7 @@ func update_match_scenario(scenario):
         text = \"Custom\"
 "
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=13]
 script/source = "extends LineEdit
 
 
@@ -398,7 +417,7 @@ func update_teams(teams):
         text = \"OFF\"
 "
 
-[sub_resource type="GDScript" id=13]
+[sub_resource type="GDScript" id=14]
 script/source = "extends LineEdit
 
 
@@ -421,7 +440,7 @@ func update_num_teams(num_of_teams):
         text += \"0 (No Teams)\"
 "
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=15]
 script/source = "extends LineEdit
 
 
@@ -444,7 +463,7 @@ func update_indoor_outdoor(indoor):
         text = \"Outdoors\"
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=16]
 script/source = "extends LineEdit
 
 
@@ -467,7 +486,7 @@ func update_limit_mode(mode):
         text = \"deaths\"
 "
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=17]
 script/source = "extends LineEdit
 
 
@@ -493,6 +512,7 @@ func update_respawn_delay(delay):
 margin_right = 40.0
 margin_bottom = 40.0
 theme = ExtResource( 2 )
+script = SubResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -501,7 +521,7 @@ __meta__ = {
 margin_right = 540.0
 margin_bottom = 960.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 1 )
+script = SubResource( 2 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -527,7 +547,7 @@ margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 text = "Game Lobby"
 align = 1
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="Label2" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_top = 52.0
@@ -535,7 +555,7 @@ margin_right = 540.0
 margin_bottom = 88.0
 text = "The host is  setting up the game."
 align = 1
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="Teams" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -543,13 +563,13 @@ margin_right = 540.0
 margin_bottom = 132.0
 text = "Teams are turned \"OFF\"."
 align = 1
-script = SubResource( 4 )
+script = SubResource( 5 )
 
 [node name="JoinTeam" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 margin_top = 140.0
 margin_right = 540.0
 margin_bottom = 184.0
-script = SubResource( 5 )
+script = SubResource( 6 )
 
 [node name="Label" type="Label" parent="0,0-Game Lobby/CenterContainer/VBoxContainer"]
 visible = false
@@ -571,7 +591,7 @@ margin_left = 4.0
 margin_right = 43.0
 margin_bottom = 684.0
 theme = ExtResource( 4 )
-custom_fonts/font = SubResource( 6 )
+custom_fonts/font = SubResource( 7 )
 text = "<"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer"]
@@ -599,7 +619,7 @@ margin_right = 430.0
 margin_bottom = 118.0
 rect_min_size = Vector2( 430, 0 )
 custom_constants/separation = 30
-script = SubResource( 7 )
+script = SubResource( 8 )
 
 [node name="Button" type="Button" parent="0,0-Game Lobby/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
 margin_right = 430.0
@@ -617,7 +637,7 @@ margin_left = 497.0
 margin_right = 536.0
 margin_bottom = 684.0
 theme = ExtResource( 5 )
-custom_fonts/font = SubResource( 8 )
+custom_fonts/font = SubResource( 9 )
 text = ">"
 
 [node name="Header2" parent="0,0-Game Lobby" instance=ExtResource( 3 )]
@@ -655,7 +675,7 @@ margin_right = 540.0
 margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 align = 1
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="Label2" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
 margin_top = 52.0
@@ -663,7 +683,7 @@ margin_right = 540.0
 margin_bottom = 88.0
 text = "The host is setting up the game."
 align = 1
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="Teams" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -671,13 +691,13 @@ margin_right = 540.0
 margin_bottom = 132.0
 text = "Teams are turned \"OFF\"."
 align = 1
-script = SubResource( 4 )
+script = SubResource( 5 )
 
 [node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
 margin_top = 140.0
 margin_right = 540.0
 margin_bottom = 184.0
-script = SubResource( 5 )
+script = SubResource( 6 )
 
 [node name="Label" type="Label" parent="0,1-Player Details/CenterContainer/VBoxContainer"]
 visible = false
@@ -698,8 +718,8 @@ alignment = 1
 margin_left = 4.0
 margin_right = 43.0
 margin_bottom = 644.0
-custom_styles/normal = SubResource( 9 )
-custom_fonts/font = SubResource( 6 )
+custom_styles/normal = SubResource( 10 )
+custom_fonts/font = SubResource( 7 )
 text = "<"
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer"]
@@ -726,7 +746,7 @@ scroll_horizontal_enabled = false
 margin_right = 430.0
 margin_bottom = 44.0
 rect_min_size = Vector2( 430, 0 )
-script = SubResource( 7 )
+script = SubResource( 8 )
 
 [node name="Button" type="Button" parent="0,1-Player Details/CenterContainer/VBoxContainer/HBoxContainer/VBoxContainer/ScrollContainer/TeamContainer"]
 margin_right = 430.0
@@ -737,8 +757,8 @@ text = "Joe"
 margin_left = 497.0
 margin_right = 536.0
 margin_bottom = 644.0
-custom_styles/normal = SubResource( 10 )
-custom_fonts/font = SubResource( 8 )
+custom_styles/normal = SubResource( 11 )
+custom_fonts/font = SubResource( 9 )
 text = ">"
 
 [node name="Header2" parent="0,1-Player Details" instance=ExtResource( 3 )]
@@ -776,7 +796,7 @@ margin_right = 540.0
 margin_bottom = 44.0
 rect_min_size = Vector2( 540, 0 )
 align = 1
-script = SubResource( 2 )
+script = SubResource( 3 )
 
 [node name="Label2" type="Label" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
 margin_top = 52.0
@@ -784,7 +804,7 @@ margin_right = 540.0
 margin_bottom = 88.0
 text = "The host is setting up the game."
 align = 1
-script = SubResource( 3 )
+script = SubResource( 4 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer"]
 margin_top = 96.0
@@ -814,7 +834,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-script = SubResource( 11 )
+script = SubResource( 12 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 70.0
@@ -838,7 +858,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Off"
 align = 2
-script = SubResource( 12 )
+script = SubResource( 13 )
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 140.0
@@ -862,7 +882,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "0 (No Teams)"
 align = 2
-script = SubResource( 13 )
+script = SubResource( 14 )
 
 [node name="HBoxContainer4" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 210.0
@@ -886,7 +906,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-script = SubResource( 14 )
+script = SubResource( 15 )
 
 [node name="HBoxContainer5" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 280.0
@@ -910,7 +930,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-script = SubResource( 15 )
+script = SubResource( 16 )
 
 [node name="HBoxContainer6" type="HBoxContainer" parent="0,-1-Game Settings/CenterContainer/VBoxContainer/VBoxContainer"]
 margin_top = 350.0
@@ -934,7 +954,7 @@ rect_min_size = Vector2( 235, 0 )
 theme = ExtResource( 6 )
 text = "Unknown"
 align = 2
-script = SubResource( 16 )
+script = SubResource( 17 )
 
 [node name="Header2" parent="0,-1-Game Settings" instance=ExtResource( 3 )]
 my_menu = "0,-1"
@@ -1000,6 +1020,9 @@ allow_preferences = false
 
 [node name="WelcomeLobbyAudio" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 8 )
+
+[node name="EmptyGunShotSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource( 9 )
 [connection signal="item_selected" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_item_selected" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" to="0,0-Game Lobby/CenterContainer/VBoxContainer/LobbyDropDown" method="_on_LobbyDropDown_pressed" flags=3]
 [connection signal="pressed" from="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" to="0,0-Game Lobby/CenterContainer/VBoxContainer/JoinTeam" method="_on_Button_pressed" flags=3]

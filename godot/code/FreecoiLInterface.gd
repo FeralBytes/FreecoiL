@@ -180,6 +180,7 @@ func _on_delay_loading():
     if Engine.has_singleton("FreecoiL"):
         FreecoiL = Engine.get_singleton("FreecoiL")
         print(" ************* " + str(FreecoiL.hello()))
+        _fine_access_location_status()
         FreecoiL.init(get_instance_id())
     
 func init_vars():
@@ -218,6 +219,8 @@ func _bt_on():
     
 func _fine_access_location_status():
     print("Granted Permissions: " + str(OS.get_granted_permissions()))
+    if OS.get_granted_permissions().empty():
+        _fine_access_location_enabled()
     #fine_access_location = FreecoiL.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
