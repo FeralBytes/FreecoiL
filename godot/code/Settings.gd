@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev2"
+const VERSION = "0.3.1-dev3"
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -686,3 +686,5 @@ func _ready():
     InGame.loading_on_ready()
     Session.loading_on_ready()
     Network.loading_on_ready()
+    Session.set_data("experimental_toggles", {"sensors_flash_on_hit":false, "gun_test_screen":false,
+        "background_resource_loader":false})

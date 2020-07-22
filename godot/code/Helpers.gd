@@ -1,8 +1,6 @@
 extends Node
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
+var background_threads = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -65,3 +63,75 @@ func get_display_metrics():
     var display_script = load("res://code/display.gd").new()
     return display_script.get_display_metrics()
     
+
+func threaded_background_loader(resource_path):
+    var background_load_thread = Thread.new()
+    background_threads.append(background_load_thread)
+    var thread_num = background_threads.size() - 1
+    var background_load_progress =  Settings.Session.get_data("Helpers_background_load_progress")
+    background_load_progress[thread_num] = 0.0
+    Settings.Session.set_data("Helpers_background_load_progress", background_load_progress)
+    var background_load_results = Settings.Session.get_data("Helpers_background_load_result")
+    background_load_results[thread_num] = null
+    Settings.Session.set_data("Helpers_background_load_result", background_load_results)
+    background_load_thread.start(self, '_threaded_loading', [resource_path, thread_num])
+    return thread_num
+    
+func background_loading_progress(progress, thread_num):
+    var background_load_progress =  Settings.Session.get_data("Helpers_background_load_progress")
+    background_load_progress[thread_num] = progress
+    Settings.Session.set_data("Helpers_background_load_progress", background_load_progress)
+    
+func finished_background_loading(thread_num):
+    var background_load_results = Settings.Session.get_data("Helpers_background_load_result")
+    background_load_results[thread_num] = "finished"
+    Settings.Session.set_data("Helpers_background_load_result", background_load_results)
+    
+func failed_background_loading(err_msg, thread_num):
+    Settings.Log(err_msg)
+    var background_load_results = Settings.Session.get_data("Helpers_background_load_result")
+    background_load_results[thread_num] = "failed"
+    Settings.Session.set_data("Helpers_background_load_result", background_load_results)
+
+func _threaded_loader(resource_data):
+    var path = null
+    var thread_num = null
+    for i in range(0, len(resource_data)):
+        match i:
+            0:
+                path = resource_data[i]
+            1: 
+                thread_num = resource_data[i]
+    var progress = 0.0
+    var loader = ResourceLoader.load_interactive(path)
+    var err = OK
+    call_deferred('background_loading_progress', progress, thread_num)
+    while err == OK:  # ERR_FILE_EOF = loading finished
+        err = loader.poll()
+        if err == OK:
+            progress = float(loader.get_stage()) / loader.get_stage_count()
+        else:
+            progress = 0.99
+        call_deferred('background_loading_progress', progress, thread_num)
+    if err == ERR_FILE_EOF:
+        var resource = loader.get_resource()
+        call_deferred("finished_background_loading", thread_num)
+        return resource
+    else: # error during loading
+            call_deferred('failed_background_loading', "Error during Loading! Error Number = " + str(err), thread_num)
+
+func get_loaded_resource_from_background(thread_num):
+    var result = Settings.Session.get_data("Helpers_background_load_result")[thread_num]
+    var loaded_resource = null
+    var tear_down = false
+    if result == "finished":
+        loaded_resource = background_threads[thread_num].wait_to_finish()
+        tear_down = true
+    elif result == "failed":
+        var __ = background_threads[thread_num].wait_to_finish()
+        tear_down = true
+    else:
+        pass
+    if tear_down:
+        background_threads.remove(thread_num)
+    return loaded_resource

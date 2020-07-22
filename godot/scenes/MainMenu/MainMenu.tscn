@@ -26,7 +26,8 @@ func update_trigger_pressed(new_val):
     if new_val != 0:
         if not EmptyGunShotSound.playing:
             EmptyGunShotSound.play()
-            Input.vibrate_handheld(200)"
+            Input.vibrate_handheld(200)
+"
 
 [sub_resource type="GDScript" id=2]
 script/source = "extends Label
@@ -662,7 +663,15 @@ func force_player_name(__):
             yield(get_tree(), 'idle_frame')
             if LoginPlayerAudio.playing == false:
                 # TODO background load this.
-                LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
+                if LoginPlayerAudio.stream == \"\":
+                    if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
+                        var thread_num = Helpers.threaded_background_loader(\"res://assets/voices/EN_MV_login2.wav\")
+                        while Settings.Session.get_data(\"Helpers_background_load_result\")[thread_num] == null:
+                            yield(get_tree(), 'idle_frame')
+                        if Settings.Session.get_data(\"Helpers_background_load_result\")[thread_num] == \"finished\":
+                            LoginPlayerAudio.stream = Helpers.get_loaded_resource_from_background(thread_num)
+                    else:
+                        LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
                 LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
 #        force_gun_connection(null)

@@ -47,8 +47,8 @@ var recoil_enabled
 # Shot Details:
 var shot_by_id_1 = null
 var shot_by_id_2 = null
-var shot_counter_1 = null
-var shot_counter_2 = null
+var previous_shot_counter_1 = null
+var previous_shot_counter_2 = null
 
 #####################
 # Public Godot API
@@ -343,18 +343,43 @@ func _laser_telem_batteryLvl(batteryLvl):
             prev_battery_lvl_avg = battery_lvl_avg
     
 func _changed_laser_telem_shot_data(shooter1LaserId, shooter2LaserId, shotCounter1, shotCounter2):
-    if shotCounter1 != shot_counter_1:
-        shot_counter_1 = shotCounter1
+    if shotCounter1 != previous_shot_counter_1:
+        previous_shot_counter_1 = shotCounter1
         shot_by_id_1 = shooter1LaserId
         Settings.Session.set_data("fi_shooter1_laser_id", shooter1LaserId)
-        Settings.Session.set_data("fi_shot_counter_1", shotCounter1)
+        Settings.Session.set_data("fi_shooter1_shot_counter", shotCounter1)
         get_tree().call_group("FreecoiL", "fi_got_shot", shooter1LaserId)
-    if shotCounter2 != shot_counter_2:
-        shot_counter_2 = shotCounter2
+    if shotCounter2 != previous_shot_counter_2:
+        previous_shot_counter_2 = shotCounter2
         shot_by_id_2 = shooter1LaserId
         Settings.Session.set_data("fi_shooter2_laser_id", shooter2LaserId)
-        Settings.Session.set_data("fi_shot_counter_2", shotCounter2)
+        Settings.Session.set_data("fi_shooter2_shot_counter", shotCounter2)
         get_tree().call_group("FreecoiL", "fi_got_shot", shooter2LaserId)
+
+func _changed_laser_telem_got_shot(shooter1LaserId, shooter1ShotCounter, shooter1WpnPrfl, shooter1ChargeLvl,
+    shooter1SensorClip, shooter1SensorFront, shooter1SensorLeft, shooter1SensorRight, shooter2LaserId,
+    shooter2ShotCounter, shooter2WpnPrfl, shooter2ChargeLvl, shooter2SensorClip, shooter2SensorFront,
+    shooter2SensorLeft, shooter2SensorRight):
+    if shooter1ShotCounter != Settings.Session.get_data("fi_shooter1_shot_counter"):
+        Settings.Session.set_data("fi_shooter1_laser_id", shooter1LaserId)
+        Settings.Session.set_data("fi_shooter1_weapon_profile", shooter1WpnPrfl)
+        Settings.Session.set_data("fi_shooter1_charge_level", shooter1ChargeLvl)
+        Settings.Session.set_data("fi_shooter1_sensor_clip", shooter1SensorClip)
+        Settings.Session.set_data("fi_shooter1_sensor_front", shooter1SensorFront)
+        Settings.Session.set_data("fi_shooter1_sensor_left", shooter1SensorLeft)
+        Settings.Session.set_data("fi_shooter1_sensor_right", shooter1SensorRight)
+        # We set "fi_shooter1_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+        Settings.Session.set_data("fi_shooter1_shot_counter", shooter1ShotCounter)
+    if shooter2ShotCounter != Settings.Session.get_data("fi_shooter2_shot_counter"):
+        Settings.Session.set_data("fi_shooter2_laser_id", shooter2LaserId)
+        Settings.Session.set_data("fi_shooter2_weapon_profile", shooter2WpnPrfl)
+        Settings.Session.set_data("fi_shooter2_charge_level", shooter2ChargeLvl)
+        Settings.Session.set_data("fi_shooter2_sensor_clip", shooter2SensorClip)
+        Settings.Session.set_data("fi_shooter2_sensor_front", shooter2SensorFront)
+        Settings.Session.set_data("fi_shooter2_sensor_left", shooter2SensorLeft)
+        Settings.Session.set_data("fi_shooter2_sensor_right", shooter2SensorRight)
+        # We set "fi_shooter2_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+        Settings.Session.set_data("fi_shooter2_shot_counter", shooter2ShotCounter)
 
 # warning-ignore:unused_argument
 func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
@@ -369,7 +394,7 @@ func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnP
     #get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
 
 func _processed_laser_telemetry2(array_of_args):
-#    if Settings.Session.get_data("fi_shot_counter_1") != array_of_args[22]:
+#    if Settings.Session.get_data("fi_shooter1_shot_counter") != array_of_args[22]:
 #        print("commandId = " + str(array_of_args[0]) + " | playerId = " + str(array_of_args[1]) + 
 #            " | buttonsPressed = " + str(array_of_args[2]) + " | triggerBtnCounter = " + str(array_of_args[3]) + 
 #            " | reloadBtnCounter = " + str(array_of_args[4]) + " | thumbBtnCounter = " + str(array_of_args[5]) + 
@@ -390,19 +415,24 @@ func _processed_laser_telemetry2(array_of_args):
 #            " | status = " + str(array_of_args[34]) + " | PlayerIdAccepted = " + str(array_of_args[35]) + 
 #            " | wpnProfileAgain = " + str(array_of_args[36]))
     _changed_laser_telem_triggerBtnCounter(array_of_args[3])
-    _changed_laser_telem_shot_data(array_of_args[14], array_of_args[15], array_of_args[22], array_of_args[23])
-    if Settings.Session.get_data("fi_shooter1_wpn_prfl") != array_of_args[16]:
-        Settings.Session.set_data("fi_shooter1_wpn_prfl", array_of_args[16])
-    if Settings.Session.get_data("fi_shooter1_charge") != array_of_args[18]:
-        Settings.Session.set_data("fi_shooter1_charge", array_of_args[18])
-    if Settings.Session.get_data("fi_shooter1_sensor_clip") != array_of_args[26]:
-        Settings.Session.set_data("fi_shooter1_sensor_clip", array_of_args[26])
-    if Settings.Session.get_data("fi_shooter1_sensor_front") != array_of_args[27]:
-        Settings.Session.set_data("fi_shooter1_sensor_front", array_of_args[27])
-    if Settings.Session.get_data("fi_shooter1_sensor_left") != array_of_args[28]:
-        Settings.Session.set_data("fi_shooter1_sensor_left", array_of_args[28])
-    if Settings.Session.get_data("fi_shooter1_sensor_right") != array_of_args[29]:
-        Settings.Session.set_data("fi_shooter1_sensor_right", array_of_args[29])
+    if Settings.Session.get_data("experimental_toggles")["sensor_flash_on_hit"]:
+        _changed_laser_telem_got_shot(array_of_args[14], array_of_args[22], array_of_args[16], array_of_args[18],
+            array_of_args[26], array_of_args[27], array_of_args[28], array_of_args[29], array_of_args[15], array_of_args[23],
+            array_of_args[17], array_of_args[20], array_of_args[30], array_of_args[31], array_of_args[32], array_of_args[33])
+    else:
+        _changed_laser_telem_shot_data(array_of_args[14], array_of_args[15], array_of_args[22], array_of_args[23])
+        if Settings.Session.get_data("fi_shooter1_wpn_prfl") != array_of_args[16]:
+            Settings.Session.set_data("fi_shooter1_wpn_prfl", array_of_args[16])
+        if Settings.Session.get_data("fi_shooter1_charge") != array_of_args[18]:
+            Settings.Session.set_data("fi_shooter1_charge", array_of_args[18])
+        if Settings.Session.get_data("fi_shooter1_sensor_clip") != array_of_args[26]:
+            Settings.Session.set_data("fi_shooter1_sensor_clip", array_of_args[26])
+        if Settings.Session.get_data("fi_shooter1_sensor_front") != array_of_args[27]:
+            Settings.Session.set_data("fi_shooter1_sensor_front", array_of_args[27])
+        if Settings.Session.get_data("fi_shooter1_sensor_left") != array_of_args[28]:
+            Settings.Session.set_data("fi_shooter1_sensor_left", array_of_args[28])
+        if Settings.Session.get_data("fi_shooter1_sensor_right") != array_of_args[29]:
+            Settings.Session.set_data("fi_shooter1_sensor_right", array_of_args[29])
     _changed_laser_telem_shotsRemaining(array_of_args[13])
     if Settings.Session.get_data("fi_laser_status") != array_of_args[34]:
         Settings.Session.set_data("fi_laser_status", array_of_args[34])

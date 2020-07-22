@@ -595,6 +595,15 @@ func fi_got_shot(laser_id):
                 eliminated(laser_id)
             else:
                 respawn_start(laser_id)
+                
+func fi_shot_by_shooter1(__):
+    pass
+    
+func fi_shot_by_shooter2(__):
+    pass
+    
+func process_shot_by_shooter():
+    pass
     
 func fi_power_btn_counter(__):
     var force_recoil = Settings.InGame.get_data("force_recoil")
@@ -609,3 +618,4 @@ func fi_thumb_btn_counter(__):
 
 func _on_RespawnButton_pressed():
     respawn_finish()
+    
