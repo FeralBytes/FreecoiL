@@ -32,8 +32,8 @@ func do_a_left_click(position:Vector2):
 func before_all():
     time_started = OS.get_unix_time()
     Settings.Testing.register_data("testing", true, false)
-    Settings.Session.set_data("experimental_toggles", {"sensors_flash_on_hit":false, "gun_test_screen":false,
-        "background_resource_loader":false})
+    Settings.Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":false, "gun_test_screen":false,
+        "background_resource_loader":true})
     Obj = load("res://scenes/Container/Container.tscn")
     _obj = Obj.instance()
     add_child(_obj)

@@ -33,13 +33,33 @@ func defer_screenshot():
     get_viewport().set_clear_mode(Viewport.CLEAR_MODE_ONLY_NEXT_FRAME)
     # Wait until the frame has finished before getting the texture.
     yield(VisualServer, \"frame_post_draw\")
-
     # Retrieve the captured image.
     var img = get_viewport().get_texture().get_data()
     get_viewport().set_clear_mode(clear_mode)
     # Flip it on the y-axis (because it's flipped).
     img.flip_y()
     img.save_png(\"res://assets/images/boot_splash.png\")
+    # Update the Version in Export presets
+    var f = File.new()
+    f.open(\"res://export_presets.cfg\", f.READ_WRITE)
+    var file_lines_array = []
+    while not f.eof_reached():
+        file_lines_array.append(f.get_line())
+    for counter in range(0, file_lines_array.size()):
+        var line = file_lines_array[counter]
+        if \"version/name=\" in line:
+            line  = 'version/name=\"' + Settings.VERSION + '\"'
+        elif \"version/code=\" in line:
+            line  = 'version/code=' + str(Settings.VERSION_MICRO_INT)
+        elif \"application/file_version=\" in line:
+            line  = 'application/file_version=\"' + Settings.VERSION + '\"'
+        elif \"application/product_version=\" in line:
+            line  = 'application/product_version=\"' + Settings.VERSION + '\"'
+        file_lines_array[counter] = line
+    var joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
+    f.seek(0)
+    f.store_string(joined_strings)
+    f.close()
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -92,8 +112,8 @@ alignment = 1
 
 [node name="Label" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 modulate = Color( 0.913725, 0.329412, 0.129412, 1 )
-margin_left = 152.0
-margin_right = 249.0
+margin_left = 159.0
+margin_right = 256.0
 margin_bottom = 26.0
 custom_fonts/font = SubResource( 1 )
 text = "Version: "
@@ -101,10 +121,10 @@ align = 2
 
 [node name="Version" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer"]
 modulate = Color( 0.913725, 0.329412, 0.129412, 1 )
-margin_left = 253.0
-margin_right = 387.0
+margin_left = 260.0
+margin_right = 380.0
 margin_bottom = 26.0
 custom_fonts/font = SubResource( 2 )
-text = "0.3.0-dev14"
+text = "0.3.1-dev3"
 align = 1
 script = SubResource( 3 )

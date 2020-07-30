@@ -1,6 +1,8 @@
 extends Node
 # alpha, beta, rc, preview, dev
 const VERSION = "0.3.1-dev3"
+#Major.Minor.Micro
+const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 const USER_DIR = "user://"
 const GAME_NAME = "FreecoiL"
@@ -686,5 +688,5 @@ func _ready():
     InGame.loading_on_ready()
     Session.loading_on_ready()
     Network.loading_on_ready()
-    Session.set_data("experimental_toggles", {"sensors_flash_on_hit":false, "gun_test_screen":false,
-        "background_resource_loader":false})
+    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":false, "gun_test_screen":false,
+        "background_resource_loader":true})

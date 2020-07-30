@@ -166,7 +166,7 @@ func toggle_recoil():
 func _ready():
     bt_connect_timeout.one_shot = true
     bt_connection_timed_out.one_shot = true
-    bt_connect_timeout.wait_time = 10
+    bt_connect_timeout.wait_time = 30
     bt_connection_timed_out.wait_time = 2  # Bumped this up because some phones are slower to load resources.
     bt_connect_timeout.connect("timeout", self, "_on_bt_connect_timeout")
     bt_connection_timed_out.connect("timeout", self, "_on_bt_connection_timed_out")
@@ -180,8 +180,13 @@ func _on_delay_loading():
     if Engine.has_singleton("FreecoiL"):
         FreecoiL = Engine.get_singleton("FreecoiL")
         print(" ************* " + str(FreecoiL.hello()))
-        _fine_access_location_status()
-        FreecoiL.init(get_instance_id())
+        if OS.get_granted_permissions().empty():
+            _fine_access_location_status()
+            while OS.get_granted_permissions().empty():
+                yield(get_tree(), 'idle_frame')
+            FreecoiL.init(get_instance_id())
+        else:
+            FreecoiL.init(get_instance_id())
     
 func init_vars():
     # We initialize the vars here to allow loading from saved defaults but also to 
@@ -221,6 +226,7 @@ func _fine_access_location_status():
     print("Granted Permissions: " + str(OS.get_granted_permissions()))
     if OS.get_granted_permissions().empty():
         _fine_access_location_enabled()
+    return OS.get_granted_permissions()
     #fine_access_location = FreecoiL.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
@@ -415,7 +421,7 @@ func _processed_laser_telemetry2(array_of_args):
 #            " | status = " + str(array_of_args[34]) + " | PlayerIdAccepted = " + str(array_of_args[35]) + 
 #            " | wpnProfileAgain = " + str(array_of_args[36]))
     _changed_laser_telem_triggerBtnCounter(array_of_args[3])
-    if Settings.Session.get_data("experimental_toggles")["sensor_flash_on_hit"]:
+    if Settings.Session.get_data("experimental_toggles")["hexes_flash_on_sensor_hit"]:
         _changed_laser_telem_got_shot(array_of_args[14], array_of_args[22], array_of_args[16], array_of_args[18],
             array_of_args[26], array_of_args[27], array_of_args[28], array_of_args[29], array_of_args[15], array_of_args[23],
             array_of_args[17], array_of_args[20], array_of_args[30], array_of_args[31], array_of_args[32], array_of_args[33])

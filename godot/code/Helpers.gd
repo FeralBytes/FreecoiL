@@ -4,7 +4,8 @@ var background_threads = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    pass # Replace with function body.
+    Settings.Session.set_data("Helpers_background_load_progress", [])
+    Settings.Session.set_data("Helpers_background_load_result", [])
 
 static func general_type_of(obj):
     var typ = typeof(obj)
@@ -69,12 +70,12 @@ func threaded_background_loader(resource_path):
     background_threads.append(background_load_thread)
     var thread_num = background_threads.size() - 1
     var background_load_progress =  Settings.Session.get_data("Helpers_background_load_progress")
-    background_load_progress[thread_num] = 0.0
+    background_load_progress.append(0.0)
     Settings.Session.set_data("Helpers_background_load_progress", background_load_progress)
     var background_load_results = Settings.Session.get_data("Helpers_background_load_result")
-    background_load_results[thread_num] = null
+    background_load_results.append(null)
     Settings.Session.set_data("Helpers_background_load_result", background_load_results)
-    background_load_thread.start(self, '_threaded_loading', [resource_path, thread_num])
+    background_load_thread.start(self, '_threaded_loader', [resource_path, thread_num])
     return thread_num
     
 func background_loading_progress(progress, thread_num):
@@ -102,7 +103,7 @@ func _threaded_loader(resource_data):
                 path = resource_data[i]
             1: 
                 thread_num = resource_data[i]
-    var progress = 0.0
+    var progress = 0.01
     var loader = ResourceLoader.load_interactive(path)
     var err = OK
     call_deferred('background_loading_progress', progress, thread_num)
@@ -118,7 +119,8 @@ func _threaded_loader(resource_data):
         call_deferred("finished_background_loading", thread_num)
         return resource
     else: # error during loading
-            call_deferred('failed_background_loading', "Error during Loading! Error Number = " + str(err), thread_num)
+            call_deferred('failed_background_loading', "Error during background loading! Error Number = " 
+                + str(err), thread_num)
 
 func get_loaded_resource_from_background(thread_num):
     var result = Settings.Session.get_data("Helpers_background_load_result")[thread_num]

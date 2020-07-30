@@ -640,6 +640,8 @@ func _on_Button_pressed():
 [sub_resource type="GDScript" id=28]
 script/source = "extends ReferenceRect
 
+var background_loading = false
+var thread_num = null
 
 onready var LoginPlayerAudio = get_node(\"LoginPlayerAudio\")
 onready var CallSignLineEdit = get_node(\"CenterContainer/VBoxContainer/VBoxContainer/LineEdit\")
@@ -662,17 +664,15 @@ func force_player_name(__):
             CallSignLineEdit.grab_focus()
             yield(get_tree(), 'idle_frame')
             if LoginPlayerAudio.playing == false:
-                # TODO background load this.
-                if LoginPlayerAudio.stream == \"\":
-                    if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
-                        var thread_num = Helpers.threaded_background_loader(\"res://assets/voices/EN_MV_login2.wav\")
-                        while Settings.Session.get_data(\"Helpers_background_load_result\")[thread_num] == null:
-                            yield(get_tree(), 'idle_frame')
-                        if Settings.Session.get_data(\"Helpers_background_load_result\")[thread_num] == \"finished\":
-                            LoginPlayerAudio.stream = Helpers.get_loaded_resource_from_background(thread_num)
-                    else:
-                        LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
-                LoginPlayerAudio.play()
+                if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
+                    if not background_loading:
+                        background_loading = true
+                        thread_num = Helpers.threaded_background_loader(\"res://assets/voices/EN_MV_login2.wav\")
+                        Settings.Session.connect(Settings.Session.monitor_data(\"Helpers_background_load_result\"), self,
+                            \"play_audio_from_background\")
+                else:
+                    LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
+                    LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
 #        force_gun_connection(null)
         
@@ -681,6 +681,12 @@ func force_gun_connection(__):
     if FreecoiLInterface.laser_is_connected != true:
         if Settings.Session.get_data(\"current_menu\") != \"1,-1\":
             get_tree().call_group(\"Container\", \"next_menu\", \"1,-1\")
+            
+func play_audio_from_background(background_results):
+    var results = background_results[thread_num]
+    if results == \"finished\":
+        LoginPlayerAudio.stream = Helpers.get_loaded_resource_from_background(thread_num)
+        LoginPlayerAudio.play()
 "
 
 [sub_resource type="GDScript" id=29]
@@ -1685,6 +1691,9 @@ margin_right = 12.0
 margin_bottom = 44.0
 text = "Start Testing"
 script = SubResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="PlusMinusWidget" parent="-1,-1-Tests2/GunTester" instance=ExtResource( 4 )]
 margin_left = 278.125
@@ -3222,8 +3231,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,6-Custom Setup 6/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3315,8 +3323,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,6-Custom Setup 7/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3410,8 +3417,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,6-Custom Setup 8/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3505,8 +3511,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,6-Custom Setup 9/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 

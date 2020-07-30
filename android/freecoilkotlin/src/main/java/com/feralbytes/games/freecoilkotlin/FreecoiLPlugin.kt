@@ -25,6 +25,8 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.*
 import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
@@ -33,6 +35,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+/*import com.google.android.gms.location.LocationServices*/
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
@@ -56,50 +61,47 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     private var vibrator: Vibrator? = null
     private var btDeviceAddress = "" // MAC address of the tagger
     private var toastDisplayLength = 0
-
     /* Code specific to BluetoothLeGATT. */
     private var BLEServiceConnection: ServiceConnection? = null
     private var telemetryCharacteristic: BluetoothGattCharacteristic? = null
     private var commandCharacteristic: BluetoothGattCharacteristic? = null
     private var configCharacteristic: BluetoothGattCharacteristic? = null
-
+    /* */
     @Volatile
     private var playerId = 0
-
     @Volatile
     private var commandId = 0
-
     @Volatile
     private var shotsRemaining = 0
-
     private val trackedHitById1 = 0
-
     private val trackedHitById2 = 0
-
     @Volatile
     private var triggerBtnCounter = 0
-
     @Volatile
     private var reloadBtnCounter = 0
-
     @Volatile
     private var thumbBtnCounter = 0
-
     @Volatile
     private var powerBtnCounter = 0
-
     @Volatile
     private var batteryLvlHigh = 0
-
     @Volatile
     private var batteryLvlLow = 0
-
     @Volatile
     private var buttonsPressed = 0
-
     private val trackedShotId1 = 0
-
     private val trackedShotId2 = 0
+    /* **********************************************************************
+     * GPS Vars
+     * ********************************************************************** */
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var mLocationRequest: LocationRequest
+    private lateinit var mLocation: Location
+    private lateinit var  mLocationManager: LocationManager
+    private val sUINTERVAL = (2 * 1000).toLong()  /* 10 secs */
+    private val sFINTERVAL: Long = 2000 /* 2 sec */
+    private lateinit var locationManager: LocationManager
+
 
     /* **********************************************************************
      * Public Methods
@@ -128,6 +130,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 logger("Unable to initialize Bluetooth Low Energy Service!", 4)
             }
             vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)*/
             GodotLib.calldeferred(instanceId.toLong(), "_on_mod_init", arrayOf())
             logger("FreecoiL Kotlin module initialized.", 1)
             initialized = true
@@ -641,6 +644,9 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
 
             private fun checkDeviceName(device: BluetoothDevice): Boolean {
                 if (device.name != null && !device.name.isEmpty()) {
+                    val devAddess = device.address
+                    val devName = device.name
+                    logger("$TAG: Found Device: $devName   $devAddess", 2)
                     if (btDeviceAddress.isEmpty() && device.name.startsWith("SRG1") || btDeviceAddress == device.address) {
                         logger("Connecting to " + device.name + " '" + device.address + "'", 1)
                         //TODO: Godot Callback set status to connecting to gun.
@@ -649,6 +655,9 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                         btDeviceAddress = device.address
                         setupBLEServiceConnection()
                         return true
+                    }
+                    else{
+                        logger("$TAG: Ignored found device because it didn't match the previous device.", 2)
                     }
                 }
                 return false

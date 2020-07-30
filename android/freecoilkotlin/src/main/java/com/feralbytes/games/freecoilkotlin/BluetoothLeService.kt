@@ -266,6 +266,7 @@ class BluetoothLeService : Service() {
      * callback.
      */
     fun connect(address: String?): Boolean {
+        FreecoiLInstance!!.logger("$TAG: Device Address is $mBluetoothDeviceAddress.", 1)
         if (mBluetoothAdapter == null || address == null) {
             FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized or unspecified address.", 2)
             return false
@@ -278,6 +279,7 @@ class BluetoothLeService : Service() {
                 mConnectionState = STATE_CONNECTING
                 true
             } else {
+                FreecoiLInstance!!.logger("$TAG: Ignored connected device.", 0)
                 false
             }
         }
