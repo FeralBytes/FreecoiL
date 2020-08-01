@@ -153,15 +153,72 @@ func test_p3_game_history_size_is_correct_after_rejoin():
     yield(get_tree().create_timer(2.0), "timeout")
     
 func test_p3_can_be_killed_for_20_times():
+#    _changed_laser_telem_got_shot(shooter1LaserId, shooter1ShotCounter, shooter1WpnPrfl, shooter1ChargeLvl,
+#    shooter1SensorClip, shooter1SensorFront, shooter1SensorLeft, shooter1SensorRight, shooter2LaserId,
+#    shooter2ShotCounter, shooter2WpnPrfl, shooter2ChargeLvl, shooter2SensorClip, shooter2SensorFront,
+#    shooter2SensorLeft, shooter2SensorRight):
+    var shot_pattern = 1
     var shot_counter = 0
+    var odd_or_even = 1
     for i in range(0, 20):
+        if shot_pattern > 15:
+            shot_pattern = 1
         if shot_counter > 15:
             shot_counter = 0
-        Settings.Session.set_data("game_player_health", 1)
+        if odd_or_even > 2:
+            odd_or_even = 1
+        if odd_or_even == 1:
+            Settings.Session.set_data("game_player_health", 2)
         yield(get_tree(), 'idle_frame')
-        FreecoiLInterface._changed_laser_telem_shot_data(Settings.InGame.get_data("player_laser_by_id")["1"], 0, shot_counter, 0)
+        if shot_pattern == 1:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 2:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 3:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 4:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 5:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 6:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 7:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 8:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 9:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 10:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 11:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 12:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 13:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 14:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
+        elif shot_pattern == 15:
+            FreecoiLInterface._changed_laser_telem_got_shot(Settings.InGame.get_data("player_laser_by_id")["1"],
+                shot_counter, 0, 7, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0)
         yield(get_tree().create_timer(2.0), "timeout")
         shot_counter += 1
+        shot_pattern += 1
+        odd_or_even += 1
 
 func test_p3_yield_to_show_result():
     yield(get_tree(), 'idle_frame')

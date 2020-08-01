@@ -655,11 +655,11 @@ func process_shot_by_shooter(shooter1_or2, laser_id):
             var hexagons_to_blink = 0
             if Settings.Session.get_data("fi_shooter" + str(shooter1_or2) + "_sensor_clip") != 0:
                 hexagons_to_blink += 1
-            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_front") != 0:
+            if Settings.Session.get_data("fi_shooter" + str(shooter1_or2) + "_sensor_front") != 0:
                 hexagons_to_blink += 2
-            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_left") != 0:
+            if Settings.Session.get_data("fi_shooter" + str(shooter1_or2) + "_sensor_left") != 0:
                 hexagons_to_blink += 4
-            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_right") != 0:
+            if Settings.Session.get_data("fi_shooter" + str(shooter1_or2) + "_sensor_right") != 0:
                 hexagons_to_blink += 8
             blink_hexagons(hexagons_to_blink)
     
@@ -765,6 +765,19 @@ func blink_hexagons(hexagon_pattern):
         triangle_top_blinked_count = 0
         triangle_topright_blinking = true
         triangle_topright_blinked_count = 0
+    elif hexagon_pattern == 15:  # you were hit in all 4 sensors. The enemy is all around you!
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
     # Because this function is only called when the sensors are hit we will always start the blinker.
     start_blinker()
 
@@ -774,19 +787,85 @@ func start_blinker():
         call_deferred("blinker")
     
 func blinker():
-    var still_blinking_things = false
-    if triangle_bottom_blinking:
-        still_blinking_things = true
-        if TriangleBottom.polygon_color == Color("5b929292"):
-            TriangleBottom.polygon_color = Color("929292")
-            triangle_bottom_blinked_count += 1
+    if Settings.Session.get_data("game_player_alive"):
+        var still_blinking_things = false
+        var MAX_BLINKS = 10
+        if triangle_top_blinking:
+            if TriangleTop.polygon_color == Color("5b929292"):
+                TriangleTop.polygon_color = Color("929292")
+                triangle_top_blinked_count += 1
+            else:
+                TriangleTop.polygon_color = Color("5b929292")
+                if triangle_top_blinked_count >= MAX_BLINKS:
+                    triangle_top_blinking = false
+        if triangle_topleft_blinking:
+            if TriangleTopLeft.polygon_color == Color("5b929292"):
+                TriangleTopLeft.polygon_color = Color("929292")
+                triangle_topleft_blinked_count += 1
+            else:
+                TriangleTopLeft.polygon_color = Color("5b929292")
+                if triangle_topleft_blinked_count >= MAX_BLINKS:
+                    triangle_topleft_blinking = false
+        if triangle_topright_blinking:
+            if TriangleTopRight.polygon_color == Color("5b929292"):
+                TriangleTopRight.polygon_color = Color("929292")
+                triangle_topright_blinked_count += 1
+            else:
+                TriangleTopRight.polygon_color = Color("5b929292")
+                if triangle_topright_blinked_count >= MAX_BLINKS:
+                    triangle_topright_blinking = false
+        if triangle_bottom_blinking:
+            if TriangleBottom.polygon_color == Color("5b929292"):
+                TriangleBottom.polygon_color = Color("929292")
+                triangle_bottom_blinked_count += 1
+            else:
+                TriangleBottom.polygon_color = Color("5b929292")
+                if triangle_bottom_blinked_count >= MAX_BLINKS:
+                    triangle_bottom_blinking = false
+        if triangle_bottomleft_blinking:
+            if TriangleBottomLeft.polygon_color == Color("5b929292"):
+                TriangleBottomLeft.polygon_color = Color("929292")
+                triangle_bottomleft_blinked_count += 1
+            else:
+                TriangleBottomLeft.polygon_color = Color("5b929292")
+                if triangle_bottomleft_blinked_count >= MAX_BLINKS:
+                    triangle_bottomleft_blinking = false
+        if triangle_bottomright_blinking:
+            if TriangleBottomRight.polygon_color == Color("5b929292"):
+                TriangleBottomRight.polygon_color = Color("929292")
+                triangle_bottomright_blinked_count += 1
+            else:
+                TriangleBottomRight.polygon_color = Color("5b929292")
+                if triangle_bottomright_blinked_count >= MAX_BLINKS:
+                    triangle_bottomright_blinking = false
+        if triangle_top_blinking:
+            still_blinking_things = true
+        if triangle_topleft_blinking:
+            still_blinking_things = true
+        if triangle_topright_blinking:
+            still_blinking_things = true
+        if triangle_bottom_blinking:
+            still_blinking_things = true
+        if triangle_bottomleft_blinking:
+            still_blinking_things = true
+        if triangle_bottomright_blinking:
+            still_blinking_things = true
+        if still_blinking_things:
+            yield(get_tree().create_timer(0.15), "timeout")
+            call_deferred("blinker")
         else:
-            TriangleBottom.polygon_color = Color("5b929292")
-            if triangle_bottom_blinked_count >= 5:
-                triangle_bottom_blinking = false
-                still_blinking_things = false
-    if still_blinking_things:
-        yield(get_tree().create_timer(0.1), "timeout")
-        call_deferred("blinker")
-    else:
+            blinker_running = false
+    else:  # Player Died.
+        TriangleTop.polygon_color = Color("5b929292")
+        TriangleTopLeft.polygon_color = Color("5b929292")
+        TriangleTopRight.polygon_color = Color("5b929292")
+        TriangleBottom.polygon_color = Color("5b929292")
+        TriangleBottomLeft.polygon_color = Color("5b929292")
+        TriangleBottomRight.polygon_color = Color("5b929292")
+        triangle_top_blinking = false
+        triangle_topleft_blinking = false
+        triangle_topright_blinking = false
+        triangle_bottom_blinking = false
+        triangle_bottomleft_blinking = false
+        triangle_bottomright_blinking = false
         blinker_running = false

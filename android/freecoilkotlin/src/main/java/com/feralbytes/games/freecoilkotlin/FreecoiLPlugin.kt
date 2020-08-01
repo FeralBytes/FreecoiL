@@ -36,13 +36,12 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
-/*import com.google.android.gms.location.LocationServices*/
+import com.google.android.gms.location.LocationServices
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
@@ -142,7 +141,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             logger("Unable to initialize Bluetooth Low Energy Service!", 4)
         }
         vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)*/
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)
     }
 
     fun requestFineAccess() {
@@ -648,7 +647,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev5"
+        private const val FREECOIL_VERSION = "0.3.1-dev6"
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
             intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)

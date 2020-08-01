@@ -229,7 +229,7 @@ func test_p1_game_history_size_is_correct_after_rejoin():
     yield(get_tree().create_timer(2.0), "timeout")
     
 func test_p1_can_wait_while_p3_dies_over_and_over():
-    while Settings.InGame.get_data("player_deaths_by_id")["3"] != 20:
+    while Settings.InGame.get_data("player_deaths_by_id")["3"] != 10:
         yield(get_tree(), 'idle_frame')
     
 func test_p1_yield_to_show_result():

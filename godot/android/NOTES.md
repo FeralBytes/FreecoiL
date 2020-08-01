@@ -1,0 +1,1 @@
+* To fix "Failed resolution of: Lcom/google/android/gms/location/LocationServices" I had to add my dependencies to the top level Godot project's build.gradel file.

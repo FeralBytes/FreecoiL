@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev5"
+const VERSION = "0.3.1-dev6"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -16,9 +16,11 @@ const MIN_PLAYERS = 2
 const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signal.
 
-var DEBUG_GUI = false
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
 var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
+# Overide sequence_enforcer() on main menu, set below to true.
+var OVERRIDE_SEQUENCE_ENFORCER = false
+var DEBUG_GUI = false
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
@@ -690,5 +692,7 @@ func _ready():
     InGame.loading_on_ready()
     Session.loading_on_ready()
     Network.loading_on_ready()
-    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":false, "gun_test_screen":false,
+    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":true, "gun_test_screen":false,
         "background_resource_loader":true})
+    if OVERRIDE_SEQUENCE_ENFORCER:
+        Testing.register_data("testing", true, false)
