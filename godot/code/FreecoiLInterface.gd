@@ -60,6 +60,10 @@ func request_fine_access_permission():
 func check_bluetooth_status():
     if FreecoiL != null:
         Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
+        
+func enable_bluetooth():
+    if FreecoiL!= null:
+        FreecoiL.enableBluetooth()
 
 func connect_to_laser_gun():
     Settings.Session.set_data("fi_laser_is_connected", 1)
@@ -283,7 +287,10 @@ func _finish_initialization(__):
             FreecoiL.finishInit()
     
 func _on_activity_result_bt_enable(resultCode):
-    Settings.Session.set_data("fi_bluetooth_status", resultCode)
+    if resultCode == 1:  # Bluetooth is now on, so we need to initialize the Bluetooth Scanner.
+        Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
+    else:  # Bluetooth is still off.
+        Settings.Session.set_data("fi_bluetooth_status", 0)
 
 func _on_fine_access_permission_request(granted):
     Settings.Session.set_data("fi_fine_access_location_permission", granted)

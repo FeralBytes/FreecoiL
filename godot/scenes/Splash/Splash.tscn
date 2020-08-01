@@ -40,7 +40,6 @@ func defer_screenshot():
     img.flip_y()
     img.save_png(\"res://assets/images/boot_splash.png\")
     # Update the version in FreecoiLPlugin.kt
-    
     var f = File.new()
     f.open(\"../android/freecoilkotlin/src/main/java/com/feralbytes/games/freecoilkotlin/FreecoiLPlugin.kt\", f.READ_WRITE)
     var file_lines_array = []
@@ -56,7 +55,7 @@ func defer_screenshot():
     f.store_string(joined_strings)
     f.close()
     joined_strings = null
-    # Update the Version in Export presets
+    # Update the version in export_presets.cfg
     f = File.new()
     f.open(\"res://export_presets.cfg\", f.READ_WRITE)
     file_lines_array = []
@@ -72,6 +71,24 @@ func defer_screenshot():
             line  = 'application/file_version=\"' + Settings.VERSION + '\"'
         elif \"application/product_version=\" in line:
             line  = 'application/product_version=\"' + Settings.VERSION + '\"'
+        file_lines_array[counter] = line
+    joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
+    f.seek(0)
+    f.store_string(joined_strings)
+    f.close()
+    joined_strings = null
+    # Update the version in build.gradle
+    f = File.new()
+    f.open(\"../android/freecoilkotlin/build.gradle\", f.READ_WRITE)
+    file_lines_array = []
+    while not f.eof_reached():
+        file_lines_array.append(f.get_line())
+    for counter in range(0, file_lines_array.size()):
+        var line = file_lines_array[counter]
+        if \"        versionName \" in line:
+            line  = \"        versionName '\" + Settings.VERSION + \"'\"
+        elif \"        versionCode \" in line:
+            line  = '        versionCode ' + str(Settings.VERSION_MICRO_INT)
         file_lines_array[counter] = line
     joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
     f.seek(0)

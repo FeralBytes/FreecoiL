@@ -36,6 +36,7 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
@@ -181,21 +182,14 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         else if (bluetoothAdapter!!.isEnabled) {
             //bluetoothManager = appContext!!.getSystemService(Context.BLUETOOTH_SERVICE)!! as BluetoothManager
             bluetoothScanner = bluetoothAdapter!!.bluetoothLeScanner
-            /*if (bluetoothManager == null) {
-                logger("Failed to get Bluetooth System Service as a Bluetooth Manager!", 4)
-                if (bluetoothScanner == null) {
-                    logger("Failed to to set up Bluetooth Low Energy Scanner.!", 4)
-                }
-                return 2
-            }*/
             if (bluetoothScanner == null) {
                 logger("Failed to to set up Bluetooth Low Energy Scanner.!", 4)
-                return 2
+                return 2  // 2 == An error setting up Bluetooth.
             }
-            return 1
+            return 1  // 0 == Bluetooth is On/Enabled.
         }
         else {
-            return 0
+            return 0  // 0 == Bluetooth is Off/Disabled.
         }
     }
 
@@ -582,9 +576,13 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     }
 
     /* Godot callbacks you can reimplement, as SDKs often need them */
-    override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 2) {
-            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_bt_enable", arrayOf(resultCode))
+            var bluetoothResults = 0
+            if (resultCode == -1) {
+                bluetoothResults = 1
+            }
+            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_bt_enable", arrayOf(bluetoothResults))
         }
     }
 
@@ -650,7 +648,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev4"
+        private const val FREECOIL_VERSION = "0.3.1-dev5"
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
             intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)
