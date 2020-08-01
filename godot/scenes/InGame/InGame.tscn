@@ -856,7 +856,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="RegularPolygon2D" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
+[node name="Hexagon" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
 position = Vector2( 270, 236 )
 rotation = 1.5708
 script = ExtResource( 3 )
@@ -870,7 +870,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 0.0
 collision_shape = true
 
-[node name="RegularPolygon2D" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleBottom" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( 156, 0 )
 script = ExtResource( 3 )
@@ -884,7 +884,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 30.0
 collision_shape = true
 
-[node name="RegularPolygon2D4" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleTop" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( -156, 0 )
 script = ExtResource( 3 )
@@ -898,7 +898,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = -30.0
 collision_shape = true
 
-[node name="RegularPolygon2D2" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleBottomRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( 78, -135 )
 script = ExtResource( 3 )
@@ -912,7 +912,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = -30.0
 collision_shape = true
 
-[node name="RegularPolygon2D6" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleBottomLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( 78, 135 )
 script = ExtResource( 3 )
@@ -926,7 +926,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = -30.0
 collision_shape = true
 
-[node name="RegularPolygon2D3" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleTopRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( -78, -135 )
 script = ExtResource( 3 )
@@ -940,7 +940,7 @@ border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = -90.0
 collision_shape = true
 
-[node name="RegularPolygon2D5" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/RegularPolygon2D"]
+[node name="TriangleTopLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 modulate = Color( 1, 0, 0, 1 )
 position = Vector2( -78, 135 )
 skew = 4.37114e-08
@@ -1126,7 +1126,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="-1,1-Scoreboard/CenterContainer"]
-margin_right = 540.0
+margin_left = 2.0
+margin_right = 542.0
 margin_bottom = 848.0
 rect_min_size = Vector2( 540, 0 )
 

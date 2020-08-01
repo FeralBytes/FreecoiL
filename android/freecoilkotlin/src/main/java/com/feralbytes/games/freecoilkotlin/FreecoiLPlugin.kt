@@ -27,6 +27,8 @@ import android.content.*
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationManager
+import android.Manifest
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
@@ -34,6 +36,8 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationRequest
@@ -112,28 +116,56 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
 
     override fun getPluginMethods(): List<String> {
         return Arrays.asList("hello", "init", "bluetoothStatus",
-                "enableBluetooth", "fineAccessPermissionStatus", "enableFineAccess", "startBluetoothScan",
+                "enableBluetooth", "fineAccessPermissionStatus", "requestFineAccess", "startBluetoothScan",
                 "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode",
-                "enableRecoil")
+                "enableRecoil", "finishInit")
     }
 
     fun hello(): String {
-        Log.i(TAG, "Got the appActivity.")
+        Log.i(TAG, "FreecoiL Kotlin Plugin: Version: " + FREECOIL_VERSION)
         return HELLO_WORLD
     }
 
     fun init(pInstanceId: Int) {
         if (!initialized) {
             instanceId = pInstanceId
-            bluetoothService = BluetoothLeService()
-            if (!bluetoothService!!.initialize(appInstance)) {
-                logger("Unable to initialize Bluetooth Low Energy Service!", 4)
-            }
-            vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)*/
             GodotLib.calldeferred(instanceId.toLong(), "_on_mod_init", arrayOf())
             logger("FreecoiL Kotlin module initialized.", 1)
             initialized = true
+        }
+    }
+
+    fun finishInit() {
+        bluetoothService = BluetoothLeService()
+        if (!bluetoothService!!.initialize(appInstance)) {
+            logger("Unable to initialize Bluetooth Low Energy Service!", 4)
+        }
+        vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        /*fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)*/
+    }
+
+    fun requestFineAccess() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            val permisionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            ActivityCompat.requestPermissions(appActivity!!,
+                    permisionStr,
+                    3)
+        } else {
+            val permisionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            ActivityCompat.requestPermissions(appActivity!!,
+                    permisionStr,
+                    1)
+
+        }
+    }
+
+    fun fineAccessPermissionStatus(): Boolean {
+        if (ContextCompat.checkSelfPermission(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
+            logger("Permission is currently denied for: ACCESS_FINE_LOCATION.", 1);
+            return false
+        }
+        else {
+            return true
         }
     }
 
@@ -146,12 +178,24 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             //finish();
             return 2 // Error Code for Bluetooth Not Supported.
         }
-        return if (bluetoothAdapter!!.isEnabled) {
-            bluetoothManager = appContext!!.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        else if (bluetoothAdapter!!.isEnabled) {
+            //bluetoothManager = appContext!!.getSystemService(Context.BLUETOOTH_SERVICE)!! as BluetoothManager
             bluetoothScanner = bluetoothAdapter!!.bluetoothLeScanner
-            1
-        } else {
-            0
+            /*if (bluetoothManager == null) {
+                logger("Failed to get Bluetooth System Service as a Bluetooth Manager!", 4)
+                if (bluetoothScanner == null) {
+                    logger("Failed to to set up Bluetooth Low Energy Scanner.!", 4)
+                }
+                return 2
+            }*/
+            if (bluetoothScanner == null) {
+                logger("Failed to to set up Bluetooth Low Energy Scanner.!", 4)
+                return 2
+            }
+            return 1
+        }
+        else {
+            return 0
         }
     }
 
@@ -160,17 +204,12 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         /* The REQUEST_ENABLE_BT constant passed to startActivityForResult() is a locally defined integer
                (which must be greater than 0), that the system passes back to you in your onActivityResult()
                implementation as the requestCode parameter. */
-        val REQUEST_ENABLE_BT = 1
-        appActivity!!.startActivityForResult(intentBtEnabled, REQUEST_ENABLE_BT)
+        appActivity!!.startActivityForResult(intentBtEnabled, 2)
         return
     }
 
     fun startBluetoothScan() {
-        if (bluetoothManager == null) {
-            logger("Failed to get Bluetooth service", 4)
-            return
-        }
-        logger("Starting Bluetooth scan", 1)
+        logger("Starting Bluetooth scan", 2)
         bluetoothScanner!!.startScan(anyLeScanCallbacks)
         bluetoothScanning = true
     }
@@ -346,9 +385,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                     logger("Unable to initialize Bluetooth LE Service!", 5)
                     //finish();
                 }
-                // Automatically connects to the device upon successful start-up initialization.
-                appActivity!!.runOnUiThread { bluetoothService!!.connect(btDeviceAddress) }
-                // TODO: Send Godot the new perfered laser Tagger for reconnects.
+                else {
+                    // Automatically connects to the device upon successful start-up initialization.
+                    appActivity!!.runOnUiThread { bluetoothService!!.connect(btDeviceAddress) }
+                    // TODO: Send Godot the new perfered laser Tagger for reconnects.
+                }
             }
 
             override fun onServiceDisconnected(componentName: ComponentName) {
@@ -542,16 +583,16 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
 
     /* Godot callbacks you can reimplement, as SDKs often need them */
     override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        if (requestCode == 1) {
-            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_bt_enable", arrayOf())
+        if (requestCode == 2) {
+            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_bt_enable", arrayOf(resultCode))
         }
     }
 
     override fun onMainRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         val granted = grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
         //GodotLib.calldeferred(mInstanceId, "_on_request_premission_result", new Object[]{requestCode, permissions[0], granted});
-        if (requestCode == 2) {
-            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_fine_access", arrayOf())
+        if ((requestCode == 1) or (requestCode == 3)) {
+            GodotLib.calldeferred(instanceId.toLong(), "_on_fine_access_permission_request", arrayOf(granted))
         }
         logger("Permission: " + requestCode + " | " + permissions[0] + " allowed? " + granted, 1)
     }
@@ -571,8 +612,6 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     override fun onGLSurfaceChanged(gl: GL10, width: Int, height: Int) {} // singletons will always miss first onGLSurfaceChanged call
 
     companion object {
-        /* We run a single handler to check and see if we have connected to a weapon within 30 seconds */
-        private const val CONNECTION_FAIL_TEST_INTERVAL_MILLISECONDS = 30000
         private const val TAG = "FreecoiLKotlinPlugin"
         private var commandId: Byte = 0x00.toByte()
         private const val COMMAND_ID_INCREMENT = 0x10.toByte()
@@ -611,6 +650,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
+        private const val FREECOIL_VERSION = "0.3.1-dev4"
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
             intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)
@@ -646,7 +686,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 if (device.name != null && !device.name.isEmpty()) {
                     val devAddess = device.address
                     val devName = device.name
-                    logger("$TAG: Found Device: $devName   $devAddess", 2)
+                    logger("$TAG: Found Device: $devName   $devAddess", 0)
                     if (btDeviceAddress.isEmpty() && device.name.startsWith("SRG1") || btDeviceAddress == device.address) {
                         logger("Connecting to " + device.name + " '" + device.address + "'", 1)
                         //TODO: Godot Callback set status to connecting to gun.
@@ -657,7 +697,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                         return true
                     }
                     else{
-                        logger("$TAG: Ignored found device because it didn't match the previous device.", 2)
+                        logger("$TAG: Ignored found device because it didn't match the previous device.", 0)
                     }
                 }
                 return false

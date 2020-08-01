@@ -16,6 +16,8 @@ export(String) var my_menu = \"0,0\"
 export(bool) var on_mainmenu_scene = true
 export(bool) var allow_main_menu = true
 export(bool) var allow_preferences = true
+export(bool) var disable_menu = false
+export(bool) var disable_icons = false
 var menu_is_visible = false
 var settings_menu_is_poped_up = false
 var batt_0 = preload(\"res://assets/images/icons/menu_battery_0.png\")
@@ -45,6 +47,14 @@ func _ready():
     Settings.InGame.connect(Settings.InGame.monitor_data(\"force_recoil\"), self, \"update_recoil_force_mode\")
     SettingsMenu.color = Color(Settings.Session.get_data(\"ThemeMenuBackground\"))
     MenuBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeFontColor\"))
+    if disable_menu:
+        MenuBtn.disabled = true
+    if disable_icons:
+        GunBtn.disabled = true
+        GpsBtn.disabled = true
+        RecoilBtn.disabled = true
+        WifiBtn.disabled = true
+        BatteryBtn.disabled = true
 
 
 func check_if_visible(current_menu):
@@ -345,7 +355,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.0-rc1 "
+text = " Ver: 0.3.1-dev5 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false

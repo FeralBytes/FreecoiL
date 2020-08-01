@@ -13,6 +13,19 @@ var catch_up_active = false
 var last_connection_status = null
 var rng = RandomNumberGenerator.new()
 var change_weapon_in_process = false
+var blinker_running = false
+var triangle_top_blinking = false
+var triangle_top_blinked_count = 0
+var triangle_topright_blinking = false
+var triangle_topright_blinked_count = 0
+var triangle_topleft_blinking = false
+var triangle_topleft_blinked_count = 0
+var triangle_bottom_blinking = false
+var triangle_bottom_blinked_count = 0
+var triangle_bottomright_blinking = false
+var triangle_bottomright_blinked_count = 0
+var triangle_bottomleft_blinking = false
+var triangle_bottomleft_blinked_count = 0
 
 onready var ReloadSound = get_node("ReloadSound")
 onready var EmptyShotSound = get_node("EmptyShotSound")
@@ -28,7 +41,12 @@ onready var TickTocTimer = get_node("TickTocTimer")
 onready var EventRecordTimer = get_node("EventRecordTimer")
 onready var EndReason = get_node("0,1-End of Game/CenterContainer/VBoxContainer/EndReason")
 onready var ObjectiveVoice = get_node("ObjectiveVoice")
-
+onready var TriangleTop = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleTop")
+onready var TriangleTopRight = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleTopRight")
+onready var TriangleTopLeft = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleTopLeft")
+onready var TriangleBottom = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleBottom")
+onready var TriangleBottomRight = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleBottomRight")
+onready var TriangleBottomLeft = get_node("0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon/TriangleBottomLeft")
 
 func invert_mups_to_lasers(mups_to_lasers):
     if get_tree().is_network_server():
@@ -59,6 +77,9 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data("fi_power_btn_counter"), self, "fi_power_btn_counter")
     Settings.Session.connect(Settings.Session.monitor_data("fi_thumb_btn_counter"), self, "fi_thumb_btn_counter")
     Settings.Session.connect(Settings.Session.monitor_data("connection_status"), self, "connection_status_event")
+    if Settings.Session.get_data("experimental_toggles")["hexes_flash_on_sensor_hit"]:
+        Settings.Session.connect(Settings.Session.monitor_data("fi_shooter1_shot_counter"), self, "fi_shot_by_shooter1")
+        Settings.Session.connect(Settings.Session.monitor_data("fi_shooter2_shot_counter"), self, "fi_shot_by_shooter2")
     rng.randomize()
     if Settings.InGame.get_data("game_limit_mode") == "time":
         ObjectiveVoice.stream = load("res://assets/voices/EN_MV_mission_objective_03.wav")
@@ -597,13 +618,50 @@ func fi_got_shot(laser_id):
                 respawn_start(laser_id)
                 
 func fi_shot_by_shooter1(__):
-    pass
+    process_shot_by_shooter(1, Settings.Session.get_data("fi_shooter1_laser_id"))
     
 func fi_shot_by_shooter2(__):
-    pass
+    process_shot_by_shooter(2, Settings.Session.get_data("fi_shooter2_laser_id"))
     
-func process_shot_by_shooter():
-    pass
+func process_shot_by_shooter(shooter1_or2, laser_id):
+    var legit_hit = false
+    # We already check that it is not laser ID 0 with a counter or 0 in FrecoiLInterface.gd.
+    if Settings.Session.get_data("game_player_alive"):
+        if Settings.InGame.get_data("game_teams"):
+            if Settings.InGame.get_data("game_friendly_fire"):
+                # Add a check to make sure the laser_id is a valid id in the current game.
+                if laser_id in Settings.InGame.get_data("player_id_by_laser"):
+                    legit_hit = true
+            else:
+                if not (Settings.InGame.get_data("player_id_by_laser")[laser_id] in 
+                        Settings.Session.get_data("game_player_teammates")):
+                    # Add a check to make sure the laser_id is a valid id in the current game.
+                    if laser_id in Settings.InGame.get_data("player_id_by_laser"):
+                        legit_hit = true
+        else:
+            # Add a check to make sure the laser_id is a valid id in the current game.
+            if laser_id in Settings.InGame.get_data("player_id_by_laser"):
+                legit_hit = true
+    if legit_hit:
+        record_game_event("hit", {"laser_id": laser_id})
+        Settings.Session.set_data("game_player_health", Settings.Session.get_data("game_player_health") - 1)
+        call_deferred("delayed_vibrate")  # Because it was slowing down the processing of shots.
+        if Settings.Session.get_data("game_player_health") <= 0:
+            if Settings.Session.get_data("game_player_deaths") + 1 == Settings.InGame.get_data("game_death_limit"):
+                eliminated(laser_id)
+            else:
+                respawn_start(laser_id)
+        else:
+            var hexagons_to_blink = 0
+            if Settings.Session.get_data("fi_shooter" + str(shooter1_or2) + "_sensor_clip") != 0:
+                hexagons_to_blink += 1
+            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_front") != 0:
+                hexagons_to_blink += 2
+            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_left") != 0:
+                hexagons_to_blink += 4
+            if Settings.Session.set_data("fi_shooter" + str(shooter1_or2) + "_sensor_right") != 0:
+                hexagons_to_blink += 8
+            blink_hexagons(hexagons_to_blink)
     
 func fi_power_btn_counter(__):
     var force_recoil = Settings.InGame.get_data("force_recoil")
@@ -619,3 +677,116 @@ func fi_thumb_btn_counter(__):
 func _on_RespawnButton_pressed():
     respawn_finish()
     
+func blink_hexagons(hexagon_pattern):
+    if hexagon_pattern == 1:  # We assume you were shot in the back in the clip sensor.
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+    elif hexagon_pattern == 2:  # You were shot in the front of your gun only, this is pretty rare.
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+    elif hexagon_pattern == 3:  # You were shot in the front and clip sensor, pretty unlikely.
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+    elif hexagon_pattern == 4:  # You were shot in the left sensor only.
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
+    elif hexagon_pattern == 5:  # You were shot in the left and the clip sensor.
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+    elif hexagon_pattern == 6:  # You were shot in the front and the left sensor.
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+    elif hexagon_pattern == 7:  # You were shot in the front, the left, and the clip sensor.
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+    elif hexagon_pattern == 8:  # You were hit in the right sensor only.
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+    elif hexagon_pattern == 9:  # You were hit in the clip and the right sensor.
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+    elif hexagon_pattern == 10:  # You were hit in the front and the right sensor.
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+    elif hexagon_pattern == 11:  # You were hit in the front, the right and the clip sensor.
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+    elif hexagon_pattern == 12:  
+        # You were hit in the right and the left sensor but not the front or clip, so how did that happen?
+        # Happens more than I would like as the IR seems to bleed through from the left to the right.
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+    elif hexagon_pattern == 13:  # You were hit in the left, the clip, and the right sensor.
+        triangle_bottomleft_blinking = true
+        triangle_bottomleft_blinked_count = 0
+        triangle_bottom_blinking = true
+        triangle_bottom_blinked_count = 0
+        triangle_bottomright_blinking = true
+        triangle_bottomright_blinked_count = 0
+    elif hexagon_pattern == 14:  # You were hit in the left, the front and the right sensor.
+        # This happens more often then I would like. it really reduces our accuracy of where the 
+        # other player is shooting you from. They should have moved the side sensors further back
+        # and made sure they don't bleed into each other with something reflective behind.
+        triangle_topleft_blinking = true
+        triangle_topleft_blinked_count = 0
+        triangle_top_blinking = true
+        triangle_top_blinked_count = 0
+        triangle_topright_blinking = true
+        triangle_topright_blinked_count = 0
+    # Because this function is only called when the sensors are hit we will always start the blinker.
+    start_blinker()
+
+func start_blinker():
+    if blinker_running == false:
+        blinker_running = true
+        call_deferred("blinker")
+    
+func blinker():
+    var still_blinking_things = false
+    if triangle_bottom_blinking:
+        still_blinking_things = true
+        if TriangleBottom.polygon_color == Color("5b929292"):
+            TriangleBottom.polygon_color = Color("929292")
+            triangle_bottom_blinked_count += 1
+        else:
+            TriangleBottom.polygon_color = Color("5b929292")
+            if triangle_bottom_blinked_count >= 5:
+                triangle_bottom_blinking = false
+                still_blinking_things = false
+    if still_blinking_things:
+        yield(get_tree().create_timer(0.1), "timeout")
+        call_deferred("blinker")
+    else:
+        blinker_running = false

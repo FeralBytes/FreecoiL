@@ -20,7 +20,9 @@ import android.bluetooth.*
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Build
 import android.os.IBinder
+import java.lang.reflect.Method
 import java.util.*
 
 /**
@@ -40,31 +42,18 @@ class BluetoothLeService : Service() {
     private var mCharacteristicReadQueue: Queue<BluetoothGattCharacteristic>? = null
     private var FreecoiLInstance: FreecoiLPlugin? = null
     private var BtLeServiceInstance: BluetoothLeService? = null
-    private fun refreshDeviceCache(gatt: BluetoothGatt): Boolean {
-        try {
-            val localMethod = gatt.javaClass.getMethod("refresh", *arrayOfNulls(0))
-            if (localMethod != null) {
-                return (localMethod.invoke(gatt, *arrayOfNulls(0)) as Boolean)
-            }
-        } catch (localException: Exception) {
-            FreecoiLInstance!!.logger("$TAG: An exception occured while refreshing device.", 0)
-        }
-        return false
-    }
 
     // Implements callback methods for GATT events that the app cares about.  For example,
     // connection change and services discovered.
     private val mGattCallback: BluetoothGattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             val intentAction: String
+            FreecoiLInstance!!.logger("$TAG: GATT CALLBACK Status = $status", 1)
             if (status == 133) {
                 intentAction = ACTION_GATT_DISCONNECTED
                 mConnectionState = STATE_DISCONNECTED
-                FreecoiLInstance!!.logger("$TAG: Got the status 133 bug, closing gatt", 2)
+                FreecoiLInstance!!.logger("$TAG: Got the status 133 bug, closing gatt", 3)
                 broadcastUpdate(intentAction)
-                if (mBluetoothGatt != null) {
-                    refreshDeviceCache(mBluetoothGatt!!)
-                }
                 close()
                 return
             }
@@ -72,9 +61,9 @@ class BluetoothLeService : Service() {
                 intentAction = ACTION_GATT_CONNECTED
                 mConnectionState = STATE_CONNECTED
                 broadcastUpdate(intentAction)
-                FreecoiLInstance!!.logger("$TAG: Connected to GATT server.", 0)
+                FreecoiLInstance!!.logger("$TAG: Connected to GATT server.", 1)
                 // Attempts to discover services after successful connection.
-                FreecoiLInstance!!.logger("$TAG: Attempting to start service discovery.", 0)
+                FreecoiLInstance!!.logger("$TAG: Attempting to start service discovery.", 1)
                 FreecoiLInstance!!.appActivity!!.runOnUiThread { mBluetoothGatt!!.discoverServices() }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 intentAction = ACTION_GATT_DISCONNECTED
@@ -240,13 +229,13 @@ class BluetoothLeService : Service() {
         if (mBluetoothManager == null) {
             mBluetoothManager = FreecoiLInstance!!.appContext!!.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
             if (mBluetoothManager == null) {
-                FreecoiLInstance!!.logger("$TAG: Unable to initialize BluetoothManager.", 2)
+                FreecoiLInstance!!.logger("$TAG: Unable to initialize BluetoothManager.", 3)
                 return false
             }
         }
         mBluetoothAdapter = mBluetoothManager!!.adapter
         if (mBluetoothAdapter == null) {
-            FreecoiLInstance!!.logger("$TAG: Unable to obtain a BluetoothAdapter.", 2)
+            FreecoiLInstance!!.logger("$TAG: Unable to obtain a BluetoothAdapter.", 3)
             return false
         }
         mCharacteristicWriteQueue = LinkedList()
@@ -265,10 +254,11 @@ class BluetoothLeService : Service() {
      * `BluetoothGattCallback#onConnectionStateChange(android.bluetooth.BluetoothGatt, int, int)`
      * callback.
      */
+
     fun connect(address: String?): Boolean {
         FreecoiLInstance!!.logger("$TAG: Device Address is $mBluetoothDeviceAddress.", 1)
         if (mBluetoothAdapter == null || address == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized or unspecified address.", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized or unspecified address.", 3)
             return false
         }
 
@@ -290,7 +280,14 @@ class BluetoothLeService : Service() {
         }
         // We want to directly connect to the device, so we are setting the autoConnect
         // parameter to false.
-        FreecoiLInstance!!.appActivity!!.runOnUiThread { mBluetoothGatt = device.connectGatt(BtLeServiceInstance, false, mGattCallback) }
+        FreecoiLInstance!!.appActivity!!.runOnUiThread {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                mBluetoothGatt = device.connectGatt(BtLeServiceInstance, false, mGattCallback, BluetoothDevice.TRANSPORT_LE)
+            }
+            else{
+                mBluetoothGatt = device.connectGatt(BtLeServiceInstance, false, mGattCallback)
+            }
+        }
         FreecoiLInstance!!.logger("$TAG: Trying to create a new connection.", 0)
         mBluetoothDeviceAddress = address
         mConnectionState = STATE_CONNECTING
@@ -305,7 +302,7 @@ class BluetoothLeService : Service() {
      */
     fun disconnect() {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 3)
             return
         }
         mBluetoothGatt!!.disconnect()
@@ -332,7 +329,7 @@ class BluetoothLeService : Service() {
      */
     fun readCharacteristic(characteristic: BluetoothGattCharacteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 3)
             return
         }
         if (!mActionAvailable) {
@@ -350,7 +347,7 @@ class BluetoothLeService : Service() {
 
     fun writeCharacteristic(characteristic: BluetoothGattCharacteristic) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 3)
             return
         }
         if (!mActionAvailable) {
@@ -368,7 +365,7 @@ class BluetoothLeService : Service() {
 
     fun writeDescriptor(descriptor: BluetoothGattDescriptor) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 3)
             return
         }
         if (!mActionAvailable) {
@@ -393,7 +390,7 @@ class BluetoothLeService : Service() {
     fun setCharacteristicNotification(characteristic: BluetoothGattCharacteristic,
                                       enabled: Boolean) {
         if (mBluetoothAdapter == null || mBluetoothGatt == null) {
-            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 2)
+            FreecoiLInstance!!.logger("$TAG: BluetoothAdapter not initialized", 3)
             return
         }
         mBluetoothGatt!!.setCharacteristicNotification(characteristic, enabled)

@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev3"
+const VERSION = "0.3.1-dev4"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -683,6 +683,8 @@ class Data:
         ######## END SIGNALS ########
 
 func _ready():
+    print(Settings.GAME_NAME + ": Version: " + Settings.VERSION + " = Integer Version Number: " 
+        + str(Settings.VERSION_MICRO_INT))
     Testing.loading_on_ready()
     Preferences.loading_on_ready()
     InGame.loading_on_ready()

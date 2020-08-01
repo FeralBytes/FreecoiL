@@ -1,4 +1,4 @@
-[gd_scene load_steps=74 format=2]
+[gd_scene load_steps=75 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -13,6 +13,7 @@
 [sub_resource type="GDScript" id=1]
 script/source = "extends Control
 
+var main_menu_forced_1_time = false
 
 onready var EmptyGunShotSound = get_node(\"EmptyGunShotSound\")
 
@@ -20,6 +21,9 @@ onready var EmptyGunShotSound = get_node(\"EmptyGunShotSound\")
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_trigger_btn_pressed\"), self, \"update_trigger_pressed\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"sequence_enforcer\")
+    sequence_enforcer(null)
+        
 
 
 func update_trigger_pressed(new_val):
@@ -27,6 +31,34 @@ func update_trigger_pressed(new_val):
         if not EmptyGunShotSound.playing:
             EmptyGunShotSound.play()
             Input.vibrate_handheld(200)
+
+func sequence_enforcer(current_menu):
+    if not Settings.Testing.get_data(\"testing\"):
+        if current_menu == null:
+            current_menu = Settings.Session.get_data(\"current_menu\")
+        if Settings.Session.get_data(\"fi_fine_access_location_permission\") == false:
+            get_location_permission()
+        elif Settings.Preferences.get_data(\"player_name\") == null:
+            player_name()
+        else:
+            if main_menu_forced_1_time == false:
+                if current_menu != \"0,0\":
+                    main_menu_forced_1_time = true
+                    main_menu()
+                else:
+                    main_menu_forced_1_time = true
+
+func get_location_permission():
+    if Settings.Session.get_data(\"current_menu\") != \"0,-2\":
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,-2\")
+  
+func player_name():
+    if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
+          
+func main_menu():
+    if Settings.Session.get_data(\"current_menu\") != \"0,0\":
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 "
 
 [sub_resource type="GDScript" id=2]
@@ -582,7 +614,7 @@ func update_player_name(new_name):
 "
 
 [sub_resource type="DynamicFont" id=25]
-size = 48
+size = 44
 font_data = ExtResource( 2 )
 
 [sub_resource type="GDScript" id=26]
@@ -637,6 +669,28 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", Settings.Session.get_data(\"previous_menu\"))
 "
 
+[sub_resource type="GDScript" id=65]
+script/source = "extends Button
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_fine_access_location_permission\"), self, 
+        \"check_if_permission_granted\")
+
+
+func check_if_permission_granted(granted):
+    if granted:
+        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
+    else:
+        disabled = false
+
+
+func _on_Button_pressed():
+    disabled = true
+    FreecoiLInterface.request_fine_access_permission()
+"
+
 [sub_resource type="GDScript" id=28]
 script/source = "extends ReferenceRect
 
@@ -650,29 +704,22 @@ onready var CallSignLineEdit = get_node(\"CenterContainer/VBoxContainer/VBoxCont
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"force_player_name\")
-    if Settings.Preferences.get_data(\"player_name\") == null:
-        force_player_name(null)
-    else: 
-        get_tree().call_group(\"Container\", \"next_menu\", \"0,0\")
 
-func force_player_name(__):
-    if Settings.Preferences.get_data(\"player_name\") == null:
-        Settings.Preferences.set_data(\"player_name\", \"No Name\")
-        if Settings.Session.get_data(\"current_menu\") != \"0,-1\":
-            get_tree().call_group(\"Container\", \"next_menu\", \"0,-1\")
-            yield(get_tree(), 'idle_frame')
-            CallSignLineEdit.grab_focus()
-            yield(get_tree(), 'idle_frame')
-            if LoginPlayerAudio.playing == false:
-                if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
-                    if not background_loading:
-                        background_loading = true
-                        thread_num = Helpers.threaded_background_loader(\"res://assets/voices/EN_MV_login2.wav\")
-                        Settings.Session.connect(Settings.Session.monitor_data(\"Helpers_background_load_result\"), self,
-                            \"play_audio_from_background\")
-                else:
-                    LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
-                    LoginPlayerAudio.play()
+func force_player_name(current_menu):
+    if current_menu == \"0,-1\":
+        CallSignLineEdit.placeholder_text = \"Please Enter A Callsign!\"
+        CallSignLineEdit.grab_focus()
+        yield(get_tree(), 'idle_frame')
+        if LoginPlayerAudio.playing == false:
+            if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
+                if not background_loading:
+                    background_loading = true
+                    thread_num = Helpers.threaded_background_loader(\"res://assets/voices/EN_MV_login2.wav\")
+                    Settings.Session.connect(Settings.Session.monitor_data(\"Helpers_background_load_result\"), self,
+                        \"play_audio_from_background\")
+            else:
+                LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
+                LoginPlayerAudio.play()
 #    if FreecoiLInterface.laser_is_connected != true:
 #        force_gun_connection(null)
         
@@ -1722,9 +1769,9 @@ text = "Laser ID=00"
 script = SubResource( 8 )
 
 [node name="Label20" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 381.637
+margin_left = 380.637
 margin_top = 46.021
-margin_right = 534.637
+margin_right = 533.637
 margin_bottom = 82.021
 text = "Status=0"
 script = SubResource( 9 )
@@ -1739,18 +1786,18 @@ text = "Command Id=00"
 script = SubResource( 10 )
 
 [node name="Label11" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 186.0
+margin_left = 185.0
 margin_top = 179.0
-margin_right = 535.0
+margin_right = 534.0
 margin_bottom = 215.0
 rect_min_size = Vector2( 349, 0 )
 text = "AmmoRemaining=000"
 script = SubResource( 11 )
 
 [node name="Label21" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 235.0
+margin_left = 233.0
 margin_top = 223.0
-margin_right = 533.0
+margin_right = 531.0
 margin_bottom = 259.0
 text = "WeaponProfile=00"
 script = SubResource( 12 )
@@ -1882,9 +1929,9 @@ margin_bottom = 645.409
 text = "Shooter2ID=00"
 
 [node name="Label22" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 350.258
+margin_left = 342.258
 margin_top = 335.139
-margin_right = 544.258
+margin_right = 536.258
 margin_bottom = 371.139
 text = "NarrowPwr"
 
@@ -1906,11 +1953,14 @@ margin_bottom = 483.272
 text = "WidePwr"
 
 [node name="Label24" type="Label" parent="-1,-1-Tests2/GunTester"]
-margin_left = 361.536
+margin_left = 358.536
 margin_top = 555.272
-margin_right = 537.536
+margin_right = 534.536
 margin_bottom = 591.272
 text = "RateOfFire"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="PlusMinusWidget4" parent="-1,-1-Tests2/GunTester" instance=ExtResource( 4 )]
 margin_left = 386.796
@@ -1932,25 +1982,25 @@ apply_maximum_value = true
 maximum_value = 255
 
 [node name="Button6" type="Button" parent="-1,-1-Tests2/GunTester"]
-margin_left = 364.337
+margin_left = 361.337
 margin_top = 672.855
-margin_right = 540.337
+margin_right = 537.337
 margin_bottom = 716.855
 text = "SingleShot"
 script = SubResource( 21 )
 
 [node name="Button7" type="Button" parent="-1,-1-Tests2/GunTester"]
-margin_left = 366.337
+margin_left = 361.337
 margin_top = 736.855
-margin_right = 543.337
+margin_right = 538.337
 margin_bottom = 780.855
 text = "3RndBurst"
 script = SubResource( 22 )
 
 [node name="Button8" type="Button" parent="-1,-1-Tests2/GunTester"]
-margin_left = 365.337
+margin_left = 360.337
 margin_top = 799.855
-margin_right = 542.337
+margin_right = 537.337
 margin_bottom = 843.855
 text = "Full Auto"
 script = SubResource( 23 )
@@ -1981,23 +2031,23 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,-1-Preferences/CenterContainer"]
-margin_top = 177.0
+margin_top = 180.0
 margin_right = 540.0
-margin_bottom = 382.0
+margin_bottom = 380.0
 rect_min_size = Vector2( 540, 0 )
 custom_constants/separation = 30
 
 [node name="Label" type="Label" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
 margin_right = 540.0
-margin_bottom = 61.0
+margin_bottom = 56.0
 custom_fonts/font = SubResource( 25 )
 text = "Player Preferences"
 align = 1
 
 [node name="HBoxContainer" type="HBoxContainer" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
-margin_top = 91.0
+margin_top = 86.0
 margin_right = 540.0
-margin_bottom = 131.0
+margin_bottom = 126.0
 rect_min_size = Vector2( 540, 0 )
 alignment = 1
 
@@ -2018,15 +2068,76 @@ max_length = 13
 script = SubResource( 26 )
 
 [node name="Button" type="Button" parent="2,-1-Preferences/CenterContainer/VBoxContainer"]
-margin_top = 161.0
+margin_top = 156.0
 margin_right = 540.0
-margin_bottom = 205.0
+margin_bottom = 200.0
 text = "Return To Previous Menu"
 script = SubResource( 27 )
 
 [node name="Header2" parent="2,-1-Preferences" instance=ExtResource( 7 )]
 my_menu = "2,-1"
 allow_preferences = false
+
+[node name="0,-2-LocationPermission" type="ReferenceRect" parent="."]
+margin_top = -1920.0
+margin_right = 540.0
+margin_bottom = -960.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,-2-LocationPermission"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 660.0
+rect_min_size = Vector2( 540, 560 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,-2-LocationPermission/CenterContainer"]
+margin_top = 45.0
+margin_right = 540.0
+margin_bottom = 514.0
+rect_min_size = Vector2( 540, 0 )
+custom_constants/separation = 30
+
+[node name="Label" type="Label" parent="0,-2-LocationPermission/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 56.0
+custom_fonts/font = SubResource( 25 )
+text = "Location Permissions"
+align = 1
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,-2-LocationPermission/CenterContainer/VBoxContainer"]
+margin_top = 86.0
+margin_right = 540.0
+margin_bottom = 395.0
+rect_min_size = Vector2( 540, 0 )
+alignment = 1
+
+[node name="Label" type="Label" parent="0,-2-LocationPermission/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_right = 540.0
+margin_bottom = 309.0
+rect_min_size = Vector2( 540, 0 )
+text = "FreecoiL requires Coarse Location Permissions for Bluetooth and Fine Location Permissions for GPS. But on Android these 2 permissions are bundled and Bluetooth and these permissions are critical to the application."
+align = 1
+autowrap = true
+
+[node name="Button" type="Button" parent="0,-2-LocationPermission/CenterContainer/VBoxContainer"]
+margin_top = 425.0
+margin_right = 540.0
+margin_bottom = 469.0
+text = "Click to Request Permissions"
+script = SubResource( 65 )
+
+[node name="Header2" parent="0,-2-LocationPermission" instance=ExtResource( 7 )]
+my_menu = "0,-2"
+allow_main_menu = false
+allow_preferences = false
+disable_menu = true
+disable_icons = true
 
 [node name="0,-1-Get Player Name" type="ReferenceRect" parent="."]
 margin_top = -960.0
@@ -2088,6 +2199,8 @@ text = "Login"
 [node name="Header2" parent="0,-1-Get Player Name" instance=ExtResource( 7 )]
 my_menu = "0,-1"
 allow_main_menu = false
+disable_menu = true
+disable_icons = true
 
 [node name="LoginPlayerAudio" type="AudioStreamPlayer" parent="0,-1-Get Player Name"]
 
@@ -3231,7 +3344,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,6-Custom Setup 6/CenterContainer"]
-margin_right = 540.0
+margin_left = 6.0
+margin_right = 546.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3323,7 +3437,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,6-Custom Setup 7/CenterContainer"]
-margin_right = 540.0
+margin_left = 6.0
+margin_right = 546.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3417,7 +3532,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,6-Custom Setup 8/CenterContainer"]
-margin_right = 540.0
+margin_left = 6.0
+margin_right = 546.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3511,7 +3627,8 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,6-Custom Setup 9/CenterContainer"]
-margin_right = 540.0
+margin_left = 6.0
+margin_right = 546.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3729,6 +3846,7 @@ stream = ExtResource( 9 )
 [connection signal="pressed" from="-1,-1-Tests2/GunTester/Button8" to="-1,-1-Tests2/GunTester/Button8" method="_on_Button8_pressed" flags=3]
 [connection signal="text_entered" from="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" to="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" method="_on_PlayerName_text_entered" flags=3]
 [connection signal="pressed" from="2,-1-Preferences/CenterContainer/VBoxContainer/Button" to="2,-1-Preferences/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
+[connection signal="pressed" from="0,-2-LocationPermission/CenterContainer/VBoxContainer/Button" to="0,-2-LocationPermission/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="text_entered" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_LineEdit_text_entered" flags=3]
 [connection signal="pressed" from="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/Button" to="0,-1-Get Player Name/CenterContainer/VBoxContainer/VBoxContainer/LineEdit" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2" to="0,0-Game Options/CenterContainer/VBoxContainer/VBoxContainer/Button2" method="_on_Button2_pressed" flags=3]

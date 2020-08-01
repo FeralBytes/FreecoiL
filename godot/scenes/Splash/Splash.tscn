@@ -39,10 +39,27 @@ func defer_screenshot():
     # Flip it on the y-axis (because it's flipped).
     img.flip_y()
     img.save_png(\"res://assets/images/boot_splash.png\")
-    # Update the Version in Export presets
+    # Update the version in FreecoiLPlugin.kt
+    
     var f = File.new()
-    f.open(\"res://export_presets.cfg\", f.READ_WRITE)
+    f.open(\"../android/freecoilkotlin/src/main/java/com/feralbytes/games/freecoilkotlin/FreecoiLPlugin.kt\", f.READ_WRITE)
     var file_lines_array = []
+    while not f.eof_reached():
+        file_lines_array.append(f.get_line())
+    for counter in range(0, file_lines_array.size()):
+        var line = file_lines_array[counter]
+        if \"        private const val FREECOIL_VERSION = \" in line:
+            line  = '        private const val FREECOIL_VERSION = \"' + Settings.VERSION + '\"'
+        file_lines_array[counter] = line
+    var joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
+    f.seek(0)
+    f.store_string(joined_strings)
+    f.close()
+    joined_strings = null
+    # Update the Version in Export presets
+    f = File.new()
+    f.open(\"res://export_presets.cfg\", f.READ_WRITE)
+    file_lines_array = []
     while not f.eof_reached():
         file_lines_array.append(f.get_line())
     for counter in range(0, file_lines_array.size()):
@@ -56,7 +73,7 @@ func defer_screenshot():
         elif \"application/product_version=\" in line:
             line  = 'application/product_version=\"' + Settings.VERSION + '\"'
         file_lines_array[counter] = line
-    var joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
+    joined_strings = PoolStringArray(file_lines_array).join(\"\\n\")
     f.seek(0)
     f.store_string(joined_strings)
     f.close()
@@ -125,6 +142,6 @@ margin_left = 260.0
 margin_right = 380.0
 margin_bottom = 26.0
 custom_fonts/font = SubResource( 2 )
-text = "0.3.1-dev3"
+text = "0.3.1-dev5"
 align = 1
 script = SubResource( 3 )

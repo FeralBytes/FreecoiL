@@ -27,7 +27,6 @@ var shot_mode
 # Permission related vars below.
 var bt_on
 var bt_scanning
-var fine_access_location
 # Various timer vars below.
 var bt_connect_timeout = Timer.new()
 var bt_connection_timed_out = Timer.new()
@@ -53,6 +52,14 @@ var previous_shot_counter_2 = null
 #####################
 # Public Godot API
 #####################
+
+func request_fine_access_permission():
+    if FreecoiL != null:
+        FreecoiL.requestFineAccess()
+        
+func check_bluetooth_status():
+    if FreecoiL != null:
+        Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
 
 func connect_to_laser_gun():
     Settings.Session.set_data("fi_laser_is_connected", 1)
@@ -173,20 +180,17 @@ func _ready():
     add_child(bt_connect_timeout)
     add_child(bt_connection_timed_out)
     init_vars()
+    Settings.Session.connect(Settings.Session.monitor_data("fi_fine_access_location_permission"), self, 
+        "_finish_initialization")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_bluetooth_status"), self, "_finish_initialization")
     # Delay the loading of FreecoiL, so as to not delay the UI.
     call_deferred('_on_delay_loading')
    
 func _on_delay_loading():
     if Engine.has_singleton("FreecoiL"):
         FreecoiL = Engine.get_singleton("FreecoiL")
-        print(" ************* " + str(FreecoiL.hello()))
-        if OS.get_granted_permissions().empty():
-            _fine_access_location_status()
-            while OS.get_granted_permissions().empty():
-                yield(get_tree(), 'idle_frame')
-            FreecoiL.init(get_instance_id())
-        else:
-            FreecoiL.init(get_instance_id())
+        FreecoiL.hello()
+        FreecoiL.init(get_instance_id())
     
 func init_vars():
     # We initialize the vars here to allow loading from saved defaults but also to 
@@ -203,7 +207,7 @@ func init_vars():
     recoil_enabled = true
     bt_on = null
     bt_scanning = false
-    fine_access_location = null
+    Settings.Session.set_data("fi_fine_access_location_permission", false)
     command_id = 0
         
 func _bt_status():
@@ -213,8 +217,6 @@ func _bt_status():
 func _bt_on():
     if bt_on == 1:
         print('Bluetooth is on.')
-        _fine_access_location_status()
-        call_deferred('_fine_access_location_enabled')
     elif bt_on == 0:
         print('Bluetooth is off.')
         if FreecoiL != null:
@@ -225,18 +227,19 @@ func _bt_on():
 func _fine_access_location_status():
     print("Granted Permissions: " + str(OS.get_granted_permissions()))
     if OS.get_granted_permissions().empty():
-        _fine_access_location_enabled()
+        if FreecoiL.fineAccessPermissionStatus() == 0:
+            _fine_access_location_enabled()
     return OS.get_granted_permissions()
     #fine_access_location = FreecoiL.fineAccessPermissionStatus()
         
 func _fine_access_location_enabled():
-    if fine_access_location == 1:
-        print('Fine Access Enabled!')
+    if Settings.Session.get_data("fi_fine_access_location_permission"):
+        print('Fine Access Location permission is granted!')
     else:
         if FreecoiL != null:
             # TODO: detect if permissions were granted, should be in the returned bool below.
-            var __ = OS.request_permissions()
-            #FreecoiL.enableFineAccess()
+            #var __ = OS.request_permissions()
+            FreecoiL.requestFineAccess()
         
 func _on_bt_connect_timeout():
     if FreecoiL != null:
@@ -271,15 +274,19 @@ func _on_laser_gun_disconnected():
         connect_to_laser_gun()
 # FreecoiL Callbacks
 func _on_mod_init():
-    _on_activity_result_bt_enable()
+    Settings.Session.set_data("fi_fine_access_location_permission", FreecoiL.fineAccessPermissionStatus())
+    Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
     
-func _on_activity_result_bt_enable():
-    _bt_status()
-    call_deferred('_bt_on')
+func _finish_initialization(__):
+    if Settings.Session.get_data("fi_fine_access_location_permission"):
+        if Settings.Session.get_data("fi_bluetooth_status") == 1:
+            FreecoiL.finishInit()
+    
+func _on_activity_result_bt_enable(resultCode):
+    Settings.Session.set_data("fi_bluetooth_status", resultCode)
 
-func _on_activity_result_fine_access():
-    _fine_access_location_status()
-    call_deferred('_fine_access_location_enabled')
+func _on_fine_access_permission_request(granted):
+    Settings.Session.set_data("fi_fine_access_location_permission", granted)
     
 func _on_laser_gun_still_connected():
     bt_connection_timed_out.start()  # resets the timer.
@@ -366,26 +373,32 @@ func _changed_laser_telem_got_shot(shooter1LaserId, shooter1ShotCounter, shooter
     shooter1SensorClip, shooter1SensorFront, shooter1SensorLeft, shooter1SensorRight, shooter2LaserId,
     shooter2ShotCounter, shooter2WpnPrfl, shooter2ChargeLvl, shooter2SensorClip, shooter2SensorFront,
     shooter2SensorLeft, shooter2SensorRight):
-    if shooter1ShotCounter != Settings.Session.get_data("fi_shooter1_shot_counter"):
-        Settings.Session.set_data("fi_shooter1_laser_id", shooter1LaserId)
-        Settings.Session.set_data("fi_shooter1_weapon_profile", shooter1WpnPrfl)
-        Settings.Session.set_data("fi_shooter1_charge_level", shooter1ChargeLvl)
-        Settings.Session.set_data("fi_shooter1_sensor_clip", shooter1SensorClip)
-        Settings.Session.set_data("fi_shooter1_sensor_front", shooter1SensorFront)
-        Settings.Session.set_data("fi_shooter1_sensor_left", shooter1SensorLeft)
-        Settings.Session.set_data("fi_shooter1_sensor_right", shooter1SensorRight)
-        # We set "fi_shooter1_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
-        Settings.Session.set_data("fi_shooter1_shot_counter", shooter1ShotCounter)
-    if shooter2ShotCounter != Settings.Session.get_data("fi_shooter2_shot_counter"):
-        Settings.Session.set_data("fi_shooter2_laser_id", shooter2LaserId)
-        Settings.Session.set_data("fi_shooter2_weapon_profile", shooter2WpnPrfl)
-        Settings.Session.set_data("fi_shooter2_charge_level", shooter2ChargeLvl)
-        Settings.Session.set_data("fi_shooter2_sensor_clip", shooter2SensorClip)
-        Settings.Session.set_data("fi_shooter2_sensor_front", shooter2SensorFront)
-        Settings.Session.set_data("fi_shooter2_sensor_left", shooter2SensorLeft)
-        Settings.Session.set_data("fi_shooter2_sensor_right", shooter2SensorRight)
-        # We set "fi_shooter2_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
-        Settings.Session.set_data("fi_shooter2_shot_counter", shooter2ShotCounter)
+    if shooter1LaserId == 0 and shooter1ShotCounter == 0:
+        pass  # This is the default for not being shot, and that is why we don't use ID 0.
+    else:
+        if shooter1ShotCounter != Settings.Session.get_data("fi_shooter1_shot_counter"):
+            Settings.Session.set_data("fi_shooter1_laser_id", shooter1LaserId)
+            Settings.Session.set_data("fi_shooter1_weapon_profile", shooter1WpnPrfl)
+            Settings.Session.set_data("fi_shooter1_charge_level", shooter1ChargeLvl)
+            Settings.Session.set_data("fi_shooter1_sensor_clip", shooter1SensorClip)
+            Settings.Session.set_data("fi_shooter1_sensor_front", shooter1SensorFront)
+            Settings.Session.set_data("fi_shooter1_sensor_left", shooter1SensorLeft)
+            Settings.Session.set_data("fi_shooter1_sensor_right", shooter1SensorRight)
+            # We set "fi_shooter1_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+            Settings.Session.set_data("fi_shooter1_shot_counter", shooter1ShotCounter)
+        if shooter2LaserId == 0 and shooter2ShotCounter == 0:
+            pass  # This is the default for not being shot.
+        else:
+            if shooter2ShotCounter != Settings.Session.get_data("fi_shooter2_shot_counter"):
+                Settings.Session.set_data("fi_shooter2_laser_id", shooter2LaserId)
+                Settings.Session.set_data("fi_shooter2_weapon_profile", shooter2WpnPrfl)
+                Settings.Session.set_data("fi_shooter2_charge_level", shooter2ChargeLvl)
+                Settings.Session.set_data("fi_shooter2_sensor_clip", shooter2SensorClip)
+                Settings.Session.set_data("fi_shooter2_sensor_front", shooter2SensorFront)
+                Settings.Session.set_data("fi_shooter2_sensor_left", shooter2SensorLeft)
+                Settings.Session.set_data("fi_shooter2_sensor_right", shooter2SensorRight)
+                # We set "fi_shooter2_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+                Settings.Session.set_data("fi_shooter2_shot_counter", shooter2ShotCounter)
 
 # warning-ignore:unused_argument
 func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed):
