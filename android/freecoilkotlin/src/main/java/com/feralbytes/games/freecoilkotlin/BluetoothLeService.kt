@@ -55,6 +55,7 @@ class BluetoothLeService : Service() {
                 FreecoiLInstance!!.logger("$TAG: Got the status 133 bug, closing gatt", 3)
                 broadcastUpdate(intentAction)
                 close()
+                FreecoiLInstance!!.status133Bug()
                 return
             }
             if (newState == BluetoothProfile.STATE_CONNECTED) {

@@ -61,6 +61,26 @@ func check_bluetooth_status():
     if FreecoiL != null:
         Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
         
+func check_cell_location_status():
+    if FreecoiL != null:
+        Settings.Session.set_data("fi_cell_location_status", FreecoiL.cellLocationStatus())
+        # the above answers if the device has something that can provide cellular location
+        # "fi_location_status" is whether or not the user has location button enabled on their phone.
+        # If "fi_cell_location_status" and "fi_gps_location_status" are both false then the 
+        # location button is disabled.
+    
+func check_gps_location_status():
+    if FreecoiL != null:
+        Settings.Session.set_data("fi_gps_location_status", FreecoiL.gpsLocationStatus())
+        # the above answers if the device has something that can provide gps location.
+        # "fi_location_status" is whether or not the user has location button enabled on their phone.
+        # If "fi_cell_location_status" and "fi_gps_location_status" are both false then the 
+        # location button is disabled.
+
+func enable_location():
+    if FreecoiL!= null:
+        FreecoiL.enableLocation()
+        
 func enable_bluetooth():
     if FreecoiL!= null:
         FreecoiL.enableBluetooth()
@@ -212,6 +232,9 @@ func init_vars():
     bt_on = null
     bt_scanning = false
     Settings.Session.set_data("fi_fine_access_location_permission", false)
+    Settings.Session.set_data("fi_gps_location_status", false)
+    Settings.Session.set_data("fi_cell_location_status", false)
+    Settings.Session.set_data("fi_location_status", false)
     command_id = 0
         
 func _bt_status():
@@ -285,12 +308,41 @@ func _finish_initialization(__):
     if Settings.Session.get_data("fi_fine_access_location_permission"):
         if Settings.Session.get_data("fi_bluetooth_status") == 1:
             FreecoiL.finishInit()
-    
+
+func _on_mod_finished_init():
+    check_gps_location_status()
+    check_cell_location_status()
+    if Settings.Session.get_data("fi_gps_location_status") == false:
+        if Settings.Session.get_data("fi_cell_location_status") == false:
+            Settings.Session.set_data("fi_location_status", false)
+        else:
+            Settings.Session.set_data("fi_location_status", false)
+    else:
+        Settings.Session.set_data("fi_location_status", true)
+    if Settings.Session.get_data("fi_location_status"):
+        FreecoiL.getLastLocation()
+        
 func _on_activity_result_bt_enable(resultCode):
     if resultCode == 1:  # Bluetooth is now on, so we need to initialize the Bluetooth Scanner.
         Settings.Session.set_data("fi_bluetooth_status", FreecoiL.bluetoothStatus())
     else:  # Bluetooth is still off.
         Settings.Session.set_data("fi_bluetooth_status", 0)
+        
+func _on_activity_result_location_enable(resultCode):
+    #The result code on success seems to be 0, but then again it is possible 
+    # that during testing I got a 0 result code even when the user denied the 
+    # action to turn on settings.
+    # So check again.
+    print("# on_activity_result_location_enable( result code = " + str(resultCode))
+    check_gps_location_status()
+    check_cell_location_status()
+    if Settings.Session.get_data("fi_gps_location_status") == false:
+        if Settings.Session.get_data("fi_cell_location_status") == false:
+            Settings.Session.set_data("fi_location_status", false)
+        else:
+            Settings.Session.set_data("fi_location_status", false)
+    else:
+        Settings.Session.set_data("fi_location_status", true)
 
 func _on_fine_access_permission_request(granted):
     Settings.Session.set_data("fi_fine_access_location_permission", granted)
@@ -487,4 +539,16 @@ func _new_status(status, level):
         Settings.Session.set_data("physical_laser_type", "RK-45")
     elif "Riffle detected." in status:
         Settings.Session.set_data("physical_laser_type", "SR-12")
-    
+
+func status_133_bug():
+    bt_connect_timeout.stop()
+    FreecoiL.stopBluetoothScan()
+    if Settings.Session.get_data("fi_laser_is_connected") == 1:
+        Settings.Session.set_data("fi_laser_is_connected", 0)
+    elif Settings.Session.get_data("fi_laser_is_connected") == 4:
+        Settings.Session.set_data("fi_laser_is_connected", 3)
+    yield(get_tree().create_timer(0.01), "timeout")
+    connect_to_laser_gun()
+
+func _last_location_test(accuracy, coordinates):
+    print("!!!! Got last location: Accuracy = " + str(accuracy) + " coordinates = " + str(coordinates))

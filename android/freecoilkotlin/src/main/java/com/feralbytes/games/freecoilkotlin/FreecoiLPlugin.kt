@@ -33,6 +33,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -118,7 +119,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         return Arrays.asList("hello", "init", "bluetoothStatus",
                 "enableBluetooth", "fineAccessPermissionStatus", "requestFineAccess", "startBluetoothScan",
                 "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode",
-                "enableRecoil", "finishInit")
+                "enableRecoil", "finishInit", "enableLocation", "cellLocationStatus", "gpsLocationStatus",
+                "getLastLocation")
     }
 
     fun hello(): String {
@@ -142,6 +144,8 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         }
         vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)
+        mLocationManager = appContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        GodotLib.calldeferred(instanceId.toLong(), "_on_mod_finished_init", arrayOf())
     }
 
     fun requestFineAccess() {
@@ -192,6 +196,14 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         }
     }
 
+    fun gpsLocationStatus(): Boolean {
+        return mLocationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+    }
+
+    fun cellLocationStatus(): Boolean {
+        return mLocationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
     fun enableBluetooth() {
         val intentBtEnabled = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
         /* The REQUEST_ENABLE_BT constant passed to startActivityForResult() is a locally defined integer
@@ -199,6 +211,34 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                implementation as the requestCode parameter. */
         appActivity!!.startActivityForResult(intentBtEnabled, 2)
         return
+    }
+
+    fun enableLocation() {
+        val intentBtEnabled = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        /* The REQUEST_ENABLE_BT constant passed to startActivityForResult() is a locally defined integer
+               (which must be greater than 0), that the system passes back to you in your onActivityResult()
+               implementation as the requestCode parameter. */
+        appActivity!!.startActivityForResult(intentBtEnabled, 4)
+        return
+    }
+
+    fun getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(appContext!!, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(appContext!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fusedLocationProviderClient!!.lastLocation.addOnSuccessListener { location: Location? ->
+            if (location != null) {
+                GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(location.accuracy, location.toString()))
+            }
+        }
     }
 
     fun startBluetoothScan() {
@@ -368,6 +408,10 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         if (level >= 2) {
             makeToast(message, true)
         }
+    }
+
+    fun status133Bug() {
+        GodotLib.calldeferred(instanceId.toLong(), "_status_133_bug", arrayOf())
     }
 
     private fun setupBLEServiceConnection() {
@@ -583,6 +627,10 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             }
             GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_bt_enable", arrayOf(bluetoothResults))
         }
+        if (requestCode == 4) {
+            var m_locationResults = 0
+            GodotLib.calldeferred(instanceId.toLong(), "_on_activity_result_location_enable", arrayOf(resultCode))
+        }
     }
 
     override fun onMainRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -647,7 +695,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev6"
+        private const val FREECOIL_VERSION = "0.3.1-dev7"
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
             intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)

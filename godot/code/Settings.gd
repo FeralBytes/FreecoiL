@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev6"
+const VERSION = "0.3.1-dev7"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -692,7 +692,7 @@ func _ready():
     InGame.loading_on_ready()
     Session.loading_on_ready()
     Network.loading_on_ready()
-    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":true, "gun_test_screen":false,
-        "background_resource_loader":true})
+    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
+        "background_resource_loader":true, "gps_location": true, "gun_names":false})
     if OVERRIDE_SEQUENCE_ENFORCER:
         Testing.register_data("testing", true, false)
