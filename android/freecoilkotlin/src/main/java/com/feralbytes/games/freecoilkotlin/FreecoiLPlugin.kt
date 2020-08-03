@@ -15,6 +15,7 @@
  */
 package com.feralbytes.games.freecoilkotlin
 
+import android.Manifest
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -25,10 +26,9 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.*
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.location.Location
 import android.location.LocationManager
-import android.Manifest
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
@@ -101,7 +101,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
      * ********************************************************************** */
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private lateinit var mLocationRequest: LocationRequest
-    private lateinit var mLocation: Location
+    private lateinit var myCurrentBestLocation: Location
     private lateinit var  mLocationManager: LocationManager
     private val sUINTERVAL = (2 * 1000).toLong()  /* 10 secs */
     private val sFINTERVAL: Long = 2000 /* 2 sec */
@@ -618,6 +618,62 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         }
     }
 
+    /* GPS & Celular Location Listener */
+    Myprivate val fcLocationListener: LocationListener = object : LocationListener() {
+        override fun onLocationChange(newlocation: Location?) {
+            if (newLocation != null) {
+                tryNewLocation(newLocation)
+            }
+        }
+    }
+
+    fun tryNewLocation(newLocation: Location?) {
+        if (checkIfNewLocationIsBetter(newLocation)) {
+            myCurrentBestLocation = newLocation
+            // TODO: Send Location to Godot Side.
+        }
+    }
+
+    fun checkIfNewLocationIsBetter(newLocation: Location?) : Boolean {
+        if (myCurrentBestLocation == null) {
+            return true
+        }
+        // Check if the time is newer.
+        val timeDelta = newLocation.getTime() - myCurrentBestLocation.getTime()
+        val isSignificantlyNewer = timeDelta > TWO_MINUTES
+        val isSignificantlyOlder = timeDelta < -TWO_MINUTES
+        val isNewer = timeDelta > 0
+        if (isSignificantlyNewer) {
+            return true
+        }
+        else if (isSignificantlyOlder) {
+            return false
+        }
+        else {
+            val accuracyDelta = newLocation.getAccuracy() - myCurrentBestLocation.getAccuracy()
+            val isLessAccurate: Boolean = accuracyDelta > 0
+            val isMoreAccurate: Boolean = accuracyDelta < 0
+            val isSignificantlyLessAccurate: Boolean = accuracyDelta > 200
+            val isFromSameProvider: Boolean = isSameProvider(location.getProvider(), currentBestLocation.getProvider())
+            if (isMoreAccurate) {
+                return true;
+            }
+            else if (isNewer && !isLessAccurate) {
+                return true;
+            }
+            else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private fun isSameProvider(provider1: String?, provider2: String?): Boolean {
+        return if (provider1 == null) {
+            provider2 == null
+        }
+        else provider1 == provider2
+    }
     /* Godot callbacks you can reimplement, as SDKs often need them */
     override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 2) {
@@ -696,6 +752,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
         private const val FREECOIL_VERSION = "0.3.1-dev7"
+        private const val TWO_MINUTES = 1000 * 60 * 2;
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
             intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED)

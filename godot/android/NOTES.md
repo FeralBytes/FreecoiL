@@ -1,1 +1,2 @@
-* To fix "Failed resolution of: Lcom/google/android/gms/location/LocationServices" I had to add my dependencies to the top level Godot project's build.gradel file.
+* To fix "Failed resolution of: Lcom/google/android/gms/location/LocationServices" I had to add my dependencies to the top level Godot project's build.gradel file. That so take the file in the repository at godot/android/build.gradle and replace godot/android/build/build.gradle .
+* To Fix min SDK issue "the library might be using APIs not available in 18" replace godot/android/build/config.gradle with the one at godot/android/config.gradle .
