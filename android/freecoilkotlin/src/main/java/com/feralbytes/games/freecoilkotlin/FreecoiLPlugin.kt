@@ -29,10 +29,7 @@ import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.location.Location
 import android.location.LocationManager
-import android.os.Build
-import android.os.IBinder
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.provider.Settings
 import android.util.Log
 import android.view.View
@@ -40,13 +37,12 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.opengles.GL10
 import kotlin.experimental.and
 
@@ -99,10 +95,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     /* **********************************************************************
      * GPS Vars
      * ********************************************************************** */
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private lateinit var mLocationRequest: LocationRequest
-    private lateinit var myCurrentBestLocation: Location
-    private lateinit var  mLocationManager: LocationManager
+    private lateinit var myFusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var myLocationRequest: LocationRequest
+    private var myCurrentBestLocation: Location? = null
+    private lateinit var  myLocationManager: LocationManager
+    private lateinit var myLocationCallback: LocationCallback
     private val sUINTERVAL = (2 * 1000).toLong()  /* 10 secs */
     private val sFINTERVAL: Long = 2000 /* 2 sec */
     private lateinit var locationManager: LocationManager
@@ -143,8 +140,30 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             logger("Unable to initialize Bluetooth Low Energy Service!", 4)
         }
         vibrator = appContext!!.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)
-        mLocationManager = appContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        myLocationRequest = LocationRequest().apply {
+            interval = TimeUnit.MILLISECONDS.toMillis(500)
+            fastestInterval = TimeUnit.SECONDS.toMillis(2)
+            maxWaitTime = TimeUnit.MINUTES.toMillis(2)
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+        myLocationCallback = theLocationCallback
+        myFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(appActivity!!)
+        myLocationManager = appContext!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                        appActivity!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        else {
+            //Looper.prepare()
+            myFusedLocationProviderClient.requestLocationUpdates(myLocationRequest, myLocationCallback, Looper.getMainLooper())
+        }
         GodotLib.calldeferred(instanceId.toLong(), "_on_mod_finished_init", arrayOf())
     }
 
@@ -165,7 +184,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
 
     fun fineAccessPermissionStatus(): Boolean {
         if (ContextCompat.checkSelfPermission(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED) {
-            logger("Permission is currently denied for: ACCESS_FINE_LOCATION.", 1);
+            logger("Permission is currently denied for: ACCESS_FINE_LOCATION.", 1)
             return false
         }
         else {
@@ -197,11 +216,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     }
 
     fun gpsLocationStatus(): Boolean {
-        return mLocationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        return myLocationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
 
     fun cellLocationStatus(): Boolean {
-        return mLocationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        return myLocationManager!!.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
     fun enableBluetooth() {
@@ -234,7 +253,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
-        fusedLocationProviderClient!!.lastLocation.addOnSuccessListener { location: Location? ->
+        myFusedLocationProviderClient!!.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(location.accuracy, location.toString()))
             }
@@ -619,8 +638,17 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     }
 
     /* GPS & Celular Location Listener */
-    Myprivate val fcLocationListener: LocationListener = object : LocationListener() {
-        override fun onLocationChange(newlocation: Location?) {
+    private val theLocationCallback:LocationCallback = object: LocationCallback() {
+        override fun onLocationResult(newLocationResult: LocationResult?) {
+            super.onLocationResult(newLocationResult)
+            if (newLocationResult?.lastLocation != null) {
+                tryNewLocation(newLocationResult.lastLocation)
+            }
+        }
+    }
+
+    private val myLocationListener: LocationListener = object: LocationListener {
+        override fun onLocationChanged(newLocation: Location?) {
             if (newLocation != null) {
                 tryNewLocation(newLocation)
             }
@@ -630,7 +658,9 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     fun tryNewLocation(newLocation: Location?) {
         if (checkIfNewLocationIsBetter(newLocation)) {
             myCurrentBestLocation = newLocation
-            // TODO: Send Location to Godot Side.
+            GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(myCurrentBestLocation!!.accuracy, myCurrentBestLocation.toString()))
+            val locAsString = myCurrentBestLocation.toString()
+            logger("Location Update Recieved.  $locAsString", 3);
         }
     }
 
@@ -639,7 +669,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             return true
         }
         // Check if the time is newer.
-        val timeDelta = newLocation.getTime() - myCurrentBestLocation.getTime()
+        val timeDelta = newLocation!!.getTime() - myCurrentBestLocation!!.getTime()
         val isSignificantlyNewer = timeDelta > TWO_MINUTES
         val isSignificantlyOlder = timeDelta < -TWO_MINUTES
         val isNewer = timeDelta > 0
@@ -650,11 +680,11 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             return false
         }
         else {
-            val accuracyDelta = newLocation.getAccuracy() - myCurrentBestLocation.getAccuracy()
+            val accuracyDelta = newLocation.getAccuracy() - myCurrentBestLocation!!.getAccuracy()
             val isLessAccurate: Boolean = accuracyDelta > 0
             val isMoreAccurate: Boolean = accuracyDelta < 0
             val isSignificantlyLessAccurate: Boolean = accuracyDelta > 200
-            val isFromSameProvider: Boolean = isSameProvider(location.getProvider(), currentBestLocation.getProvider())
+            val isFromSameProvider: Boolean = isSameProvider(newLocation.getProvider(), myCurrentBestLocation!!.getProvider())
             if (isMoreAccurate) {
                 return true;
             }
