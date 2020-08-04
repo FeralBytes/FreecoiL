@@ -19,7 +19,7 @@ const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signa
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
 var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 # Overide sequence_enforcer() on main menu, set below to true.
-var OVERRIDE_SEQUENCE_ENFORCER = true
+var OVERRIDE_SEQUENCE_ENFORCER = false
 var DEBUG_GUI = false
 # warning-ignore:unused_class_variable
 var __signals_used = -1
