@@ -14,3 +14,4 @@ godot/android/build/build/
 android/libs/
 android/build/
 android/freecoilkotlin/build/
+android/gradle.properties

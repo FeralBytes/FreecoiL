@@ -38,6 +38,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
@@ -781,7 +787,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev7"
+        private const val FREECOIL_VERSION = "0.3.1-dev8"
         private const val TWO_MINUTES = 1000 * 60 * 2;
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()

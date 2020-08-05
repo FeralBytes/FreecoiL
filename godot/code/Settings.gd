@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev7"
+const VERSION = "0.3.1-dev8"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
