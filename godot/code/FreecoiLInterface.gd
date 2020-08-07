@@ -95,7 +95,11 @@ func connect_to_laser_gun():
   
 func start_bt_scan():
     if FreecoiL != null:
-        FreecoiL.startBluetoothScan()
+        # TODO: Get and check if we are connecting to a preferred gun.
+        # if the Settings.Preferences.get_data("preferred_gun") != null
+        #    FrecoiL.startBluetoothScan(Settings.Preferences.get_data("preferred_gun"))
+        # else:
+        FreecoiL.startBluetoothScan("")
 
 func stop_bt_scan():
     if FreecoiL != null:
@@ -285,9 +289,10 @@ func _on_bt_connection_timed_out():
     if auto_reconnect_laser:
       pass  # TODO: generic connect to device, and delete from _on_laser_gun_disconnected()
 
-func _on_laser_gun_connected():
+func _on_laser_gun_connected(laserGunId):
     Settings.Session.set_data("fi_laser_is_connected", 2)
     Settings.Session.set_data("fi_laser_recoil", 1)
+    Settings.Session.set_data("fi_laser_mac_address", laserGunId)
     bt_connect_timeout.stop()
     bt_connection_timed_out.start()
 

@@ -266,8 +266,14 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         }
     }
 
-    fun startBluetoothScan() {
-        logger("Starting Bluetooth scan", 2)
+    fun startBluetoothScan(preferredDevice: String) {
+        if (preferredDevice == "") {
+            logger("Starting Bluetooth scan.", 2)
+        }
+        else {
+            btDeviceAddress = preferredDevice
+            logger("Starting Bluetooth scan for $preferredDevice.", 2)
+        }
         bluetoothScanner!!.startScan(anyLeScanCallbacks)
         bluetoothScanning = true
     }
@@ -595,7 +601,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
             if (BluetoothLeService.ACTION_GATT_CONNECTED == action) {
-                GodotLib.calldeferred(instanceId.toLong(), "_on_laser_gun_connected", arrayOf())
+                GodotLib.calldeferred(instanceId.toLong(), "_on_laser_gun_connected", arrayOf(btDeviceAddress))
             } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED == action) {
                 //GodotLib.calldeferred(instanceId, "_on_laser_gun_disconnected", new Object[]{});
                 //This is called too often to be reliable even when the device is still connected.
@@ -835,7 +841,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                         return true
                     }
                     else{
-                        logger("$TAG: Ignored found device because it didn't match the previous device.", 0)
+                        logger("$TAG: Ignored found device because it didn't match the requested device address.", 0)
                     }
                 }
                 return false
