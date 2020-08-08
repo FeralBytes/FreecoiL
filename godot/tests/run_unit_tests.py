@@ -16,7 +16,11 @@ else:
     app_path = cwd.joinpath("/usr/local/bin/godot")
     proj_path = cwd.joinpath("godot")
 
-returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=unit"])
+if len(sys.argv) == 2:
+    if sys.argv[1] == "fast":
+        returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=unit", "speed=fast"])
+else:
+    returncode = subprocess.call([app_path, "-s", "--path", proj_path, "tests/gut_runner_custom.gd", "type=unit"])
 if returncode == 0:
     print("Returning 0 exit code from Python. Success!")
     sys.exit(0)

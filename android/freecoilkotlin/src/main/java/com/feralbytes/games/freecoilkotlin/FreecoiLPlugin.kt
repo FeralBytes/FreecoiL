@@ -672,7 +672,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             myCurrentBestLocation = newLocation
             GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(myCurrentBestLocation!!.accuracy, myCurrentBestLocation.toString()))
             val locAsString = myCurrentBestLocation.toString()
-            logger("Location Update Recieved.  $locAsString", 3);
+            logger("Location Update Recieved.  $locAsString", 1);
         }
     }
 

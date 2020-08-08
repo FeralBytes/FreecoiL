@@ -1,6 +1,5 @@
 [gd_scene load_steps=26 format=2]
 
-[ext_resource path="res://scenes/Widgets/PlusMinusWidget.gd" type="Script" id=1]
 [ext_resource path="res://assets/images/pistol.png" type="Texture" id=2]
 [ext_resource path="res://scenes/Widgets/PlusMinusWidget.tscn" type="PackedScene" id=3]
 
@@ -339,6 +338,24 @@ func update_val(new_val):
 script/source = "extends Label
 
 
+var total_times_shot = 0
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_shot_counter_1\"), self, \"update_val\")
+
+
+func update_val(new_val):
+    if new_val != 0:
+        total_times_shot += 1
+        text = \"TotalTimesShot=\" + str(total_times_shot)
+"
+
+[sub_resource type="GDScript" id=15]
+script/source = "extends Label
+
+
 # Declare member variables here. Examples:
 # var a = 2
 # var b = \"text\"
@@ -354,7 +371,7 @@ func update_val(new_val):
         text = \"Shooter1WpnProfile=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=15]
+[sub_resource type="GDScript" id=16]
 script/source = "extends Label
 
 
@@ -373,7 +390,7 @@ func update_val(new_val):
         text = \"Shooter1Charge=\" + str(new_val)
 "
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Label
 
 
@@ -398,7 +415,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=18]
 script/source = "extends Label
 
 
@@ -423,7 +440,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=18]
+[sub_resource type="GDScript" id=19]
 script/source = "extends Label
 
 
@@ -448,7 +465,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=19]
+[sub_resource type="GDScript" id=20]
 script/source = "extends Label
 
 
@@ -473,7 +490,7 @@ func update_val(new_val):
         self_modulate = Color(\"ffffff\")
 "
 
-[sub_resource type="GDScript" id=20]
+[sub_resource type="GDScript" id=21]
 script/source = "extends Button
 
 onready var RateOfFire = get_parent().get_node(\"PlusMinusWidget5\")
@@ -493,7 +510,7 @@ func _on_Button6_pressed():
     RateOfFire.current_val = 0
 "
 
-[sub_resource type="GDScript" id=21]
+[sub_resource type="GDScript" id=22]
 script/source = "extends Button
 
 
@@ -514,7 +531,7 @@ func _on_Button7_pressed():
     RateOfFire.current_val = 3
 "
 
-[sub_resource type="GDScript" id=22]
+[sub_resource type="GDScript" id=23]
 script/source = "extends Button
 
 
@@ -581,10 +598,10 @@ align = 1
 script = SubResource( 3 )
 
 [node name="Button4" type="Label" parent="."]
-margin_left = 252.45
-margin_top = 275.133
-margin_right = 312.45
-margin_bottom = 311.133
+margin_left = 268.0
+margin_top = 285.0
+margin_right = 328.0
+margin_bottom = 321.0
 rect_min_size = Vector2( 60, 0 )
 text = "00"
 align = 1
@@ -610,28 +627,20 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlusMinusWidget" type="CenterContainer" parent="." instance=ExtResource( 3 )]
+[node name="PlusMinusWidget" parent="." instance=ExtResource( 3 )]
 margin_left = 278.125
 margin_top = 125.001
 margin_right = 427.125
 margin_bottom = 172.001
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 apply_minimum_value = true
 apply_maximum_value = true
 maximum_value = 63
 
-[node name="PlusMinusWidget2" type="CenterContainer" parent="." instance=ExtResource( 3 )]
+[node name="PlusMinusWidget2" parent="." instance=ExtResource( 3 )]
 margin_left = 351.081
 margin_top = 264.293
 margin_right = 500.081
 margin_bottom = 311.293
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 apply_minimum_value = true
 apply_maximum_value = true
 maximum_value = 15
@@ -693,6 +702,20 @@ margin_right = 282.755
 margin_bottom = 373.514
 text = "ShotCounter1=00"
 script = SubResource( 13 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label25" type="Label" parent="."]
+margin_left = -0.24487
+margin_top = 253.514
+margin_right = 284.755
+margin_bottom = 289.514
+text = "TotalTimesShot=000"
+script = SubResource( 14 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Label4" type="Label" parent="."]
 margin_left = -5.61224
@@ -700,7 +723,7 @@ margin_top = 374.146
 margin_right = 378.388
 margin_bottom = 410.146
 text = "Shooter1WpnProfile=00"
-script = SubResource( 14 )
+script = SubResource( 15 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -721,7 +744,7 @@ margin_top = 406.698
 margin_right = 381.755
 margin_bottom = 442.698
 text = "Shooter1Charge=00"
-script = SubResource( 15 )
+script = SubResource( 16 )
 
 [node name="Label13" type="Label" parent="."]
 margin_left = -2.87744
@@ -736,7 +759,7 @@ margin_top = 437.183
 margin_right = 319.633
 margin_bottom = 473.183
 text = "Shooter1SensorClip"
-script = SubResource( 16 )
+script = SubResource( 17 )
 
 [node name="Label14" type="Label" parent="."]
 margin_left = -0.122498
@@ -751,7 +774,7 @@ margin_top = 470.857
 margin_right = 348.51
 margin_bottom = 506.857
 text = "Shooter1SensorFront"
-script = SubResource( 17 )
+script = SubResource( 18 )
 
 [node name="Label15" type="Label" parent="."]
 margin_left = 1.0
@@ -766,7 +789,7 @@ margin_top = 505.898
 margin_right = 321.0
 margin_bottom = 541.898
 text = "Shooter1SensorLeft"
-script = SubResource( 18 )
+script = SubResource( 19 )
 
 [node name="Label16" type="Label" parent="."]
 margin_left = 1.0
@@ -781,7 +804,7 @@ margin_top = 541.94
 margin_right = 338.388
 margin_bottom = 577.94
 text = "Shooter1SensorRight"
-script = SubResource( 19 )
+script = SubResource( 20 )
 
 [node name="Label17" type="Label" parent="."]
 margin_left = -2.36737
@@ -811,15 +834,11 @@ margin_right = 536.258
 margin_bottom = 371.139
 text = "NarrowPwr"
 
-[node name="PlusMinusWidget3" type="CenterContainer" parent="." instance=ExtResource( 3 )]
+[node name="PlusMinusWidget3" parent="." instance=ExtResource( 3 )]
 margin_left = 381.756
 margin_top = 377.976
 margin_right = 530.756
 margin_bottom = 424.976
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 current_val = 15
 apply_minimum_value = true
 apply_maximum_value = true
@@ -842,29 +861,21 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="PlusMinusWidget4" type="CenterContainer" parent="." instance=ExtResource( 3 )]
+[node name="PlusMinusWidget4" parent="." instance=ExtResource( 3 )]
 margin_left = 386.796
 margin_top = 493.889
 margin_right = 535.796
 margin_bottom = 540.889
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 current_val = 15
 apply_minimum_value = true
 apply_maximum_value = true
 maximum_value = 255
 
-[node name="PlusMinusWidget5" type="CenterContainer" parent="." instance=ExtResource( 3 )]
+[node name="PlusMinusWidget5" parent="." instance=ExtResource( 3 )]
 margin_left = 386.796
 margin_top = 593.889
 margin_right = 535.796
 margin_bottom = 640.889
-script = ExtResource( 1 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
 apply_minimum_value = true
 apply_maximum_value = true
 maximum_value = 255
@@ -875,7 +886,7 @@ margin_top = 672.855
 margin_right = 537.337
 margin_bottom = 716.855
 text = "SingleShot"
-script = SubResource( 20 )
+script = SubResource( 21 )
 
 [node name="Button7" type="Button" parent="."]
 margin_left = 361.337
@@ -883,7 +894,7 @@ margin_top = 736.855
 margin_right = 538.337
 margin_bottom = 780.855
 text = "3RndBurst"
-script = SubResource( 21 )
+script = SubResource( 22 )
 
 [node name="Button8" type="Button" parent="."]
 margin_left = 360.337
@@ -891,7 +902,7 @@ margin_top = 799.855
 margin_right = 537.337
 margin_bottom = 843.855
 text = "Full Auto"
-script = SubResource( 22 )
+script = SubResource( 23 )
 [connection signal="pressed" from="Button5" to="Button5" method="_on_Button5_pressed"]
 [connection signal="PMWidChanged" from="PlusMinusWidget" to="Button5" method="_on_PlusMinusWidget_PMWidChanged" flags=3]
 [connection signal="pressed" from="Button6" to="Button6" method="_on_Button6_pressed" flags=3]
