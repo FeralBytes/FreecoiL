@@ -16,7 +16,9 @@ extends Node
 # fi_thumb_btn_pushed
 # fi_power_btn_pushed
 # fi_got_shot(shooter_id)
-
+const TWO_MIN_IN_MILI_SECS = 120000
+const ONE_MIN_IN_MILI_SECS = 60000
+const HALF_MIN_IN_MILI_SECS = 30000
 # The FreecoiL Singleton
 var FreecoiL = null
 
@@ -211,6 +213,7 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data("fi_fine_access_location_permission"), self, 
         "_finish_initialization")
     Settings.Session.connect(Settings.Session.monitor_data("fi_bluetooth_status"), self, "_finish_initialization")
+    Settings.Session.connect(Settings.Session.monitor_data("fi_current_location"), self, "_update_location_quality")
     # Delay the loading of FreecoiL, so as to not delay the UI.
     call_deferred('_on_delay_loading')
    
@@ -448,7 +451,8 @@ func _changed_laser_telem_got_shot(shooter1LaserId, shooter1ShotCounter, shooter
             Settings.Session.set_data("fi_shooter1_sensor_front", shooter1SensorFront)
             Settings.Session.set_data("fi_shooter1_sensor_left", shooter1SensorLeft)
             Settings.Session.set_data("fi_shooter1_sensor_right", shooter1SensorRight)
-            # We set "fi_shooter1_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+            # We set "fi_shooter1_shot_counter" last to make it the trigger for fi_got_shot, 
+            # which replaces the group call.
             Settings.Session.set_data("fi_shooter1_shot_counter", shooter1ShotCounter)
         if shooter2LaserId == 0 and shooter2ShotCounter == 0:
             pass  # This is the default for not being shot.
@@ -461,7 +465,8 @@ func _changed_laser_telem_got_shot(shooter1LaserId, shooter1ShotCounter, shooter
                 Settings.Session.set_data("fi_shooter2_sensor_front", shooter2SensorFront)
                 Settings.Session.set_data("fi_shooter2_sensor_left", shooter2SensorLeft)
                 Settings.Session.set_data("fi_shooter2_sensor_right", shooter2SensorRight)
-                # We set "fi_shooter2_shot_counter" last to make it the trigger for fi_got_shot, which replaces the group call.
+                # We set "fi_shooter2_shot_counter" last to make it the trigger for fi_got_shot, 
+                # which replaces the group call.
                 Settings.Session.set_data("fi_shooter2_shot_counter", shooter2ShotCounter)
 
 # warning-ignore:unused_argument
@@ -474,7 +479,8 @@ func _changed_telem_button_pressed(powerBtnPressed, triggerBtnPressed, thumbBtnP
         Settings.Session.set_data("fi_thumb_btn_pressed", thumbBtnPressed)
     if Settings.Session.get_data("fi_reload_btn_pressed") != reloadBtnPressed:
         Settings.Session.set_data("fi_reload_btn_pressed", reloadBtnPressed)
-    #get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
+    #get_tree().call_group("FreecoiL", "fi_buttons_pressed", powerBtnPressed, 
+    #    triggerBtnPressed, thumbBtnPressed, reloadBtnPressed)
 
 func _processed_laser_telemetry2(array_of_args):
 #    if Settings.Session.get_data("fi_shooter1_shot_counter") != array_of_args[22]:
@@ -532,14 +538,20 @@ func _processed_laser_telemetry2(array_of_args):
     
 
 func _new_status(status, level):
-    # Debug Levels:
-    #     0 = debug
-    #     1 = info
-    #     2 = warning
-    #     3 = error
-    #     4 = critical
-    #     5 = exception
-    Settings.Log('FreecoiL Java: DEBUG: ' + status) # debug level always print
+    var debug_level = "debug"
+    # const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
+    if level == 0:
+        debug_level = "not_set"
+    # skip == 1, already set.
+    elif level == 2:
+        debug_level = "info"
+    elif level == 3:
+        debug_level = "warning"
+    elif level == 4:
+        debug_level = "error"
+    elif level == 5:
+        debug_level = "critical"
+    Settings.Log('FreecoiL Kotlin Logger: ' + status, debug_level)
     if "Pistol detected." in status:
         Settings.Session.set_data("physical_laser_type", "RK-45")
     elif "Riffle detected." in status:
@@ -555,5 +567,58 @@ func status_133_bug():
     yield(get_tree().create_timer(0.01), "timeout")
     connect_to_laser_gun()
 
-func _last_location_test(accuracy, coordinates):
-    print("!!!! Got last location: Accuracy = " + str(accuracy) + " coordinates = " + str(coordinates))
+func _new_location_data(location):
+    # latitude, longitude, altitude, speed, bearing, accuracy, provider, timestamp
+    var latitude = location[0]
+    var longitude = location[1]
+    var altitude = location[2]
+    var speed = location[3]
+    var bearing = location[4]
+    var accuracy = location[5]
+    var provider = location[6]
+    var timestamp = location[7]
+    var current_location = Settings.Session.get_data("fi_current_location")
+    var new_location_is_better = false
+    if current_location == null:
+        new_location_is_better = true
+    else:
+        var time_delta = timestamp - current_location["timestamp"]
+        var is_much_newer = time_delta > TWO_MIN_IN_MILI_SECS
+        var is_much_older = time_delta < 120000
+        var is_newer = time_delta > 0
+        var accuracy_delta = accuracy - current_location["accuracy"]
+        var is_more_accurate = accuracy_delta < 0
+        var is_much_less_accurate = accuracy_delta > 30
+        var is_slightly_less_accurate = accuracy_delta < 5
+        if is_more_accurate and is_newer:
+            new_location_is_better = true
+        elif is_much_newer:
+            new_location_is_better = true
+    if new_location_is_better:
+        Settings.Session.set_data("fi_current_location", {"latitude": latitude, 
+            "longitude": longitude, "altitude": altitude, "speed": speed,
+            "bearing": bearing, "accuracy": accuracy, "provider": provider, 
+            "timestamp": timestamp})
+            
+func _update_location_quality(current_location):
+    # Quality = time relative to now and the accuracy of the location.
+    # Quality of 0 is Location is null or off. 0 bars. And Disabled Icon color.
+    # Quality of 1 is Location Accuracy of greater than 20 meters or time greater than 2 minutes. 0 bars, enabled color.
+    # Quality of 2 is Location accuracy of greater than 10 meters or time greater than 1 minutes. 1 bar, enabled color.
+    # Quality of 3 is Location accuracy greater than 6 meters or time greater than 30 seconds. 2 bars, enabled color.
+    # Quality of 4 is Location accuracy less than 6 meters and time less than 30 seconds. 3 bars, enabled color.
+    var location_quality = 4
+    if current_location == null:
+        location_quality = 0
+    else:
+        var time_delta = OS.get_unix_time() - current_location["timestamp"]
+        if current_location["accuracy"] > 20 or time_delta > TWO_MIN_IN_MILI_SECS :
+            location_quality = 1
+        elif current_location["accuracy"] > 10 or time_delta > ONE_MIN_IN_MILI_SECS:
+            location_quality = 2
+        elif current_location["accuracy"] > 6 or time_delta > HALF_MIN_IN_MILI_SECS:
+            location_quality = 3
+        else:
+            location_quality = 4
+    Settings.Session.set_data("fi_location_quality", location_quality)
+

@@ -30,6 +30,7 @@ func _ready():
     splash_timer.connect("timeout",self,"_on_splash_timer_timeout") 
     splash_timer.start()
     SplashScene = null
+    Settings.Session.set_data("previous_menu", "0,0")
         
         
 
@@ -164,7 +165,8 @@ func next_menu(menu):
     var xy = menu.split_floats(",")
     get_tree().call_group("Camera", "instant_pan_camera", int(xy[0]), int(xy[1]))
     if Settings.Session.get_data("previous_menu") != Settings.Session.get_data("current_menu"):
-        Settings.Session.set_data("previous_menu", Settings.Session.get_data("current_menu"))
+        if Settings.Session.get_data("current_menu") != null:
+            Settings.Session.set_data("previous_menu", Settings.Session.get_data("current_menu"))
     Settings.Session.set_data("current_menu", menu)
     
 func load_lobby():

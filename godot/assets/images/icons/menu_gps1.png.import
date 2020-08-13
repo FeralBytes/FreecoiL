@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/menu_gps.png-0f3445971f04656b8199c3600372fe89.stex"
+path="res://.import/menu_gps1.png-6889c04febbd2cb731a6fd3e88eded63.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/images/icons/menu_gps.png"
-dest_files=[ "res://.import/menu_gps.png-0f3445971f04656b8199c3600372fe89.stex" ]
+source_file="res://assets/images/icons/menu_gps1.png"
+dest_files=[ "res://.import/menu_gps1.png-6889c04febbd2cb731a6fd3e88eded63.stex" ]
 
 [params]
 

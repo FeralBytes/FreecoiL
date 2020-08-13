@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev8"
+const VERSION = "0.3.1-dev9"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -17,7 +17,7 @@ const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signal.
 
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
-var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
+var DEBUG_LEVEL = 3  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 # Overide sequence_enforcer() on main menu, set below to true.
 var OVERRIDE_SEQUENCE_ENFORCER = false
 var DEBUG_GUI = false
@@ -37,8 +37,8 @@ var Network = Data.new("Network", null, false, false, true)
 func Log(to_print, level="debug"):
     if DEBUG_LEVELS.find(level) >= DEBUG_LEVEL:
         print(to_print)
-    if DEBUG_GUI:
-        get_tree().call_group("DebugOutput", "put", to_print)
+        if DEBUG_GUI:
+            get_tree().call_group("DebugOutput", "put", to_print)
 
 class Data:
     var __settings = {}  # {"dumby": [1234, "S00"]}
@@ -695,4 +695,4 @@ func _ready():
     Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
         "background_resource_loader":true, "gps_location": true, "gun_names":false})
     if OVERRIDE_SEQUENCE_ENFORCER:
-        Testing.register_data("testing", true, false)
+        Testing.register_data("testing", true)

@@ -3,7 +3,7 @@
 [ext_resource path="res://assets/images/icons/menu_sandwich.png" type="Texture" id=1]
 [ext_resource path="res://assets/images/icons/menu_battery_0.png" type="Texture" id=2]
 [ext_resource path="res://assets/images/icons/menu_wlan_good.png" type="Texture" id=3]
-[ext_resource path="res://assets/images/icons/menu_gps_poor.png" type="Texture" id=4]
+[ext_resource path="res://assets/images/icons/menu_gps0.png" type="Texture" id=4]
 [ext_resource path="res://assets/images/icons/menu_recoil.png" type="Texture" id=5]
 [ext_resource path="res://assets/images/icons/menu_gun.png" type="Texture" id=6]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=7]
@@ -25,6 +25,10 @@ var batt_25 = preload(\"res://assets/images/icons/menu_battery_25.png\")
 var batt_50 = preload(\"res://assets/images/icons/menu_battery_50.png\")
 var batt_75 = preload(\"res://assets/images/icons/menu_battery_75.png\")
 var batt_100 = preload(\"res://assets/images/icons/menu_battery_100.png\")
+var gps_qual_1 = preload(\"res://assets/images/icons/menu_gps0.png\")
+var gps_qual_2 = preload(\"res://assets/images/icons/menu_gps1.png\")
+var gps_qual_3 = preload(\"res://assets/images/icons/menu_gps2.png\")
+var gps_qual_4 = preload(\"res://assets/images/icons/menu_gps3.png\")
 
 onready var SettingsMenu = get_node(\"HBoxContainer/MenuBtn/SettingsMenu\")
 onready var MainMenuBtn = get_node(\"HBoxContainer/MenuBtn/SettingsMenu/VBoxContainer/MainMenu\")
@@ -43,6 +47,7 @@ func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_is_connected\"), self, \"update_gun\")
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_recoil\"), self, \"update_recoil\")
     Settings.Session.connect(Settings.Session.monitor_data(\"fi_laser_battery_lvl\"), self, \"update_battery\")
+    Settings.Session.connect(Settings.Session.monitor_data(\"fi_location_quality\"), self, \"update_gps\")
     Settings.Session.connect(Settings.Session.monitor_data(\"connection_status\"), self, \"update_wifi\")
     Settings.InGame.connect(Settings.InGame.monitor_data(\"force_recoil\"), self, \"update_recoil_force_mode\")
     SettingsMenu.color = Color(Settings.Session.get_data(\"ThemeMenuBackground\"))
@@ -89,10 +94,28 @@ func update_menu():
         else:
             PrefrencesBtn.disabled = true
     
-func update_gps(gps_status=0):
+func update_gps(gps_quality=-1):
     if menu_is_visible:
-        if gps_status == 0:
+        if gps_quality == -1:
+            if Settings.Session.get_data(\"fi_location_quality\") != null:
+                gps_quality = Settings.Session.get_data(\"fi_location_quality\")
+            else:
+                gps_quality = 0
+        if gps_quality == 0:
             GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeDisabledState\"))
+            GpsBtn.texture_normal = gps_qual_1
+        elif gps_quality == 1:
+            GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GpsBtn.texture_normal = gps_qual_1
+        elif gps_quality == 2:
+            GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GpsBtn.texture_normal = gps_qual_2
+        elif gps_quality == 3:
+            GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GpsBtn.texture_normal = gps_qual_3
+        elif gps_quality == 4:
+            GpsBtn.self_modulate = Color(Settings.Session.get_data(\"ThemeGoodState\"))
+            GpsBtn.texture_normal = gps_qual_4
     
 func update_recoil(recoil=-1):
     if menu_is_visible:
@@ -317,9 +340,11 @@ modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
 margin_left = 149.0
 margin_right = 209.0
 margin_bottom = 60.0
+rect_min_size = Vector2( 60, 60 )
 hint_tooltip = "GPS not impleneted yet."
 disabled = true
 texture_normal = ExtResource( 4 )
+expand = true
 
 [node name="RecoilBtn" type="TextureButton" parent="HBoxContainer"]
 modulate = Color( 0.592157, 0.592157, 0.592157, 1 )
@@ -355,7 +380,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.1-dev5 "
+text = " Ver: 0.3.1-dev9 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false

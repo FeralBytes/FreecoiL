@@ -38,12 +38,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
 import com.google.android.gms.location.*
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
 import org.godotengine.godot.plugin.GodotPlugin
@@ -174,18 +168,19 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     }
 
     fun requestFineAccess() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            val permisionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        // https://stackoverflow.com/questions/38999045/requestpermissions-does-nothing#38999684
+        // https://code.google.com/p/android/issues/detail?id=200758&can=1&q=shouldShowRequestPermissionRationale&colspec=ID%20Status%20Priority%20Owner%20Summary%20Stars%20Reporter%20Opened
+        /*if (ActivityCompat.shouldShowRequestPermissionRationale(appActivity!!, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            val permissionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+            logger("Requesting fine access permission: Using should show Rationale.", 1)
             ActivityCompat.requestPermissions(appActivity!!,
-                    permisionStr,
+                    permissionStr,
                     3)
-        } else {
-            val permisionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
-            ActivityCompat.requestPermissions(appActivity!!,
-                    permisionStr,
-                    1)
-
-        }
+        } else {*/
+        val permissionStr = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+        logger("Requesting fine access permissions: Using standard request.", 1)
+        ActivityCompat.requestPermissions(appActivity!!, permissionStr,1)
+        //}
     }
 
     fun fineAccessPermissionStatus(): Boolean {
@@ -250,6 +245,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     fun getLastLocation() {
         if (ActivityCompat.checkSelfPermission(appContext!!, Manifest.permission.ACCESS_FINE_LOCATION) != PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(appContext!!, Manifest.permission.ACCESS_COARSE_LOCATION) != PERMISSION_GRANTED) {
+            logger("Somehow wound up here!.", 3)
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
@@ -259,9 +255,16 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
             // for ActivityCompat#requestPermissions for more details.
             return
         }
+        logger("Making onSuccessListener.", 1)
         myFusedLocationProviderClient!!.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
-                GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(location.accuracy, location.toString()))
+                myCurrentBestLocation = location
+                GodotLib.calldeferred(instanceId.toLong(), "_new_location_data", arrayOf<Any>(arrayOf<Any>(
+                        myCurrentBestLocation!!.latitude, myCurrentBestLocation!!.longitude, myCurrentBestLocation!!.altitude,
+                        myCurrentBestLocation!!.speed, myCurrentBestLocation!!.bearing, myCurrentBestLocation!!.accuracy,
+                        myCurrentBestLocation!!.provider, myCurrentBestLocation!!.time)))
+                val locAsString = myCurrentBestLocation.toString()
+                logger("onSuccessListener: Location Update Received.  $locAsString", 1);
             }
         }
     }
@@ -436,6 +439,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
            4 = critical
            5 = exception */
         GodotLib.calldeferred(instanceId.toLong(), "_new_status", arrayOf(message, level))
+        //Log.i(TAG, "FreecoiL Kotlin Plugin: Logger: $level: $message")
         if (level >= 2) {
             makeToast(message, true)
         }
@@ -654,6 +658,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         override fun onLocationResult(newLocationResult: LocationResult?) {
             super.onLocationResult(newLocationResult)
             if (newLocationResult?.lastLocation != null) {
+                logger("theLocationCallback.onLocationResult: Update is being passed to tryNewLocation.", 1)
                 tryNewLocation(newLocationResult.lastLocation)
             }
         }
@@ -662,60 +667,52 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     private val myLocationListener: LocationListener = object: LocationListener {
         override fun onLocationChanged(newLocation: Location?) {
             if (newLocation != null) {
+                logger("myLocationListener.onLocationChanged: Update is being passed to tryNewLocation.", 1)
                 tryNewLocation(newLocation)
             }
         }
     }
 
     fun tryNewLocation(newLocation: Location?) {
-        if (checkIfNewLocationIsBetter(newLocation)) {
+        if (newLocation != null) {
             myCurrentBestLocation = newLocation
-            GodotLib.calldeferred(instanceId.toLong(), "_last_location_test", arrayOf(myCurrentBestLocation!!.accuracy, myCurrentBestLocation.toString()))
+            val timestamp: Long = myCurrentBestLocation!!.time
+            var provider: String = if (myCurrentBestLocation!!.provider != null) {
+                myCurrentBestLocation!!.provider
+            }
+            else {
+                ""
+            }
+            val accuracy: Float = myCurrentBestLocation!!.accuracy
+            val bearing: Float = if (myCurrentBestLocation!!.bearing != null) {
+                myCurrentBestLocation!!.bearing
+            }
+            else {
+                -1F
+            }
+            val speed: Float = if (myCurrentBestLocation!!.speed != null) {
+                myCurrentBestLocation!!.speed
+            }
+            else {
+                -1F
+            }
+            val altitude: Double = if (myCurrentBestLocation!!.altitude != null) {
+                myCurrentBestLocation!!.altitude
+            }
+            else {
+                (-99999).toDouble()
+            }
+            val longitude: Double = myCurrentBestLocation!!.longitude
+            val latitude: Double = myCurrentBestLocation!!.latitude
+            GodotLib.calldeferred(instanceId.toLong(), "_new_location_data", arrayOf<Any>(arrayOf<Any>(
+                    latitude, longitude, altitude,
+                    speed, bearing, accuracy,
+                    provider, timestamp)))
             val locAsString = myCurrentBestLocation.toString()
-            logger("Location Update Recieved.  $locAsString", 1);
+            logger("tryNewLocation: Location Update Received.  $locAsString", 1)
         }
     }
 
-    fun checkIfNewLocationIsBetter(newLocation: Location?) : Boolean {
-        if (myCurrentBestLocation == null) {
-            return true
-        }
-        // Check if the time is newer.
-        val timeDelta = newLocation!!.getTime() - myCurrentBestLocation!!.getTime()
-        val isSignificantlyNewer = timeDelta > TWO_MINUTES
-        val isSignificantlyOlder = timeDelta < -TWO_MINUTES
-        val isNewer = timeDelta > 0
-        if (isSignificantlyNewer) {
-            return true
-        }
-        else if (isSignificantlyOlder) {
-            return false
-        }
-        else {
-            val accuracyDelta = newLocation.getAccuracy() - myCurrentBestLocation!!.getAccuracy()
-            val isLessAccurate: Boolean = accuracyDelta > 0
-            val isMoreAccurate: Boolean = accuracyDelta < 0
-            val isSignificantlyLessAccurate: Boolean = accuracyDelta > 200
-            val isFromSameProvider: Boolean = isSameProvider(newLocation.getProvider(), myCurrentBestLocation!!.getProvider())
-            if (isMoreAccurate) {
-                return true;
-            }
-            else if (isNewer && !isLessAccurate) {
-                return true;
-            }
-            else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
-                return true;
-            }
-            return false;
-        }
-    }
-
-    private fun isSameProvider(provider1: String?, provider2: String?): Boolean {
-        return if (provider1 == null) {
-            provider2 == null
-        }
-        else provider1 == provider2
-    }
     /* Godot callbacks you can reimplement, as SDKs often need them */
     override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 2) {
@@ -793,7 +790,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev8"
+        private const val FREECOIL_VERSION = "0.3.1-dev9"
         private const val TWO_MINUTES = 1000 * 60 * 2;
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()
