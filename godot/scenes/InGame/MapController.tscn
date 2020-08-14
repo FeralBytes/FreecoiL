@@ -1,0 +1,246 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://addons/regular_polygon2d_node/RegularPolygon2D.gd" type="Script" id=1]
+[ext_resource path="res://assets/images/staticmap.png" type="Texture" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+const RADAR_PULSE_RATE = 8
+
+onready var Radar = get_node(\"Hexagon2/Radar\")
+onready var RadarPulseTimer = get_node(\"RadarPulse\")
+onready var MapDownloader = get_node(\"MapDownloader\")
+onready var CenterTile = get_node(\"Hexagon2/MapMoverContainer/Center\")
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    var current_location = Settings.Session.get_data(\"fi_current_location\")
+    RadarPulseTimer.wait_time = RADAR_PULSE_RATE
+    RadarPulseTimer.connect(\"timeout\", self, \"pulse_radar\")
+    RadarPulseTimer.start(RadarPulseTimer.wait_time)
+    MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
+    var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
+        str(current_location[\"latitude\"]) + \",\" + str(current_location[\"longitude\"]) + 
+        \"&zoom=19&scale=1&size=640x640&maptype=hybrid&key=\" + FreecoiLInterface.API_KEY)
+    if http_error != OK:
+        print(\"An error occurred in the HTTP request.\")
+
+func map_tile_downloaded(result, response_code, headers, body):
+    var image = Image.new()
+    var image_error = image.load_png_from_buffer(body)
+    if image_error != OK:
+        print(\"An error occurred while trying to display the image.\")
+    else:
+        var texture = ImageTexture.new()
+        texture.create_from_image(image)
+        CenterTile.texture = texture
+
+func pulse_radar():
+    Radar.border_size = 30
+    Radar.visible = true
+    while true:
+        if Radar.size > 600:
+            Radar.size = 10
+            Radar.border_size = 1
+            Radar.visible = false
+            RadarPulseTimer.start(RadarPulseTimer.wait_time)
+            break
+        else:
+            Radar.size += 5
+            yield(get_tree().create_timer(0.01), \"timeout\")
+"
+
+[node name="MapController" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Hexagon2" type="Node2D" parent="."]
+position = Vector2( 270, 403 )
+rotation = 1.5708
+skew = 4.37114e-08
+script = ExtResource( 1 )
+centered = true
+num_sides = 6
+size = 540.0
+polygon_color = Color( 1, 1, 1, 0 )
+border_size = 0.0
+
+[node name="MapMoverContainer" type="Node2D" parent="Hexagon2"]
+skew = 4.37114e-08
+
+[node name="Center" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="North" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -640, 0 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="NorthEast" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -640, -640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="East" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 0, -640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="SouthEast" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 640, -640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="South" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 640, 0 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="SouthWest" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 640, 640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="West" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 0, 640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="NorthWest" type="Sprite" parent="Hexagon2/MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -640, 640 )
+rotation = -1.5708
+skew = 4.37114e-08
+texture = ExtResource( 2 )
+
+[node name="PlayerMarker" type="Node2D" parent="Hexagon2"]
+script = ExtResource( 1 )
+centered = true
+size = 26.0
+polygon_color = Color( 0, 0.0941176, 0.847059, 1 )
+border_color = Color( 0, 0.0941176, 0.847059, 1 )
+polygon_rotation = 30.0
+
+[node name="Radar" type="Node2D" parent="Hexagon2"]
+visible = false
+script = ExtResource( 1 )
+centered = true
+num_sides = 6
+size = 10.0
+polygon_color = Color( 1, 1, 1, 0.0862745 )
+border_size = 1.0
+border_color = Color( 0, 0.0156863, 1, 0.152941 )
+
+[node name="BlockingNodes" type="Node2D" parent="."]
+skew = 4.37114e-08
+
+[node name="BlockingTriangle" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 874, -471 )
+rotation = 1.0472
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="BlockingTriangle2" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 21, -471 )
+rotation = 1.0472
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="BlockingTriangle3" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 448, 218 )
+rotation = 1.0472
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="BlockingTriangle4" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 90, 588 )
+rotation = -2.09439
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="BlockingTriangle5" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 516, 1284 )
+rotation = -2.09439
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="BlockingTriangle6" type="Node2D" parent="BlockingNodes"]
+position = Vector2( -330, 1284 )
+rotation = -2.09439
+skew = 4.37114e-08
+script = ExtResource( 1 )
+size = 960.0
+polygon_color = Color( 0, 0, 0, 1 )
+
+[node name="LeftRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( -1822, 432 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="RightRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 2374, 408 )
+skew = 4.37114e-08
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="TopRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 286, -1542 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="BottomRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 334, 2354 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="RadarPulse" type="Timer" parent="."]
+wait_time = 6.0
+one_shot = true
+
+[node name="MapDownloader" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 30

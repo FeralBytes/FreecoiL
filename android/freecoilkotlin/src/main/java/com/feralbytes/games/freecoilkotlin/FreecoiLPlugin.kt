@@ -37,6 +37,7 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.feralbytes.games.freecoilkotlin.BluetoothLeService.LocalBinder
+import com.feralbytes.games.freecoilkotlin.BuildConfig.ApiKeyMap
 import com.google.android.gms.location.*
 import org.godotengine.godot.Godot
 import org.godotengine.godot.GodotLib
@@ -117,7 +118,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
                 "enableBluetooth", "fineAccessPermissionStatus", "requestFineAccess", "startBluetoothScan",
                 "stopBluetoothScan", "vibrate", "setLaserId", "startReload", "finishReload", "setShotMode",
                 "enableRecoil", "finishInit", "enableLocation", "cellLocationStatus", "gpsLocationStatus",
-                "getLastLocation")
+                "getLastLocation", "getApiKey")
     }
 
     fun hello(): String {
@@ -713,6 +714,10 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         }
     }
 
+    fun getApiKey(): String {
+        return ApiKeyMap
+    }
+
     /* Godot callbacks you can reimplement, as SDKs often need them */
     override fun onMainActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 2) {
@@ -790,7 +795,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev9"
+        private const val FREECOIL_VERSION = "0.3.1-dev10"
         private const val TWO_MINUTES = 1000 * 60 * 2;
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()

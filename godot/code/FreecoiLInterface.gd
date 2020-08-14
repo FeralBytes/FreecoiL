@@ -21,6 +21,7 @@ const ONE_MIN_IN_MILI_SECS = 60000
 const HALF_MIN_IN_MILI_SECS = 30000
 # The FreecoiL Singleton
 var FreecoiL = null
+var API_KEY = ""
 
 # State vars below.
 var auto_reconnect_laser
@@ -329,6 +330,7 @@ func _on_mod_finished_init():
         Settings.Session.set_data("fi_location_status", true)
     if Settings.Session.get_data("fi_location_status"):
         FreecoiL.getLastLocation()
+        _rx_g_maps_api_key(FreecoiL.getApiKey())
         
 func _on_activity_result_bt_enable(resultCode):
     if resultCode == 1:  # Bluetooth is now on, so we need to initialize the Bluetooth Scanner.
@@ -622,3 +624,5 @@ func _update_location_quality(current_location):
             location_quality = 4
     Settings.Session.set_data("fi_location_quality", location_quality)
 
+func _rx_g_maps_api_key(api_key):
+    API_KEY = api_key

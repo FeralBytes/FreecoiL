@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev9"
+const VERSION = "0.3.1-dev10"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -17,9 +17,9 @@ const MAX_OBSERVERS = 1
 const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signal.
 
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
-var DEBUG_LEVEL = 3  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
+var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 # Overide sequence_enforcer() on main menu, set below to true.
-var OVERRIDE_SEQUENCE_ENFORCER = false
+var OVERRIDE_SEQUENCE_ENFORCER = true
 var DEBUG_GUI = false
 # warning-ignore:unused_class_variable
 var __signals_used = -1

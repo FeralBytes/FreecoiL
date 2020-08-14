@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=2]
+[gd_scene load_steps=50 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://scenes/MainMenu/Header2.tscn" type="PackedScene" id=2]
@@ -17,38 +17,7 @@
 [ext_resource path="res://assets/sounds/TangoDown.wav" type="AudioStream" id=15]
 [ext_resource path="res://assets/themes/default/default_RightBumper.theme" type="Theme" id=16]
 [ext_resource path="res://assets/themes/default/default_LeftBumper.theme" type="Theme" id=17]
-
-[sub_resource type="DynamicFont" id=1]
-size = 40
-font_data = ExtResource( 4 )
-
-[sub_resource type="DynamicFont" id=2]
-size = 40
-font_data = ExtResource( 4 )
-
-[sub_resource type="DynamicFont" id=3]
-size = 40
-font_data = ExtResource( 4 )
-
-[sub_resource type="GDScript" id=4]
-script/source = "extends Label
-
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = \"text\"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_start_delay\"), self, \"update_time_remaining\")
-
-func update_time_remaining(new_val):
-    var time_minutes = int(new_val / 60)
-    var time_seconds_left = \"%02d\" % (new_val - (time_minutes * 60))
-    time_minutes = \"%02d\" % time_minutes
-    text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
-"
+[ext_resource path="res://scenes/InGame/MapController.tscn" type="PackedScene" id=18]
 
 [sub_resource type="StyleBoxEmpty" id=5]
 
@@ -237,6 +206,38 @@ func update_weapon_type(__):
     var new_wpn = Settings.Session.get_data(\"game_weapon_type\")
     var wpn_ammo = Settings.Session.get_data(\"game_weapon_total_ammo\")
     text = new_wpn + \" total ammo = \" + str(wpn_ammo)
+"
+
+[sub_resource type="DynamicFont" id=1]
+size = 40
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 40
+font_data = ExtResource( 4 )
+
+[sub_resource type="DynamicFont" id=3]
+size = 40
+font_data = ExtResource( 4 )
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends Label
+
+
+# Declare member variables here. Examples:
+# var a = 2
+# var b = \"text\"
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"game_tick_toc_start_delay\"), self, \"update_time_remaining\")
+
+func update_time_remaining(new_val):
+    var time_minutes = int(new_val / 60)
+    var time_seconds_left = \"%02d\" % (new_val - (time_minutes * 60))
+    time_minutes = \"%02d\" % time_minutes
+    text = \"in: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
 [sub_resource type="GDScript" id=18]
@@ -663,6 +664,255 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="0,0-Playing" type="ReferenceRect" parent="."]
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 960 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Playing"]
+margin_top = 100.0
+margin_right = 540.0
+margin_bottom = 960.0
+rect_min_size = Vector2( 540, 860 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
+margin_top = 67.0
+margin_right = 540.0
+margin_bottom = 792.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="CenterContainer" type="CenterContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 472.0
+rect_min_size = Vector2( 540, 472 )
+
+[node name="ReferenceRect" type="ReferenceRect" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
+margin_right = 540.0
+margin_bottom = 472.0
+rect_min_size = Vector2( 540, 472 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="MapController" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer" instance=ExtResource( 18 )]
+position = Vector2( 0, -167 )
+skew = 4.37114e-08
+
+[node name="Control" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
+skew = 4.37114e-08
+
+[node name="skull" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
+position = Vector2( 493, 394 )
+scale = Vector2( 0.9, 0.9 )
+skew = 4.37114e-08
+texture = ExtResource( 8 )
+
+[node name="target_person" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
+position = Vector2( 48, 395 )
+scale = Vector2( 0.8, 0.8 )
+skew = 4.37114e-08
+texture = ExtResource( 6 )
+
+[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+margin_left = 430.0
+margin_top = 423.0
+margin_right = 541.0
+margin_bottom = 486.0
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
+text = "000"
+script = SubResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+margin_left = -2.0
+margin_top = 423.0
+margin_right = 72.0
+margin_bottom = 486.0
+custom_styles/normal = SubResource( 5 )
+custom_fonts/font = SubResource( 6 )
+text = "000"
+script = SubResource( 8 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Button" type="Button" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
+margin_right = 12.0
+margin_bottom = 39.0
+text = "Scores"
+script = SubResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Hexagon" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
+position = Vector2( 270, 236 )
+rotation = 1.5708
+script = ExtResource( 3 )
+centered = true
+num_sides = 6
+size = 540.0
+polygon_color = Color( 1, 1, 1, 0 )
+border_size = 0.0
+
+[node name="TriangleBottom" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( 156, 0 )
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = 30.0
+
+[node name="TriangleTop" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( -156, 0 )
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = -30.0
+
+[node name="TriangleBottomRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( 78, -135 )
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = -30.0
+
+[node name="TriangleBottomLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( 78, 135 )
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = -30.0
+
+[node name="TriangleTopRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( -78, -135 )
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = -90.0
+
+[node name="TriangleTopLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
+position = Vector2( -78, 135 )
+skew = 4.37114e-08
+script = ExtResource( 3 )
+centered = true
+size = 311.0
+polygon_color = Color( 0.929412, 0.0117647, 0.0117647, 0 )
+border_size = 0.0
+polygon_rotation = -90.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+margin_top = 480.0
+margin_right = 540.0
+margin_bottom = 547.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 11.0
+margin_top = 2.0
+margin_right = 255.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 244, 0 )
+custom_fonts/font = SubResource( 10 )
+text = "15/30"
+align = 1
+script = SubResource( 11 )
+
+[node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
+modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
+margin_left = 259.0
+margin_right = 285.0
+margin_bottom = 67.0
+texture = ExtResource( 5 )
+patch_margin_right = 26
+
+[node name="ProgressBar" type="ProgressBar" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
+margin_left = 289.0
+margin_right = 529.0
+margin_bottom = 67.0
+rect_min_size = Vector2( 240, 67 )
+max_value = 30.0
+step = 1.0
+value = 15.0
+percent_visible = false
+script = SubResource( 12 )
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+margin_top = 555.0
+margin_right = 540.0
+margin_bottom = 622.0
+alignment = 1
+
+[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 3.0
+margin_top = 2.0
+margin_right = 247.0
+margin_bottom = 65.0
+rect_min_size = Vector2( 244, 0 )
+custom_fonts/font = SubResource( 10 )
+text = "15/30"
+align = 1
+script = SubResource( 13 )
+
+[node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
+modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
+margin_left = 251.0
+margin_right = 292.0
+margin_bottom = 67.0
+texture = ExtResource( 7 )
+patch_margin_right = 41
+
+[node name="ProgressBar" type="ProgressBar" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
+margin_left = 296.0
+margin_right = 536.0
+margin_bottom = 67.0
+rect_min_size = Vector2( 240, 67 )
+max_value = 30.0
+step = 1.0
+value = 15.0
+percent_visible = false
+script = SubResource( 14 )
+
+[node name="ObjectiveTracker" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+margin_top = 630.0
+margin_right = 540.0
+margin_bottom = 681.0
+custom_fonts/font = SubResource( 15 )
+text = "Time Remaining: 00:00"
+align = 1
+script = SubResource( 16 )
+
+[node name="GunType" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
+margin_top = 689.0
+margin_right = 540.0
+margin_bottom = 725.0
+align = 1
+script = SubResource( 17 )
+
+[node name="Header2" parent="0,0-Playing" instance=ExtResource( 2 )]
+on_mainmenu_scene = false
+allow_preferences = false
+
 [node name="0,-1-Waiting For Other Players" type="ReferenceRect" parent="."]
 margin_top = -960.0
 margin_right = 540.0
@@ -767,285 +1017,6 @@ margin_left = 20.0
 margin_top = 20.0
 margin_right = 20.0
 margin_bottom = 20.0
-
-[node name="0,0-Playing" type="ReferenceRect" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
-rect_min_size = Vector2( 540, 960 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="CenterContainer" type="CenterContainer" parent="0,0-Playing"]
-margin_top = 100.0
-margin_right = 540.0
-margin_bottom = 960.0
-rect_min_size = Vector2( 540, 860 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="VBoxContainer" type="VBoxContainer" parent="0,0-Playing/CenterContainer"]
-margin_top = 67.0
-margin_right = 540.0
-margin_bottom = 792.0
-rect_min_size = Vector2( 540, 0 )
-
-[node name="CenterContainer" type="CenterContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_right = 540.0
-margin_bottom = 472.0
-rect_min_size = Vector2( 540, 472 )
-
-[node name="ReferenceRect" type="ReferenceRect" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
-margin_right = 540.0
-margin_bottom = 472.0
-rect_min_size = Vector2( 540, 472 )
-__meta__ = {
-"_edit_lock_": true
-}
-
-[node name="Control" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
-skew = 4.37114e-08
-
-[node name="skull" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
-position = Vector2( 493, 394 )
-scale = Vector2( 0.9, 0.9 )
-skew = 4.37114e-08
-texture = ExtResource( 8 )
-
-[node name="target_person" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
-position = Vector2( 48, 395 )
-scale = Vector2( 0.8, 0.8 )
-skew = 4.37114e-08
-texture = ExtResource( 6 )
-
-[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-margin_left = 430.0
-margin_top = 423.0
-margin_right = 541.0
-margin_bottom = 486.0
-custom_styles/normal = SubResource( 5 )
-custom_fonts/font = SubResource( 6 )
-text = "000"
-script = SubResource( 7 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Label2" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-margin_left = -2.0
-margin_top = 423.0
-margin_right = 72.0
-margin_bottom = 486.0
-custom_styles/normal = SubResource( 5 )
-custom_fonts/font = SubResource( 6 )
-text = "000"
-script = SubResource( 8 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Button" type="Button" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
-margin_right = 12.0
-margin_bottom = 39.0
-text = "Scores"
-script = SubResource( 9 )
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="Hexagon" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
-position = Vector2( 270, 236 )
-rotation = 1.5708
-script = ExtResource( 3 )
-centered = true
-num_sides = 6
-size = 540.0
-polygon_color = Color( 1, 1, 1, 0.0941176 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = 0.0
-collision_shape = true
-
-[node name="TriangleBottom" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( 156, 0 )
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = 30.0
-collision_shape = true
-
-[node name="TriangleTop" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( -156, 0 )
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = -30.0
-collision_shape = true
-
-[node name="TriangleBottomRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( 78, -135 )
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = -30.0
-collision_shape = true
-
-[node name="TriangleBottomLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( 78, 135 )
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = -30.0
-collision_shape = true
-
-[node name="TriangleTopRight" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( -78, -135 )
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = -90.0
-collision_shape = true
-
-[node name="TriangleTopLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
-modulate = Color( 1, 0, 0, 1 )
-position = Vector2( -78, 135 )
-skew = 4.37114e-08
-script = ExtResource( 3 )
-centered = true
-num_sides = 3
-size = 311.0
-polygon_color = Color( 0.572549, 0.572549, 0.572549, 0.356863 )
-polygon_texture = null
-border_size = 0.0
-border_color = Color( 0, 0, 0, 1 )
-polygon_rotation = -90.0
-collision_shape = true
-
-[node name="HBoxContainer" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 480.0
-margin_right = 540.0
-margin_bottom = 547.0
-alignment = 1
-
-[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 11.0
-margin_top = 2.0
-margin_right = 255.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 10 )
-text = "15/30"
-align = 1
-script = SubResource( 11 )
-
-[node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
-modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
-margin_left = 259.0
-margin_right = 285.0
-margin_bottom = 67.0
-texture = ExtResource( 5 )
-patch_margin_right = 26
-
-[node name="ProgressBar" type="ProgressBar" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
-margin_left = 289.0
-margin_right = 529.0
-margin_bottom = 67.0
-rect_min_size = Vector2( 240, 67 )
-max_value = 30.0
-step = 1.0
-value = 15.0
-percent_visible = false
-script = SubResource( 12 )
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 555.0
-margin_right = 540.0
-margin_bottom = 622.0
-alignment = 1
-
-[node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 3.0
-margin_top = 2.0
-margin_right = 247.0
-margin_bottom = 65.0
-rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 10 )
-text = "15/30"
-align = 1
-script = SubResource( 13 )
-
-[node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
-modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
-margin_left = 251.0
-margin_right = 292.0
-margin_bottom = 67.0
-texture = ExtResource( 7 )
-patch_margin_right = 41
-
-[node name="ProgressBar" type="ProgressBar" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
-margin_left = 296.0
-margin_right = 536.0
-margin_bottom = 67.0
-rect_min_size = Vector2( 240, 67 )
-max_value = 30.0
-step = 1.0
-value = 15.0
-percent_visible = false
-script = SubResource( 14 )
-
-[node name="ObjectiveTracker" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 630.0
-margin_right = 540.0
-margin_bottom = 681.0
-custom_fonts/font = SubResource( 15 )
-text = "Time Remaining: 00:00"
-align = 1
-script = SubResource( 16 )
-
-[node name="GunType" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
-margin_top = 689.0
-margin_right = 540.0
-margin_bottom = 725.0
-align = 1
-script = SubResource( 17 )
-
-[node name="Header2" parent="0,0-Playing" instance=ExtResource( 2 )]
-on_mainmenu_scene = false
-allow_preferences = false
 
 [node name="0,1-End of Game" type="ReferenceRect" parent="."]
 margin_top = 960.0
