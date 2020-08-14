@@ -8,15 +8,18 @@ script/source = "extends Node2D
 
 const RADAR_PULSE_RATE = 8
 
+var original_center = {}
+
 onready var Radar = get_node(\"Hexagon2/Radar\")
 onready var RadarPulseTimer = get_node(\"RadarPulse\")
 onready var MapDownloader = get_node(\"MapDownloader\")
 onready var CenterTile = get_node(\"Hexagon2/MapMoverContainer/Center\")
 
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
     var current_location = Settings.Session.get_data(\"fi_current_location\")
+    original_center[\"latitude\"] = current_location[\"latitude\"]
+    original_center[\"logitude\"] = current_location[\"logitude\"]
     RadarPulseTimer.wait_time = RADAR_PULSE_RATE
     RadarPulseTimer.connect(\"timeout\", self, \"pulse_radar\")
     RadarPulseTimer.start(RadarPulseTimer.wait_time)

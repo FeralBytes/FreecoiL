@@ -263,7 +263,11 @@ extends Label
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    text = \" Ver: \" + Settings.VERSION + \" \"
+    var plugin = Engine.has_singleton(\"FreecoiL\")
+    if plugin:
+        text = \"*Ver: \" + Settings.VERSION + \" \"
+    else:
+        text = \" Ver: \" + Settings.VERSION + \" \"
 
 "
 
@@ -380,7 +384,7 @@ texture_normal = ExtResource( 6 )
 margin_right = 40.0
 margin_bottom = 14.0
 custom_fonts/font = SubResource( 2 )
-text = " Ver: 0.3.1-dev9 "
+text = " Ver: 0.3.1-dev10 "
 script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false

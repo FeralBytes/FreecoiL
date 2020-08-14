@@ -795,7 +795,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
         const val RECOIL_POWER_BIT = 0x10
         private const val WEAPON_PROFILE = 0x00.toByte()
         private const val HELLO_WORLD = "Hello New World from FreecoiL Kotlin"
-        private const val FREECOIL_VERSION = "0.3.1-dev10"
+        private const val FREECOIL_VERSION = "0.3.1-dev11"
         private const val TWO_MINUTES = 1000 * 60 * 2;
         private fun makeGattUpdateIntentFilter(): IntentFilter {
             val intentFilter = IntentFilter()

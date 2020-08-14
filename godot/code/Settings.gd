@@ -1,6 +1,6 @@
 extends Node
 # alpha, beta, rc, preview, dev
-const VERSION = "0.3.1-dev10"
+const VERSION = "0.3.1-dev11"
 #Major.Minor.Micro
 const VERSION_MICRO_INT = 2  # Increment any time the micro changes.
 const DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
@@ -19,8 +19,11 @@ const __MAX_SIGNALS = 255  #  + 1 is the real max because S0 is a possible signa
 # 0=Rebuild Boot Splash Screen, 1=Print all Log Entries, 3=Typical Release Level.
 var DEBUG_LEVEL = 1  #DEBUG_LEVELS = ["not_set", "debug", "info", "warning", "error", "critical"]
 # Overide sequence_enforcer() on main menu, set below to true.
-var OVERRIDE_SEQUENCE_ENFORCER = true
+var OVERRIDE_SEQUENCE_ENFORCER = false
 var DEBUG_GUI = false
+var experimental_toggles = {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
+        "background_resource_loader":true, "gps_location": true, "gun_names":false, 
+        "map_downloads": true}
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
@@ -686,13 +689,12 @@ class Data:
 
 func _ready():
     print(Settings.GAME_NAME + ": Version: " + Settings.VERSION + " = Integer Version Number: " 
-        + str(Settings.VERSION_MICRO_INT))
+        + str(Settings.VERSION_MICRO_INT) + " | FrecoiL Plugin Loaded=" + str(Engine.has_singleton("FreecoiL")))
     Testing.loading_on_ready()
     Preferences.loading_on_ready()
     InGame.loading_on_ready()
     Session.loading_on_ready()
     Network.loading_on_ready()
-    Session.set_data("experimental_toggles", {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
-        "background_resource_loader":true, "gps_location": true, "gun_names":false})
+    Session.set_data("experimental_toggles", experimental_toggles)
     if OVERRIDE_SEQUENCE_ENFORCER:
         Testing.register_data("testing", true)
