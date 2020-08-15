@@ -36,7 +36,7 @@ func haversine_v0(lat1, long1, lat2, long2, radius=EARTH_RADIUS):
     var delta_long = rlong2 - rlong1
     var a  = pow(sin(delta_lat / 2), 2) + cos(rlat1) * cos(rlat2) * pow(sin(delta_long / 2), 2)
     var c = 2 * asin(sqrt(a))
-    return c * radius
+    return c * radius  # Distance between the 2 points.
 
 func haversine_v1(lat1, long1, lat2, long2, radius=EARTH_RADIUS):
     var rlat1 = deg2rad(lat1)
@@ -55,9 +55,9 @@ func bearing_from_to(lat1, long1, lat2, long2):
     var rlong1 = deg2rad(long1)
     var rlat2 = deg2rad(lat2)
     var rlong2 = deg2rad(long2)
-    var delta_long = rlong2 - rlong1
-    var x = cos(rlat1) * sin(rlat2) - sin(rlat1) * cos(rlat2) * cos(delta_long)
-    var y = sin(delta_long) * cos(rlat2)
+    var delta_rlong = rlong2 - rlong1
+    var x = cos(rlat1) * sin(rlat2) - sin(rlat1) * cos(rlat2) * cos(delta_rlong)
+    var y = sin(delta_rlong) * cos(rlat2)
     var bearing_rad = atan2(y, x)
     var bearing_deg = wrap360(rad2deg(bearing_rad))
     return bearing_deg
@@ -68,3 +68,45 @@ func wrap360(degrees_beyond):
         return degrees_beyond
     else:
         return fmod((fmod(degrees_beyond, 360.0) + 360.0), 360.0)
+        
+func midpoint(lat1, long1, lat2, long2):
+    var rlat1 = deg2rad(lat1)
+    var rlat2 = deg2rad(lat2)
+    var delta_rlong = rlong2 - rlong1
+    var xb = cos(rlat2) * cos(delta_rlong)
+    var yb = cos(rlat2) * sin(delta_rlong)
+    var mid_rlat = atan2(sin(rlat1) + sin(rlat2), sqrt(cos(rlat1) + xb) * cos(rlat1) + yb * yb))
+    var mid_rlong = atan2(yb, cos(rlat1) + xb)
+    return [wrap360(rad2deg(mid_rlat)), wrap360(rad2deg(mid_rlong))]
+    
+func get_dest_from_bearing_range(start_lat, start_long, distance, bearing):
+    var start_rlat = deg2rad(start_lat)
+    var start_rlong = deg2rad(start_long)
+    var dest_rlat = asin(sin(start_rlat) * cos(distance / EARTH_RADIUS) + cos(start_rlat) *
+        sin(distance / EARTH_RADIUS) * cos(bearing))
+    var dest_rlong = start_rlong + atan2(sin(bearing) * sin(distance / EARTH_RADIUS) * 
+        cos(start_rlat), cos(distance / EARTH_RADIUS) - sin(start_rlat) * sin(dest_rlong)
+    return [wrap360(rad2deg(dest_rlat)), wrap360(rad2deg(dest_rlong))]
+    
+func get_meters_per_pixel(zoom_lvl, latitude):
+    return 156543.03392 cos(latitude * PI / 180) / pow(2, zoom_lvl + 1)
+    
+func get_next_tile_from_center(center_lat, center_long, zoom_lvl, bearing):
+    var meters_per_px = get_meters_per_pixel(zomm_lvl, center_lat)
+    var distance = meters_per_px * 640
+    var next_tile_center = get_dest_from_bearing_range(center_lat, center_long, distance, bearing)
+    return next_tile_center
+
+func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
+    var north_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 0)
+    var north_east_tile_center = get_next_tile_from_center(north_tile_center[0], north_tile_center[1], zoom_lvl, 90)
+    var east_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 90)
+    var south_east_tile_center = get_next_tile_from_center(east_tile_center[0], east_tile_center[1], zoom_lvl, 180)
+    var south_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 180)
+    var south_west_tile_center = get_next_tile_from_center(south_tile_center[0], south_tile_center[1], zoom_lvl, 270)
+    var west_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 270)
+    var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
+    
+ func calc_map_movement():
+    pass
+    
