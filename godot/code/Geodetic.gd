@@ -106,7 +106,12 @@ func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
     var south_west_tile_center = get_next_tile_from_center(south_tile_center[0], south_tile_center[1], zoom_lvl, 270)
     var west_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 270)
     var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
-    
+   
+ func get_bearing_n_range(lat1, long1, lat2, long2):
+    var range = haversine_v0(lat1, long1, lat2, long2)
+    var bearing = bearing_from_to(lat1, long1, lat2, long2)
+    return [bearing, range]
+ 
  func calc_map_movement():
     pass
     
