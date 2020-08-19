@@ -72,10 +72,10 @@ func wrap360(degrees_beyond):
 func midpoint(lat1, long1, lat2, long2):
     var rlat1 = deg2rad(lat1)
     var rlat2 = deg2rad(lat2)
-    var delta_rlong = rlong2 - rlong1
+    var delta_rlong = deg2rad(long2) - deg2rad(long1)
     var xb = cos(rlat2) * cos(delta_rlong)
     var yb = cos(rlat2) * sin(delta_rlong)
-    var mid_rlat = atan2(sin(rlat1) + sin(rlat2), sqrt(cos(rlat1) + xb) * cos(rlat1) + yb * yb))
+    var mid_rlat = atan2(sin(rlat1) + sin(rlat2), sqrt(cos(rlat1) + xb) * cos(rlat1) + yb * yb)
     var mid_rlong = atan2(yb, cos(rlat1) + xb)
     return [wrap360(rad2deg(mid_rlat)), wrap360(rad2deg(mid_rlong))]
     
@@ -85,14 +85,14 @@ func get_dest_from_bearing_range(start_lat, start_long, distance, bearing):
     var dest_rlat = asin(sin(start_rlat) * cos(distance / EARTH_RADIUS) + cos(start_rlat) *
         sin(distance / EARTH_RADIUS) * cos(bearing))
     var dest_rlong = start_rlong + atan2(sin(bearing) * sin(distance / EARTH_RADIUS) * 
-        cos(start_rlat), cos(distance / EARTH_RADIUS) - sin(start_rlat) * sin(dest_rlong)
+        cos(start_rlat), cos(distance / EARTH_RADIUS) - sin(start_rlat) * sin(dest_rlat))
     return [wrap360(rad2deg(dest_rlat)), wrap360(rad2deg(dest_rlong))]
     
 func get_meters_per_pixel(zoom_lvl, latitude):
-    return 156543.03392 cos(latitude * PI / 180) / pow(2, zoom_lvl + 1)
+    return 156543.03392 * cos(latitude * PI / 180) / pow(2, zoom_lvl + 1)
     
 func get_next_tile_from_center(center_lat, center_long, zoom_lvl, bearing):
-    var meters_per_px = get_meters_per_pixel(zomm_lvl, center_lat)
+    var meters_per_px = get_meters_per_pixel(zoom_lvl, center_lat)
     var distance = meters_per_px * 640
     var next_tile_center = get_dest_from_bearing_range(center_lat, center_long, distance, bearing)
     return next_tile_center
@@ -107,11 +107,11 @@ func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
     var west_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 270)
     var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
    
- func get_bearing_n_range(lat1, long1, lat2, long2):
-    var range = haversine_v0(lat1, long1, lat2, long2)
+func get_bearing_n_range(lat1, long1, lat2, long2):
+    var distance = haversine_v0(lat1, long1, lat2, long2)  # distance == range
     var bearing = bearing_from_to(lat1, long1, lat2, long2)
-    return [bearing, range]
+    return [bearing, distance]
  
- func calc_map_movement():
+func calc_map_movement():
     pass
     
