@@ -57,6 +57,9 @@ build_apk:
     - ls -l /usr/lib/jvm/java-8-openjdk-amd64/bin/jarsigner
     - ls -l /root/android-sdk/
     - ls -l /root/android-sdk/debug.keystore
+    - ls -l /root/android-sdk/cmdline-tools/
+    - ls -l /root/android-sdk/cmdline-tools/latest/
+    - ls -l /root/android-sdk/cmdline-tools/latest/platform-tools/
     - ls -l /root/android-sdk/cmdline-tools/latest/platform-tools/adb
     - ls -l /root/android-sdk/cmdline-tools/latest/build-tools
     - ls -l /root/.local/share/godot/templates/3.2.2
