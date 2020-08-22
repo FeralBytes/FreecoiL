@@ -1,4 +1,4 @@
-image: myood/godot-ci-android-export:godot-3.2.2-beta4
+image: myood/godot-ci-android-export:godot-3.2.2
 
 #https://github.com/myood/godot-ci-android-export
 #https://github.com/myood/godot-ci-android-export/blob/master/.gitlab-ci.yml
@@ -55,18 +55,23 @@ build_apk:
     # This is simply (semi-manual :-)) double-check if editor settings are OK for debug export
     - grep android /root/.config/godot/editor_settings-3.tres
     - ls -l /usr/lib/jvm/java-8-openjdk-amd64/bin/jarsigner
-    - ls -l /root/android/
-    - ls -l /root/android/debug.keystore
-    - ls -l /root/android/platform-tools/adb
-    - ls -l /root/android/build-tools
-    - ls -l /root/.local/share/godot/templates/3.2.2.beta4
+    - ls -l /root/android-sdk/
+    - ls -l /root/android-sdk/debug.keystore
+    - ls -l /root/android-sdk/cmdline-tools/latest/platform-tools/adb
+    - ls -l /root/android-sdk/cmdline-tools/latest/build-tools
+    - ls -l /root/.local/share/godot/templates/3.2.2
+    # Quick check if basic settings are properly set
+    - grep -F "export/android/jarsigner =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls
+    - grep -F "export/android/debug_keystore =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls
+    - grep -F "export/android/adb =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls
+    - grep -F "export/android/custom_build_sdk_path =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls
     # Add the right build tools
     - set +o pipefail
-    - yes | ~/android/tools/bin/sdkmanager "build-tools;29.0.3" > /dev/null
+    - yes | ~/android-sdk/cmdline-tools/latest/bin/sdkmanager "build-tools;29.0.3" > /dev/null
     - set -o pipefail
-    - ls -l /root/android/build-tools
-    # Create directory for artifacts
-    #- mkdir -v -p export/android
+    - ls -l /root/android-sdk/cmdline-tools/latest/build-tools
+    # Prevent android build gradlew from failing due to not executable
+    - chmod +x android/build/gradlew
     # Export APP_VERSION
     - export APP_VERSION=$(python3 .gitlab/ci_scripts/extract_version.py)
     - godot --path godot --export-debug "Android" /builds/FeralBytes/FreecoiL/${APP_NAME}-Ver:${APP_VERSION}-debug.apk
@@ -75,3 +80,4 @@ build_apk:
     paths:
       - ./*.apk
     expire_in: 1 week
+

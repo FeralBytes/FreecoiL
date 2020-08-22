@@ -745,7 +745,7 @@ class FreecoiLPlugin(godot: Godot?) : GodotPlugin(godot) {
     override fun onMainPause() {}
     override fun onMainResume() {}
     override fun onMainDestroy() {}
-    override fun onMainCreateView(activity: Activity): View? {
+    override fun onMainCreate(activity: Activity): View? {
         appActivity = activity
         appContext = appActivity!!.applicationContext
         val view = activity.layoutInflater.inflate(R.layout.freecoil_view, null)
