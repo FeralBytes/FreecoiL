@@ -111,7 +111,36 @@ func get_bearing_n_range(lat1, long1, lat2, long2):
     var distance = haversine_v0(lat1, long1, lat2, long2)  # distance == range
     var bearing = bearing_from_to(lat1, long1, lat2, long2)
     return [bearing, distance]
- 
+
+# The mapping between latitude, longitude and pixels is defined by the web mercator projection.
+# https://developers.google.com/maps/documentation/javascript/examples/map-coordinates?hl=ko
+# https://developers.google.com/maps/documentation/javascript/coordinates
+func apply_projection(lat, long, tile_size):
+    var siny = sin((lat * PI) / 180.0)
+    # Truncating to 0.9999 effectively limits latitude to 89.189. This is
+    # about a third of a tile past the edge of the world tile.
+    if siny < -0.9999:
+        siny = -0.9999
+    if siny > 0.9999:
+        siny = 0.9999
+    # siny = min(max(siny, -0.9999), 0.9999)  # Creats a round/percision error.
+    var lat_to_x = tile_size * (0.5 + long / 360.0)
+    var long_to_y = tile_size * (0.5 - log((1.0 + siny) / (1.0 - siny)) / (4.0 * PI))
+    #var test = log((1.0 + siny) / (1.0 - siny))
+    var test = (1.0 + siny) / (1.0 - siny)
+    return [lat_to_x, long_to_y]
+
+func convert_lat_long_to_pixel(lat, long, zoom, tile_size):
+    var projected_lat_long = apply_projection(lat, long, 256)
+    lat = projected_lat_long[0]
+    long = projected_lat_long[1]
+    var x = (long + 180) / 360
+    var sin_latitude = sin(lat * PI / 180)
+    var y = 0.5 - log((1 + sin_latitude) / (1 - sin_latitude)) / (4 * PI)
+    var total_x = int(lat * pow(2, zoom))
+    var total_y = int(long * pow(2, zoom))
+    return [total_x, total_y]
+
 func calc_map_movement():
     pass
     

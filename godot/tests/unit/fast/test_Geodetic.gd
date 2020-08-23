@@ -52,3 +52,28 @@ func test_wrap360():
     assert_eq(_obj.wrap360(0), 0.0)
     assert_eq(_obj.wrap360(722), 2.0)
     assert_almost_eq(_obj.wrap360(722.56), 2.56, 0.01)
+
+func test_apply_projection():
+    var results = _obj.apply_projection(41.85, -87.65, 256)  # Chicago, Illionois, USA
+    assert_almost_eq(results[0], 65.67111111111112, 0.00000000000001)
+    assert_almost_eq(results[1], 95.17492654697409, 0.00000000000001)
+    results = _obj.apply_projection(61.3533146,-163.4431429, 256)  # Yukon Delta National Wildlife Refuge, Alaska, USA
+    assert_almost_eq(results[0], 11.77376504888889, 0.00000000000001)
+    assert_almost_eq(results[1], 72.37692684178135, 0.00000000000001)
+    results = _obj.apply_projection(50.1213479, 8.4964819, 256)  # Frankfurt, Germany
+    assert_almost_eq(results[0], 134.04194268444445, 0.00000000000001)
+    assert_almost_eq(results[1], 86.68664622374683, 0.00000000000001)
+    results = _obj.apply_projection(-34.6156625, -58.503338, 256)  # Buenos Aires, Argentina
+    assert_almost_eq(results[0], 86.39762631111111, 0.00000000000001)
+    assert_almost_eq(results[1], 154.266087980084, 0.00000000000001)
+    
+    
+func test_lat_long_to_pixel():
+    # Chicago, Illionois, USA
+    assert_eq(_obj.convert_lat_long_to_pixel(41.85, -87.65, 19, 640), [34430575, 49899071])
+    # Yukon Delta National Wildlife Refuge, Alaska, USA
+    assert_eq(_obj.convert_lat_long_to_pixel(61.3533146,-163.4431429, 19, 640), [6172843, 37946354])
+    # Frankfurt, Germany
+    assert_eq(_obj.convert_lat_long_to_pixel(50.1213479, 8.4964819, 19, 640), [70276582, 45448768])
+    # Buenos Aires, Argentina
+    assert_eq(_obj.convert_lat_long_to_pixel(-34.6156625, -58.503338, 19, 640), [45297238, 80879858])

@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 if getpass.getuser() == "wolfrage":
-    app_path = pathlib.Path("~/Apps/Godot/Godot_v3.2.2-beta3_x11.64").expanduser()
+    app_path = pathlib.Path("~/Apps/Godot/Godot_v3.2.2-stable_x11.64").expanduser()
 else:
     app_path = cwd.joinpath("/usr/local/bin/godot")
 cwd = pathlib.Path.cwd()
