@@ -214,8 +214,9 @@ func calc_map_movement(player_new_lat, player_new_long, zoom):  # We move the ma
     moved_x = player_x - map_origin_x
     moved_y = player_y - map_origin_y
     return [moved_x, moved_y]
-    
-func plot_entity_by_lat_long_from_origin_in_px(entity_lat, entity_long, zoom):
+
+# Long Name: plot_entity_by_lat_long_from_origin_in_px()
+func plot_entity(entity_lat, entity_long, zoom):
     var results = convert_lat_long_to_pixel(entity_lat, entity_long, zoom)
     var entity_x = map_origin_x - results[0]
     var entity_y = map_origin_y - results[1]
