@@ -70,6 +70,11 @@ func test_apply_projection():
 func test_lat_long_to_pixel():
     # Chicago, Illionois, USA
     assert_eq(_obj.convert_lat_long_to_pixel(41.850004, -87.6521887, 19), [34429759, 49899069])
+    # Test Close changes of longitude:
+    assert_eq(_obj.convert_lat_long_to_pixel(41.850006, -87.6521873, 19), [34429760, 49899068])
+    assert_eq(_obj.convert_lat_long_to_pixel(41.850006, -87.6521874, 19), [34429759, 49899068])
+    assert_eq(_obj.convert_lat_long_to_pixel(41.850006, -87.6521900, 19), [34429759, 49899068])
+    assert_eq(_obj.convert_lat_long_to_pixel(41.850006, -87.6521901, 19), [34429758, 49899068])
     # Yukon Delta National Wildlife Refuge, Alaska, USA
     assert_eq(_obj.convert_lat_long_to_pixel(61.3533146,-163.4431429, 19), [6172843, 37946354])
     # Frankfurt, Germany
@@ -112,9 +117,9 @@ func test_calc_map_movement():
     # Reset to center.
     assert_eq(_obj.calc_map_movement(41.850004, -87.6521887, 19), [0, 0])
     # Move East which will cause the map to shift to the West.
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521885, 19), [1, 0])
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521873, 19), [1, 0])
     # Move West which will cause the map to shift to the East.
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521889, 19), [-1, 0])
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521901, 19), [-1, 0])
     
 func test_plot_entity():
     _obj.set_map_origin(41.850004, -87.6521887, 19)
@@ -125,9 +130,9 @@ func test_plot_entity():
     # Plot entity at map origin.
     assert_eq(_obj.plot_entity(41.850004, -87.6521887, 19), [0, 0])
     # Plot entity to the East.
-    assert_eq(_obj.plot_entity(41.850004, -87.6521885, 19), [-1, 0])
+    assert_eq(_obj.plot_entity(41.850004, -87.6521873, 19), [-1, 0])
     # Plot entity to the West.
-    assert_eq(_obj.plot_entity(41.850004, -87.6521889, 19), [1, 0])
+    assert_eq(_obj.plot_entity(41.850004, -87.6521901, 19), [1, 0])
 
 #########################################
 # Example Data

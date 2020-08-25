@@ -37,18 +37,28 @@ func poly_offset():
         return Vector2(size/2 + border_size, size/2 + border_size)
     return Vector2(0,0)
 
-func poly_pts(p_size):
+func poly_pts(p_size, is_border=false):
     p_size /= 2
     var th = 2*PI/num_sides
     var pts = PoolVector2Array()
     var off = poly_offset()
+    var first_point = null
     vlog("off: ", off)
     for i in range(num_sides):
+        if i == 0:
+            if is_border:
+                first_point = off + polar2cartesian(p_size, deg2rad(-90+polygon_rotation) + i*th)
         pts.append(off + polar2cartesian(p_size, deg2rad(-90+polygon_rotation) + i*th))
+    if is_border:
+        pts.append(first_point)
     return pts
 
 func draw_poly(p_size, p_color, p_texture, is_border=false):
-    var pts = poly_pts(p_size)
+    var pts = []
+    if is_border:
+        pts = poly_pts(p_size, true)
+    else:
+        pts = poly_pts(p_size)
 
     var uvs = PoolVector2Array()	
     if p_texture:

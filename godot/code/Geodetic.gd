@@ -209,15 +209,13 @@ func set_map_origin(lat, long, zoom):
 
 func calc_map_movement(player_new_lat, player_new_long, zoom):  # We move the map because the player is the center of our universe.
     var results = convert_lat_long_to_pixel(player_new_lat, player_new_long, zoom)
-    player_x = results[0]
-    player_y = results[1]
-    moved_x = player_x - map_origin_x
-    moved_y = player_y - map_origin_y
+    moved_x = results[0] - map_origin_x
+    moved_y = map_origin_y - results[1]
     return [moved_x, moved_y]
 
 # Long Name: plot_entity_by_lat_long_from_origin_in_px()
 func plot_entity(entity_lat, entity_long, zoom):
     var results = convert_lat_long_to_pixel(entity_lat, entity_long, zoom)
     var entity_x = map_origin_x - results[0]
-    var entity_y = map_origin_y - results[1]
+    var entity_y = results[1] - map_origin_y
     return [entity_x, entity_y]

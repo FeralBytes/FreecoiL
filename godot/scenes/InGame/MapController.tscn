@@ -14,10 +14,10 @@ var count = 0
 onready var Radar = get_node(\"Hexagon2/PlayerMarker/Radar\")
 onready var RadarPulseTimer = get_node(\"RadarPulse\")
 onready var MapDownloader = get_node(\"MapDownloader\")
-onready var CenterTile = get_node(\"Hexagon2/MapMoverContainer/Center\")
+onready var CenterTile = get_node(\"MapMoverContainer/Center\")
 onready var Geodetic = preload(\"res://code/Geodetic.gd\").new()
 onready var RegularPolygon2D = preload(\"res://addons/regular_polygon2d_node/RegularPolygon2D.gd\")
-onready var MapContainer = get_node(\"Hexagon2/MapMoverContainer\")
+onready var MapContainer = get_node(\"MapMoverContainer\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -55,23 +55,22 @@ func map_tile_downloaded(result, response_code, headers, body):
 
 func pulse_radar():
     running_test()
-    Radar.border_size = 30
     Radar.visible = true
     while true:
         if Radar.size > 600:
             Radar.size = 10
-            Radar.border_size = 1
             Radar.visible = false
             RadarPulseTimer.start(RadarPulseTimer.wait_time)
             break
         else:
             Radar.size += 5
-            yield(get_tree().create_timer(0.001), \"timeout\")
+            yield(get_tree().create_timer(0.01), \"timeout\")
 
 func running_test():
     player_position[\"latitude\"] -= 0.000001
+    #player_position[\"longitude\"] -= 0.000001
     var map_container_new_xy = Geodetic.calc_map_movement(player_position[\"latitude\"], player_position[\"longitude\"], 19)
-    print(map_container_new_xy)
+    print(str(player_position) + \"  | \" + str(map_container_new_xy))
     MapContainer.position.x = map_container_new_xy[0]
     MapContainer.position.y = map_container_new_xy[1]
     if count == 30:
@@ -97,87 +96,83 @@ func test_add_another_marker():
 [node name="MapController" type="Node2D"]
 script = SubResource( 1 )
 
+[node name="MapMoverContainer" type="Node2D" parent="."]
+
+[node name="Center" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+texture = ExtResource( 2 )
+offset = Vector2( 270, 403 )
+
+[node name="MapOrigin" type="Node2D" parent="MapMoverContainer/Center"]
+script = ExtResource( 1 )
+centered = true
+num_sides = 5
+size = 20.0
+polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
+border_size = 4.0
+border_color = Color( 0.258824, 0.258824, 0.258824, 1 )
+
+[node name="West" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 403 )
+texture = ExtResource( 2 )
+
+[node name="NorthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, -237 )
+texture = ExtResource( 2 )
+
+[node name="North" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, -237 )
+texture = ExtResource( 2 )
+
+[node name="NorthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, -237 )
+texture = ExtResource( 2 )
+
+[node name="East" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 403 )
+texture = ExtResource( 2 )
+
+[node name="SouthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 1043 )
+texture = ExtResource( 2 )
+
+[node name="South" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, 1043 )
+texture = ExtResource( 2 )
+
+[node name="SouthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 1043 )
+texture = ExtResource( 2 )
+
 [node name="Hexagon2" type="Node2D" parent="."]
 position = Vector2( 270, 403 )
 rotation = 1.5708
 script = ExtResource( 1 )
+__meta__ = {
+"_editor_description_": "Rotation is 90 so transforms are backwards!"
+}
 centered = true
 num_sides = 6
 size = 540.0
 polygon_color = Color( 1, 1, 1, 0 )
 border_size = 0.0
 
-[node name="MapMoverContainer" type="Node2D" parent="Hexagon2"]
-
-[node name="Center" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="MapOrigin" type="Node2D" parent="Hexagon2/MapMoverContainer/Center"]
-script = ExtResource( 1 )
-centered = true
-num_sides = 5
-size = 14.0
-polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
-border_size = 8.0
-border_color = Color( 0.258824, 0.258824, 0.258824, 1 )
-
-[node name="North" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( -640, 0 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="NorthEast" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( -640, -640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="East" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( 0, -640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="SouthEast" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( 640, -640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="South" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( 640, 0 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="SouthWest" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( 640, 640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="West" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( 0, 640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
-[node name="NorthWest" type="Sprite" parent="Hexagon2/MapMoverContainer"]
-show_behind_parent = true
-position = Vector2( -640, 640 )
-rotation = -1.5708
-texture = ExtResource( 2 )
-
 [node name="PlayerMarker" type="Node2D" parent="Hexagon2"]
 script = ExtResource( 1 )
 centered = true
 size = 26.0
 polygon_color = Color( 0, 0.0941176, 0.847059, 1 )
+border_size = 0.0
 border_color = Color( 0, 0.0941176, 0.847059, 1 )
-polygon_rotation = 30.0
+polygon_rotation = -90.0
 
 [node name="Radar" type="Node2D" parent="Hexagon2/PlayerMarker"]
 visible = false
@@ -186,9 +181,9 @@ script = ExtResource( 1 )
 centered = true
 num_sides = 6
 size = 10.0
-polygon_color = Color( 1, 1, 1, 0.0862745 )
-border_size = 1.0
-border_color = Color( 0, 0.0156863, 1, 0.152941 )
+polygon_color = Color( 0, 0.0156863, 1, 0.121569 )
+border_size = 2.0
+border_color = Color( 0, 0.0156863, 1, 0.231373 )
 
 [node name="BlockingNodes" type="Node2D" parent="."]
 
