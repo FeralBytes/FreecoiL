@@ -103,10 +103,31 @@ func test_convert_pixel_to_lat_long():
     assert_almost_eq(results[1], -87.6521887, 0.00001)
 
 func test_calc_map_movement():
-    pass
+    _obj.set_map_origin(41.850004, -87.6521887, 19)
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521887, 19), [0, 0])
+    # Move North which will cause the map to shift to the South.
+    assert_eq(_obj.calc_map_movement(41.850006, -87.6521887, 19), [0, 1])
+    # Move South which will cause the map to shift to the North.
+    assert_eq(_obj.calc_map_movement(41.850002, -87.6521887, 19), [0, -1])
+    # Reset to center.
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521887, 19), [0, 0])
+    # Move East which will cause the map to shift to the West.
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521885, 19), [1, 0])
+    # Move West which will cause the map to shift to the East.
+    assert_eq(_obj.calc_map_movement(41.850004, -87.6521889, 19), [-1, 0])
     
-func test_plot_entity_by_lat_long_from_origin_in_px():
-    pass
+func test_plot_entity():
+    _obj.set_map_origin(41.850004, -87.6521887, 19)
+    # Plot entity to the North.
+    assert_eq(_obj.plot_entity(41.850006, -87.6521887, 19), [0, -1])
+    # Plot entity to the South.
+    assert_eq(_obj.plot_entity(41.850002, -87.6521887, 19), [0, 1])
+    # Plot entity at map origin.
+    assert_eq(_obj.plot_entity(41.850004, -87.6521887, 19), [0, 0])
+    # Plot entity to the East.
+    assert_eq(_obj.plot_entity(41.850004, -87.6521885, 19), [-1, 0])
+    # Plot entity to the West.
+    assert_eq(_obj.plot_entity(41.850004, -87.6521889, 19), [1, 0])
 
 #########################################
 # Example Data
