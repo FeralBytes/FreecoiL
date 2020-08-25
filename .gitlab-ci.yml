@@ -59,7 +59,8 @@ build_apk:
     - ls -l /root/android-sdk/debug.keystore
     - ls -l /root/android-sdk/cmdline-tools/
     - ls -l /root/android-sdk/cmdline-tools/latest/
-    - ls -l /root/.local/share/godot/templates/3.2.2
+    - ls -l /root/.local/share/godot/templates/
+    #- ls -l /root/.local/share/godot/templates/3.2.2
     # Quick check if basic settings are properly set
     - grep -F "export/android/jarsigner =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls
     - grep -F "export/android/debug_keystore =" ~/.config/godot/editor_settings-3.tres | grep '".*"' -o | xargs ls

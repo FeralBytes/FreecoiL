@@ -1,6 +1,6 @@
 extends Node
 
-const EARTH_RADIUS = 6371000  # in meters
+const EARTH_RADIUS = 6371000.0  # in meters
 #const EARTH_RADIUS = 6372800  # in meters
 #-- 6371.0 km is the authalic radius based on/extracted from surface area;
 # -- 6372.8 km is an approximation of the radius of the average circumference
@@ -23,8 +23,16 @@ const EARTH_RADIUS = 6371000  # in meters
 #the mean earth radius, 6371 km. This value is recommended by the International 
 #Union of Geodesy and Geophysics and it minimizes the RMS relative error between 
 #the great circle and geodesic distance.
-
 # https://www.movable-type.co.uk/scripts/latlong.html
+
+var map_origin_lat
+var map_origin_long
+var map_origin_x
+var map_origin_y
+var player_x
+var player_y
+var moved_x
+var moved_y
 
 func haversine_v0(lat1, long1, lat2, long2, radius=EARTH_RADIUS):
     # Version 0 of the formula was fastest in testing.
@@ -123,24 +131,92 @@ func apply_projection(lat, long, tile_size):
         siny = -0.9999
     if siny > 0.9999:
         siny = 0.9999
-    # siny = min(max(siny, -0.9999), 0.9999)  # Creats a round/percision error.
     var lat_to_x = tile_size * (0.5 + long / 360.0)
     var long_to_y = tile_size * (0.5 - log((1.0 + siny) / (1.0 - siny)) / (4.0 * PI))
-    #var test = log((1.0 + siny) / (1.0 - siny))
-    var test = (1.0 + siny) / (1.0 - siny)
     return [lat_to_x, long_to_y]
 
-func convert_lat_long_to_pixel(lat, long, zoom, tile_size):
-    var projected_lat_long = apply_projection(lat, long, 256)
+
+func convert_lat_long_to_pixel(lat, long, zoom):
+    var projected_lat_long = apply_projection(lat, long, 256)  # 256 is the constant used by Google.
     lat = projected_lat_long[0]
     long = projected_lat_long[1]
-    var x = (long + 180) / 360
-    var sin_latitude = sin(lat * PI / 180)
-    var y = 0.5 - log((1 + sin_latitude) / (1 - sin_latitude)) / (4 * PI)
     var total_x = int(lat * pow(2, zoom))
     var total_y = int(long * pow(2, zoom))
     return [total_x, total_y]
 
-func calc_map_movement():
-    pass
+func convert_pixel_to_projection(x, y, zoom):
+    var scale = pow(2, zoom)
+    var projection_x = x / scale
+    var projection_y = y / scale
+    return [projection_x, projection_y]
+
+func convert_pixel_to_projection_attempt_beter(x, y, zoom):
+    # Ultimately this failed: time to move on.
+    # https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
+    var scale = pow(2, zoom)
+    var lat_quotient = floor(x / 256)
+    var long_qoutient = floor(y / 256)
+    var lat_whole = lat_quotient * 256
+    var long_whole = long_qoutient * 256
+    var lat_remains = x - lat_whole
+    var long_remains = y - long_whole
+    var almost_lat = lat_whole / scale
+    var almost_long = long_whole / scale
+    # to make all of the extra stuff work below, we would have to accept that 
+    # the calculated projection value would always be off, and then we have to 
+    # pass out the remain meters and in the final conversion to lat long we 
+    # could then add in the missing meters and then maybe it would come out 
+    # correctly.
+    print("almost_lat = " + str(almost_lat) + " | lat_remains = " + str(lat_remains))
+    print("almost_long = " + str(almost_long) + " | long_remains = " + str(long_remains))
+    var lat_long = convert_projection_to_lat_long(almost_lat, almost_long, zoom, 256)
+    var mets_per_px = get_meters_per_pixel(zoom, lat_long[0])
+    print("Meters Per Pixel = %0.8f" % mets_per_px)
+    var mets_in_lat = mets_per_px * lat_remains
+    # number of km per degree = ~111km (111.32 in google maps, but range varies
+    # between 110.567km at the equator and 111.699km at the poles)
+    # 1km in degree = 1 / 111.32km = 0.0089
+    # 1m in degree = 0.0089 / 1000 = 0.0000089
+    var coef = mets_in_lat *  0.000008983
+    print("coef = " + str(coef))
+    var lat = almost_lat + coef
+    print("lat = " + str(lat) + " | almost_lat = " + str(almost_lat))
+    return [almost_lat, almost_long]
+
+func total_tiles_at_zoom(zoom):
+    return pow(2, zoom) * pow(2, zoom)
     
+func get_tile_coordinates_from_x_y(x, y, tile_size):
+    return [int(x / tile_size), int(y / tile_size)]
+
+func convert_projection_to_lat_long(projected_x, projected_y, zoom, tile_size):  #reverse_projection
+    # https://gis.stackexchange.com/questions/66247/what-is-the-formula-for-calculating-world-coordinates-for-a-given-latlng-in-goog
+    var long = projected_x / 256 * 360 - 180
+    var n = PI - 2 * PI * projected_y / 256
+    var lat = (180 / PI * atan(0.5 * (exp(n) - exp(-n))))
+    return [lat, long]
+    
+func convert_pixel_to_lat_long(x, y, zoom, tile_size):
+    var result = convert_pixel_to_projection(x, y, zoom)
+    return convert_projection_to_lat_long(result[0], result[1], zoom, tile_size)
+
+func set_map_origin(lat, long, zoom):
+    map_origin_lat = lat
+    map_origin_long = long
+    var results = convert_lat_long_to_pixel(lat, long, zoom)
+    map_origin_x = results[0]
+    map_origin_y = results[1]
+
+func calc_map_movement(player_new_lat, player_new_long, zoom):  # We move the map because the player is the center of our universe.
+    var results = convert_lat_long_to_pixel(player_new_lat, player_new_long, zoom)
+    player_x = results[0]
+    player_y = results[1]
+    moved_x = player_x - map_origin_x
+    moved_y = player_y - map_origin_y
+    return [moved_x, moved_y]
+    
+func plot_entity_by_lat_long_from_origin_in_px(entity_lat, entity_long, zoom):
+    var results = convert_lat_long_to_pixel(entity_lat, entity_long, zoom)
+    var entity_x = map_origin_x - results[0]
+    var entity_y = map_origin_y - results[1]
+    return [entity_x, entity_y]
