@@ -84,7 +84,7 @@ func test_add_another_marker():
     var new_marker_pos = {\"latitude\": player_position[\"latitude\"], \"longitude\": player_position[\"longitude\"] + 0.000005}
     var marker = RegularPolygon2D.new()
     CenterTile.add_child(marker)
-    var new_marker_px_pos = Geodetic.plot_entity_by_lat_long_from_origin_in_px(new_marker_pos[\"latitude\"], new_marker_pos[\"longitude\"], 19)
+    var new_marker_px_pos = Geodetic.plot_entity(new_marker_pos[\"latitude\"], new_marker_pos[\"longitude\"], 19)
     marker.position = Vector2(new_marker_px_pos[0], new_marker_px_pos[1])
     print(\"marker data\")
     print(marker.position)
