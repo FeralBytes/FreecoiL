@@ -131,9 +131,9 @@ func apply_projection(lat, long, tile_size):
         siny = -0.9999
     if siny > 0.9999:
         siny = 0.9999
-    var lat_to_x = tile_size * (0.5 + long / 360.0)
-    var long_to_y = tile_size * (0.5 - log((1.0 + siny) / (1.0 - siny)) / (4.0 * PI))
-    return [lat_to_x, long_to_y]
+    var long_to_x = tile_size * (0.5 + long / 360.0)
+    var lat_to_y = tile_size * (0.5 - log((1.0 + siny) / (1.0 - siny)) / (4.0 * PI))
+    return [long_to_x, lat_to_y]
 
 
 func convert_lat_long_to_pixel(lat, long, zoom):
