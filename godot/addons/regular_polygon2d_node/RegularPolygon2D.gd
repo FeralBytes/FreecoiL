@@ -47,7 +47,7 @@ func poly_pts(p_size):
         pts.append(off + polar2cartesian(p_size, deg2rad(-90+polygon_rotation) + i*th))
     return pts
 
-func draw_poly(p_size, p_color, p_texture):
+func draw_poly(p_size, p_color, p_texture, is_border=false):
     var pts = poly_pts(p_size)
 
     var uvs = PoolVector2Array()	
@@ -59,12 +59,15 @@ func draw_poly(p_size, p_color, p_texture):
 
     vlog("pts: ", pts)
     vlog("uvs: ", uvs)
-    draw_colored_polygon(pts, p_color, uvs, p_texture, polygon_texture, true)
+    if is_border:
+        draw_polyline(pts, p_color, border_size, true)
+    else:
+        draw_colored_polygon(pts, p_color, uvs, p_texture, polygon_texture, true)
     
 func _notification(what):
     if what == NOTIFICATION_DRAW:
         if border_size > 0:
-            draw_poly(size + border_size, border_color, null)
+            draw_poly(size + border_size, border_color, null, true)
         draw_poly(size, polygon_color, polygon_texture)
     if what == NOTIFICATION_READY:
         vlog("enter tree")
