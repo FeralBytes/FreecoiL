@@ -114,6 +114,8 @@ func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
     var south_west_tile_center = get_next_tile_from_center(south_tile_center[0], south_tile_center[1], zoom_lvl, 270)
     var west_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 270)
     var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
+    return [north_tile_center, north_east_tile_center, east__tile_center, south_east_tile_center, south_tile_center, 
+            south_west_tile_center, west_tile_center, north_west_tile_center]
    
 func get_bearing_n_range(lat1, long1, lat2, long2):
     var distance = haversine_v0(lat1, long1, lat2, long2)  # distance == range
