@@ -219,3 +219,54 @@ func plot_entity(entity_lat, entity_long, zoom):
     var entity_x = map_origin_x - results[0]
     var entity_y = results[1] - map_origin_y
     return [entity_x, entity_y]
+
+# Specifically when enough of a difference in latitude will cause a change in "y" pixel coordinates.
+func calc_difference_for_lat_change():
+    if map_orig_lat == null:
+        return null
+    var diff = 0.0
+    var var_lat = map_orig_lat
+    var pos_diff_lat = 0.0
+    var neg_diff_lat = 0.0
+    var temp_y
+    while true:
+        var_lat += 0.0000001
+        temp_y = plot_entity(var_lat, map_orig_long)[1]
+        if temp_y == 1:
+            pos_diff_lat = var_lat - map_orig_lat
+            break
+    var_lat = map_orig_lat
+    while true:
+        var_lat -= 0.0000001
+        temp_y = plot_entity(var_lat, map_orig_long)[1]
+        if temp_y == -1:
+            neg_diff_lat = map_orig_lat - var_lat
+            break
+    diff = neg_diff_lat + pos_diff_lat
+    return diff
+
+# Specifically when enough of a difference in longitude will cause a change in "x" pixel coordinates.
+func calc_difference_for_long_change():  
+    if map_orig_long == null:
+        return null
+    var diff = 0.0
+    var var_long = map_orig_long
+    var pos_diff_long = 0.0
+    var neg_diff_long = 0.0
+    var temp_x
+    while true:
+        var_long += 0.0000001
+        temp_x = plot_entity(map_orig_lat, var_long)[0]
+        if temp_x == 1:
+            pos_diff_long = var_long - map_orig_long
+            break
+    var_long = map_orig_long
+    while true:
+        var_long -= 0.0000001
+        temp_x = plot_entity(map_orig_lat, var_long)[0]
+        if temp_x == -1:
+            neg_diff_long = map_orig_long - var_long
+            break
+    diff = neg_diff_long + pos_diff_long
+    return diff
+    
