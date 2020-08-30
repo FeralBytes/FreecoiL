@@ -114,7 +114,7 @@ func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
     var south_west_tile_center = get_next_tile_from_center(south_tile_center[0], south_tile_center[1], zoom_lvl, 270)
     var west_tile_center = get_next_tile_from_center(center_lat, center_long, zoom_lvl, 270)
     var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
-    return [north_tile_center, north_east_tile_center, east__tile_center, south_east_tile_center, south_tile_center, 
+    return [north_tile_center, north_east_tile_center, east_tile_center, south_east_tile_center, south_tile_center, 
             south_west_tile_center, west_tile_center, north_west_tile_center]
    
 func get_bearing_n_range(lat1, long1, lat2, long2):
@@ -223,51 +223,51 @@ func plot_entity(entity_lat, entity_long, zoom):
     return [entity_x, entity_y]
 
 # Specifically when enough of a difference in latitude will cause a change in "y" pixel coordinates.
-func calc_difference_for_lat_change():
-    if map_orig_lat == null:
+func calc_difference_for_lat_change(zoom):
+    if map_origin_lat == null:
         return null
     var diff = 0.0
-    var var_lat = map_orig_lat
+    var var_lat = map_origin_lat
     var pos_diff_lat = 0.0
     var neg_diff_lat = 0.0
     var temp_y
     while true:
         var_lat += 0.0000001
-        temp_y = plot_entity(var_lat, map_orig_long)[1]
+        temp_y = plot_entity(var_lat, map_origin_long, zoom)[1]
         if temp_y == 1:
-            pos_diff_lat = var_lat - map_orig_lat
+            pos_diff_lat = var_lat - map_origin_lat
             break
-    var_lat = map_orig_lat
+    var_lat = map_origin_lat
     while true:
         var_lat -= 0.0000001
-        temp_y = plot_entity(var_lat, map_orig_long)[1]
+        temp_y = plot_entity(var_lat, map_origin_long, zoom)[1]
         if temp_y == -1:
-            neg_diff_lat = map_orig_lat - var_lat
+            neg_diff_lat = map_origin_lat - var_lat
             break
     diff = neg_diff_lat + pos_diff_lat
     return diff
 
 # Specifically when enough of a difference in longitude will cause a change in "x" pixel coordinates.
-func calc_difference_for_long_change():  
-    if map_orig_long == null:
+func calc_difference_for_long_change(zoom):  
+    if map_origin_long == null:
         return null
     var diff = 0.0
-    var var_long = map_orig_long
+    var var_long = map_origin_long
     var pos_diff_long = 0.0
     var neg_diff_long = 0.0
     var temp_x
     while true:
         var_long += 0.0000001
-        temp_x = plot_entity(map_orig_lat, var_long)[0]
+        temp_x = plot_entity(map_origin_lat, var_long, zoom)[0]
         if temp_x == 1:
-            pos_diff_long = var_long - map_orig_long
+            pos_diff_long = var_long - map_origin_long
             break
-    var_long = map_orig_long
+    var_long = map_origin_long
     while true:
         var_long -= 0.0000001
-        temp_x = plot_entity(map_orig_lat, var_long)[0]
+        temp_x = plot_entity(map_origin_lat, var_long, zoom)[0]
         if temp_x == -1:
-            neg_diff_long = map_orig_long - var_long
+            neg_diff_long = map_origin_long - var_long
             break
     diff = neg_diff_long + pos_diff_long
     return diff

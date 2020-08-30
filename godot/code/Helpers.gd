@@ -137,3 +137,19 @@ func get_loaded_resource_from_background(thread_num):
     if tear_down:
         background_threads.remove(thread_num)
     return loaded_resource
+
+func list_files_in_directory(path):
+    var files = []
+    var dir = Directory.new()
+    dir.open(path)
+    dir.list_dir_begin(true)
+    while true:
+        var file = dir.get_next()
+        if file == "":
+            break
+        else:
+            if dir.current_is_dir():
+                files.append(file)
+            else:
+                break
+    return files

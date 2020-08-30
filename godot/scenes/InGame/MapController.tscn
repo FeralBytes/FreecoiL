@@ -21,7 +21,6 @@ onready var MapContainer = get_node(\"MapMoverContainer\")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-    
     var current_location = Settings.Session.get_data(\"fi_current_location\")
     if current_location == null: # Testing
         current_location = {\"latitude\": 41.850004, \"longitude\": -87.6521887}
@@ -32,6 +31,7 @@ func _ready():
     RadarPulseTimer.wait_time = RADAR_PULSE_RATE
     RadarPulseTimer.connect(\"timeout\", self, \"pulse_radar\")
     RadarPulseTimer.start(RadarPulseTimer.wait_time)
+    check_for_existing_maps()
     MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
     var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
         str(current_location[\"latitude\"]) + \",\" + str(current_location[\"longitude\"]) + 
@@ -49,6 +49,7 @@ func map_tile_downloaded(result, response_code, headers, body):
         print(headers)
         print(body)
     else:
+        
         var texture = ImageTexture.new()
         texture.create_from_image(image)
         CenterTile.texture = texture
@@ -91,6 +92,18 @@ func test_add_another_marker():
     marker.num_sides = 10
     marker.size = 26
     marker.polygon_color = Color(Color.crimson)
+
+func check_for_existing_maps():
+    var files = Helpers.list_files_in_directory(\"user://maps/\")
+    if files == []:
+        return false
+    else:
+        return true
+
+func save_map_tile():
+    var dir_check = Directory.new()
+    dir_check.dir_exists(\"user://maps/\")
+    
 "
 
 [node name="MapController" type="Node2D"]
@@ -109,7 +122,6 @@ centered = true
 num_sides = 5
 size = 20.0
 polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
-border_size = 4.0
 border_color = Color( 0.258824, 0.258824, 0.258824, 1 )
 
 [node name="West" type="Sprite" parent="MapMoverContainer"]
