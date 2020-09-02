@@ -272,3 +272,4 @@ func calc_difference_for_long_change(zoom):
     diff = neg_diff_long + pos_diff_long
     return diff
     
+

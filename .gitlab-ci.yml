@@ -4,6 +4,7 @@ image: myood/godot-ci-android-export:godot-3.2.2
 #https://github.com/myood/godot-ci-android-export/blob/master/.gitlab-ci.yml
 #https://hub.docker.com/r/myood/godot-ci-android-export/tags
 
+
 variables:
   APP_NAME: "FreecoiL"
 
