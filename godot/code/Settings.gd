@@ -23,7 +23,7 @@ var OVERRIDE_SEQUENCE_ENFORCER = false
 var DEBUG_GUI = false
 var experimental_toggles = {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
         "background_resource_loader":true, "gps_location": true, "gun_names":false, 
-        "map_downloads": true, "awesome_new_feature": false}
+        "map_downloads": true, "awesome_new_feature": true}
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
