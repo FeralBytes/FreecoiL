@@ -309,7 +309,7 @@ func force_player_name(current_menu):
                 LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
                 LoginPlayerAudio.play()
     if Settings.Session.get_data(\"experimental_toggles\")[\"awesome_feature2\"]:
-        pass
+        print(\"Everything is Awesome!\")
     else:
         pass
             
