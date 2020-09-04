@@ -10,6 +10,7 @@ const RADAR_PULSE_RATE = 0.2
 
 var player_position = {}
 var count = 0
+var last_downloaded_tile_coords
 
 onready var Radar = get_node(\"Hexagon2/PlayerMarker/Radar\")
 onready var RadarPulseTimer = get_node(\"RadarPulse\")
@@ -31,13 +32,21 @@ func _ready():
     RadarPulseTimer.wait_time = RADAR_PULSE_RATE
     RadarPulseTimer.connect(\"timeout\", self, \"pulse_radar\")
     RadarPulseTimer.start(RadarPulseTimer.wait_time)
-    check_for_existing_maps()
-    MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
-    var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
-        str(current_location[\"latitude\"]) + \",\" + str(current_location[\"longitude\"]) + 
-        \"&zoom=19&scale=1&size=640x640&maptype=hybrid&key=\" + FreecoiLInterface.API_KEY)
-    if http_error != OK:
-        print(\"An error occurred in the HTTP request.\")
+    if check_for_existing_maps():
+        # Need to check if the existing tiles meet the needs of the current map origin.
+        var existing_close_tile = check_if_existing_tile_is_close()
+        if existing_close_tile == false:
+            pass  # Download new maps instead.
+           else:
+            pass  # Need to check if we have the neighbor tiles.
+    else:
+        MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
+        last_downloaded_tile_coords = [current_location[\"latitude\"], current_location[\"longitude\"]]
+        var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
+            str(current_location[\"latitude\"]) + \",\" + str(current_location[\"longitude\"]) + 
+            \"&zoom=19&scale=1&size=640x640&maptype=hybrid&key=\" + FreecoiLInterface.API_KEY)
+        if http_error != OK:
+            print(\"An error occurred in the HTTP request.\")
 
 func map_tile_downloaded(result, response_code, headers, body):
     var image = Image.new()
@@ -49,7 +58,7 @@ func map_tile_downloaded(result, response_code, headers, body):
         print(headers)
         print(body)
     else:
-        
+        save_map_tile(body, last_downloaded_tile_coords)
         var texture = ImageTexture.new()
         texture.create_from_image(image)
         CenterTile.texture = texture
@@ -99,10 +108,36 @@ func check_for_existing_maps():
         return false
     else:
         return true
+        
+func get_existing_map_tiles():
+    return Helpers.list_files_in_directory(\"user://maps/\")
 
-func save_map_tile():
+func save_map_tile(map_tile_buffer, tile_coords):
     var dir_check = Directory.new()
-    dir_check.dir_exists(\"user://maps/\")
+    dir_check.open(\"user://\")
+    if not dir_check.dir_exists(\"user://maps/\"):
+        dir_check.make_dir(\"user://maps/\")
+    var map_tile_as_file = File.new()
+    var file_name = str(tile_coords[0]) + "," + str(tile_coords[1]) + ".png"
+    map_tile_as_file.open(\"user://maps/\" + file_name, File.WRITE)
+    map_tile_as_file.store_buffer(map_tile_buffer)
+    map_tile_as_file.close()
+    
+func check_if_existing_tile_is_close():
+    var saved_tiles = get_existing_map_tiles()
+    var coordinates_only = []
+    var coords_split = []
+    var range
+    var count = 0
+    for tile in saved_tiles:
+        coordinates_only.append(tile.rstrip(\".png\"))
+    for coords in coordinates_only:
+        coords_split = coords.split(",")
+        range = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
+        if range < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
+            return saved_tiles[count]
+        count += 1
+     return false
     
 "
 
