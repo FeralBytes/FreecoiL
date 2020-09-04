@@ -19,13 +19,13 @@
 [ext_resource path="res://assets/themes/default/default_LeftBumper.theme" type="Theme" id=17]
 [ext_resource path="res://scenes/InGame/MapController.tscn" type="PackedScene" id=18]
 
-[sub_resource type="StyleBoxEmpty" id=5]
+[sub_resource type="StyleBoxEmpty" id=1]
 
-[sub_resource type="DynamicFont" id=6]
+[sub_resource type="DynamicFont" id=2]
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=7]
+[sub_resource type="GDScript" id=3]
 script/source = "extends Label
 
 
@@ -43,7 +43,7 @@ func update_player_deaths(new_val):
     text = \"%03d\" % new_val
 "
 
-[sub_resource type="GDScript" id=8]
+[sub_resource type="GDScript" id=4]
 script/source = "extends Label
 
 
@@ -61,7 +61,7 @@ func update_player_kills(new_val):
     text = \"%03d\" % new_val
 "
 
-[sub_resource type="GDScript" id=9]
+[sub_resource type="GDScript" id=5]
 script/source = "extends Button
 
 
@@ -84,11 +84,11 @@ func _on_Button_pressed():
     get_tree().call_group(\"Container\", \"next_menu\", \"-1,1\")
 "
 
-[sub_resource type="DynamicFont" id=10]
+[sub_resource type="DynamicFont" id=6]
 size = 50
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=11]
+[sub_resource type="GDScript" id=7]
 script/source = "extends Label
 
 
@@ -106,7 +106,7 @@ func update_weapon_mag_ammo(new_val):
     text = str(new_val) + \"/\" + str(Settings.Session.get_data(\"game_weapon_magazine_size\"))
 "
 
-[sub_resource type="GDScript" id=12]
+[sub_resource type="GDScript" id=8]
 script/source = "extends ProgressBar
 
 
@@ -125,7 +125,7 @@ func update_weapon_mag_ammo(new_val):
     max_value = Settings.Session.get_data(\"game_weapon_magazine_size\")
 "
 
-[sub_resource type="GDScript" id=13]
+[sub_resource type="GDScript" id=9]
 script/source = "extends Label
 
 
@@ -143,7 +143,7 @@ func update_player_health(new_val):
     text = str(new_val) + \"/\" + str(Settings.InGame.get_data(\"game_start_health\"))
 "
 
-[sub_resource type="GDScript" id=14]
+[sub_resource type="GDScript" id=10]
 script/source = "extends ProgressBar
 
 
@@ -162,11 +162,11 @@ func update_player_health(new_val):
     max_value = Settings.InGame.get_data(\"game_start_health\")
 "
 
-[sub_resource type="DynamicFont" id=15]
+[sub_resource type="DynamicFont" id=11]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=16]
+[sub_resource type="GDScript" id=12]
 script/source = "extends Label
 
 
@@ -187,7 +187,7 @@ func update_time_remaining(new_val):
     text = \"Time Remaining: \" + str(time_minutes) + \":\" + str(time_seconds_left)
 "
 
-[sub_resource type="GDScript" id=17]
+[sub_resource type="GDScript" id=13]
 script/source = "extends Label
 
 
@@ -208,19 +208,19 @@ func update_weapon_type(__):
     text = new_wpn + \" total ammo = \" + str(wpn_ammo)
 "
 
-[sub_resource type="DynamicFont" id=1]
+[sub_resource type="DynamicFont" id=14]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=15]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="DynamicFont" id=3]
+[sub_resource type="DynamicFont" id=16]
 size = 40
 font_data = ExtResource( 4 )
 
-[sub_resource type="GDScript" id=4]
+[sub_resource type="GDScript" id=17]
 script/source = "extends Label
 
 
@@ -705,20 +705,17 @@ position = Vector2( 0, -167 )
 skew = 4.37114e-08
 
 [node name="Control" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer"]
-skew = 4.37114e-08
 
 [node name="skull" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
 modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
 position = Vector2( 493, 394 )
 scale = Vector2( 0.9, 0.9 )
-skew = 4.37114e-08
 texture = ExtResource( 8 )
 
 [node name="target_person" type="Sprite" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
 modulate = Color( 0.164706, 0.164706, 0.164706, 1 )
 position = Vector2( 48, 395 )
 scale = Vector2( 0.8, 0.8 )
-skew = 4.37114e-08
 texture = ExtResource( 6 )
 
 [node name="Label" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Control"]
@@ -726,10 +723,10 @@ margin_left = 430.0
 margin_top = 423.0
 margin_right = 541.0
 margin_bottom = 486.0
-custom_styles/normal = SubResource( 5 )
-custom_fonts/font = SubResource( 6 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
 text = "000"
-script = SubResource( 7 )
+script = SubResource( 3 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -739,10 +736,10 @@ margin_left = -2.0
 margin_top = 423.0
 margin_right = 72.0
 margin_bottom = 486.0
-custom_styles/normal = SubResource( 5 )
-custom_fonts/font = SubResource( 6 )
+custom_styles/normal = SubResource( 1 )
+custom_fonts/font = SubResource( 2 )
 text = "000"
-script = SubResource( 8 )
+script = SubResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -751,7 +748,7 @@ __meta__ = {
 margin_right = 12.0
 margin_bottom = 39.0
 text = "Scores"
-script = SubResource( 9 )
+script = SubResource( 5 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -813,7 +810,6 @@ polygon_rotation = -90.0
 
 [node name="TriangleTopLeft" type="Node2D" parent="0,0-Playing/CenterContainer/VBoxContainer/CenterContainer/Hexagon"]
 position = Vector2( -78, 135 )
-skew = 4.37114e-08
 script = ExtResource( 3 )
 centered = true
 size = 311.0
@@ -833,10 +829,10 @@ margin_top = 2.0
 margin_right = 255.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 10 )
+custom_fonts/font = SubResource( 6 )
 text = "15/30"
 align = 1
-script = SubResource( 11 )
+script = SubResource( 7 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer"]
 modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
@@ -855,7 +851,7 @@ max_value = 30.0
 step = 1.0
 value = 15.0
 percent_visible = false
-script = SubResource( 12 )
+script = SubResource( 8 )
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="0,0-Playing/CenterContainer/VBoxContainer"]
 margin_top = 555.0
@@ -869,10 +865,10 @@ margin_top = 2.0
 margin_right = 247.0
 margin_bottom = 65.0
 rect_min_size = Vector2( 244, 0 )
-custom_fonts/font = SubResource( 10 )
+custom_fonts/font = SubResource( 6 )
 text = "15/30"
 align = 1
-script = SubResource( 13 )
+script = SubResource( 9 )
 
 [node name="NinePatchRect" type="NinePatchRect" parent="0,0-Playing/CenterContainer/VBoxContainer/HBoxContainer2"]
 modulate = Color( 0.952941, 0.87451, 0.635294, 1 )
@@ -891,23 +887,23 @@ max_value = 30.0
 step = 1.0
 value = 15.0
 percent_visible = false
-script = SubResource( 14 )
+script = SubResource( 10 )
 
 [node name="ObjectiveTracker" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
 margin_top = 630.0
 margin_right = 540.0
 margin_bottom = 681.0
-custom_fonts/font = SubResource( 15 )
+custom_fonts/font = SubResource( 11 )
 text = "Time Remaining: 00:00"
 align = 1
-script = SubResource( 16 )
+script = SubResource( 12 )
 
 [node name="GunType" type="Label" parent="0,0-Playing/CenterContainer/VBoxContainer"]
 margin_top = 689.0
 margin_right = 540.0
 margin_bottom = 725.0
 align = 1
-script = SubResource( 17 )
+script = SubResource( 13 )
 
 [node name="Header2" parent="0,0-Playing" instance=ExtResource( 2 )]
 on_mainmenu_scene = false
@@ -938,7 +934,7 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="0,-1-Waiting For Other Players/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 213.0
-custom_fonts/font = SubResource( 1 )
+custom_fonts/font = SubResource( 14 )
 text = "Waiting for the other players to finish loading the game.
 Please be patient..."
 align = 1
@@ -978,7 +974,7 @@ rect_min_size = Vector2( 540, 0 )
 [node name="Label" type="Label" parent="-1,-1-Start Game Delay/CenterContainer/VBoxContainer"]
 margin_right = 540.0
 margin_bottom = 51.0
-custom_fonts/font = SubResource( 2 )
+custom_fonts/font = SubResource( 15 )
 text = "Game Starting"
 align = 1
 
@@ -986,10 +982,10 @@ align = 1
 margin_top = 59.0
 margin_right = 540.0
 margin_bottom = 110.0
-custom_fonts/font = SubResource( 3 )
+custom_fonts/font = SubResource( 16 )
 text = "in: 00:00"
 align = 1
-script = SubResource( 4 )
+script = SubResource( 17 )
 
 [node name="Header2" parent="-1,-1-Start Game Delay" instance=ExtResource( 2 )]
 my_menu = "-1,-1"
@@ -1340,12 +1336,10 @@ stream = ExtResource( 9 )
 pitch_scale = 1.2
 
 [node name="TangoDownSound" type="AudioStreamPlayer2D" parent="."]
-skew = 4.37114e-08
 stream = ExtResource( 15 )
 volume_db = 10.0
 
 [node name="NiceSound" type="AudioStreamPlayer2D" parent="."]
-skew = 4.37114e-08
 stream = ExtResource( 14 )
 volume_db = 5.0
 

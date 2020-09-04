@@ -118,7 +118,7 @@ func save_map_tile(map_tile_buffer, tile_coords):
     if not dir_check.dir_exists(\"user://maps/\"):
         dir_check.make_dir(\"user://maps/\")
     var map_tile_as_file = File.new()
-    var file_name = str(tile_coords[0]) + "," + str(tile_coords[1]) + ".png"
+    var file_name = str(tile_coords[0]) + \",\" + str(tile_coords[1]) + \".png\"
     map_tile_as_file.open(\"user://maps/\" + file_name, File.WRITE)
     map_tile_as_file.store_buffer(map_tile_buffer)
     map_tile_as_file.close()
@@ -132,7 +132,7 @@ func check_if_existing_tile_is_close():
     for tile in saved_tiles:
         coordinates_only.append(tile.rstrip(\".png\"))
     for coords in coordinates_only:
-        coords_split = coords.split(",")
+        coords_split = coords.split(\",\")
         range = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
         if range < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
             return saved_tiles[count]
