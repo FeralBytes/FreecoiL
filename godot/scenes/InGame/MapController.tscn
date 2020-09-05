@@ -37,7 +37,7 @@ func _ready():
         var existing_close_tile = check_if_existing_tile_is_close()
         if existing_close_tile == false:
             pass  # Download new maps instead.
-           else:
+        else:
             pass  # Need to check if we have the neighbor tiles.
     else:
         MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
@@ -127,17 +127,17 @@ func check_if_existing_tile_is_close():
     var saved_tiles = get_existing_map_tiles()
     var coordinates_only = []
     var coords_split = []
-    var range
+    var range_to
     var count = 0
     for tile in saved_tiles:
         coordinates_only.append(tile.rstrip(\".png\"))
     for coords in coordinates_only:
         coords_split = coords.split(\",\")
-        range = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
-        if range < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
+        range_to = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
+        if range_to < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
             return saved_tiles[count]
         count += 1
-     return false
+    return false
     
 "
 

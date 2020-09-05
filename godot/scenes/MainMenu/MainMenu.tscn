@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=2]
+[gd_scene load_steps=57 format=2]
 
 [ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=1]
 [ext_resource path="res://assets/fonts/BlackOpsOne-Regular.ttf" type="DynamicFontData" id=2]
@@ -308,10 +308,6 @@ func force_player_name(current_menu):
             else:
                 LoginPlayerAudio.stream = load(\"res://assets/voices/EN_MV_login2.wav\")
                 LoginPlayerAudio.play()
-    if Settings.Session.get_data(\"experimental_toggles\")[\"awesome_feature2\"]:
-        print(\"Everything is Awesome!\")
-    else:
-        pass
             
 func play_audio_from_background(background_results):
     var results = background_results[thread_num]
@@ -1074,10 +1070,14 @@ func check_if_visible(current_menu):
     if current_menu == my_menu:
         clear_grid()
         build_grid()
-        get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
-        # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
-        Settings.InGame.set_data(\"game_start_delay\", 5)
-        get_tree().call_group(\"Container\", \"load_lobby\")
+        if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads\"]:
+            print(\"************* Here\")
+            get_tree().call_group(\"Container\", \"next_menu\", \"0,7\")
+        else:
+            get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
+            # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
+            Settings.InGame.set_data(\"game_start_delay\", 5)
+            get_tree().call_group(\"Container\", \"load_lobby\") 
 
 func clear_grid():
     for child in Grid.get_children():
@@ -1158,10 +1158,7 @@ func check_if_visible(current_menu):
     if current_menu == my_menu:
         #clear_grid()
         #build_grid()
-        get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
-        # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
-        Settings.InGame.set_data(\"game_start_delay\", 5)
-        get_tree().call_group(\"Container\", \"load_lobby\") 
+        pass
 
 func clear_grid():
     for child in Grid.get_children():
@@ -1220,6 +1217,119 @@ func _ready():
 
 func _on_RichTextLabel_meta_clicked(meta):
     var __ = OS.shell_open(meta)
+"
+
+[sub_resource type="GDScript" id=48]
+script/source = "extends ReferenceRect
+
+const my_menu = \"0,7\"
+
+var counter = 0
+var MapDownloader = HTTPRequest.new()
+var last_downloaded_tile_coords
+var current_location
+
+onready var Geodetic = preload(\"res://code/Geodetic.gd\").new()
+onready var Assessement = get_node(\"CenterContainer/VBoxContainer/Assessment\")
+onready var Accuracy = get_node(\"CenterContainer/VBoxContainer/Accuracy\")
+onready var Latitude = get_node(\"CenterContainer/VBoxContainer/Latitude\")
+onready var Longitude = get_node(\"CenterContainer/VBoxContainer/Longitude\")
+onready var DownloadMaps = get_node(\"CenterContainer/VBoxContainer/DownloadMaps\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+
+
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        add_child(MapDownloader)
+        assess_gps_location()
+        
+
+func assess_gps_location():
+    if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
+        current_location = update_accuracy_over_time()
+    else:
+        current_location = Settings.Session.get_data(\"fi_current_location\")
+    var cont_yield = true
+    if \"accuracy\" in current_location:
+        if current_location[\"accuracy\"] < 10:
+            Assessement.text = \"Accuracy is sufficient.\"
+            DownloadMaps.disabled = false
+            cont_yield = false
+        else:
+            Assessement.text = \"Accuracy is not sufficient yet.\"
+    else:
+        Assessement.text = \"Ensure device can see the sky.\"
+    if cont_yield:
+        yield(get_tree().create_timer(0.1), \"timeout\")
+
+func check_for_existing_maps():
+    if check_for_any_existing_maps():
+        # Need to check if the existing tiles meet the needs of the current map origin.
+        var existing_close_tile = check_if_existing_tile_is_close()
+        if existing_close_tile == false:
+            pass  # Download new maps instead.
+        else:
+            pass  # Need to check if we have the neighbor tiles.
+    else:
+        download_map(current_location[\"latitude\"], current_location[\"longitude\"])
+        
+func download_map(latitude, longitude):
+        MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
+        last_downloaded_tile_coords = [latitude, longitude]
+        var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
+            str(latitude) + \",\" + str(longitude) + 
+            \"&zoom=19&scale=1&size=640x640&maptype=hybrid&key=\" + FreecoiLInterface.API_KEY)
+        if http_error != OK:
+            print(\"An error occurred in the HTTP request.\")
+
+func _on_DownloadMaps_toggled(button_pressed):
+    pass # Replace with function body.
+
+func check_for_any_existing_maps():
+    var files = Helpers.list_files_in_directory(\"user://maps/\")
+    if files == []:
+        return false
+    else:
+        return true
+
+func get_existing_map_tiles():
+    return Helpers.list_files_in_directory(\"user://maps/\")
+
+func check_if_existing_tile_is_close():
+    var saved_tiles = get_existing_map_tiles()
+    var coordinates_only = []
+    var coords_split = []
+    var range_to
+    var count = 0
+    for tile in saved_tiles:
+        coordinates_only.append(tile.rstrip(\".png\"))
+    for coords in coordinates_only:
+        coords_split = coords.split(\",\")
+        range_to = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
+        if range_to < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
+            return saved_tiles[count]
+        count += 1
+    return false
+
+func load_lobby():
+    # Below is the End settings that need to be called prior to loading the lobby.
+    get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
+    # TODO: Putting other Game Settings Here for Now until MainMenu is Expanded.
+    Settings.InGame.set_data(\"game_start_delay\", 5)
+    get_tree().call_group(\"Container\", \"load_lobby\") 
+
+func update_accuracy_over_time():
+    var current_locale = {\"latitude\": 41.850004, \"longitude\": -87.6521887, \"accuracy\": 15}
+    if counter > 10:
+        current_locale[\"accuracy\"] = 10.1
+    elif counter > 15:
+        current_locale[\"accuracy\"] = 9
+    counter += 1
+    return current_locale
+        
 "
 
 [node name="MainMenu" type="Control"]
@@ -2780,8 +2890,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,6-Custom Setup 6/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2873,8 +2982,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="1,6-Custom Setup 7/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -2968,8 +3076,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="2,6-Custom Setup 8/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3063,8 +3170,7 @@ __meta__ = {
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="3,6-Custom Setup 9/CenterContainer"]
-margin_left = 6.0
-margin_right = 546.0
+margin_right = 540.0
 margin_bottom = 838.0
 rect_min_size = Vector2( 540, 0 )
 
@@ -3273,6 +3379,63 @@ script = SubResource( 47 )
 [node name="Header2" parent="-1,1-Networked IP Conflict" instance=ExtResource( 7 )]
 my_menu = "-1,-1"
 
+[node name="0,7-MapDownload" type="ReferenceRect" parent="."]
+margin_top = 6720.0
+margin_right = 540.0
+margin_bottom = 7680.0
+rect_min_size = Vector2( 540, 960 )
+script = SubResource( 48 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="CenterContainer" type="CenterContainer" parent="0,7-MapDownload"]
+margin_right = 540.0
+margin_bottom = 960.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="0,7-MapDownload/CenterContainer"]
+margin_top = 370.0
+margin_right = 540.0
+margin_bottom = 590.0
+rect_min_size = Vector2( 540, 0 )
+
+[node name="Assessment" type="Label" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
+margin_right = 540.0
+margin_bottom = 36.0
+text = "Assessing your position quality..."
+align = 1
+
+[node name="Accuracy" type="Label" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
+margin_top = 44.0
+margin_right = 540.0
+margin_bottom = 80.0
+text = "Accuracy:"
+align = 1
+
+[node name="Latitude" type="Label" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
+margin_top = 88.0
+margin_right = 540.0
+margin_bottom = 124.0
+text = "Latitude:"
+align = 1
+
+[node name="Longitude" type="Label" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
+margin_top = 132.0
+margin_right = 540.0
+margin_bottom = 168.0
+text = "Longitude:"
+align = 1
+
+[node name="DownloadMaps" type="Button" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
+margin_top = 176.0
+margin_right = 540.0
+margin_bottom = 220.0
+disabled = true
+text = "Download Maps"
+
 [node name="EmptyGunShotSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 9 )
 [connection signal="text_entered" from="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" to="2,-1-Preferences/CenterContainer/VBoxContainer/HBoxContainer/PlayerName" method="_on_PlayerName_text_entered" flags=3]
@@ -3324,3 +3487,4 @@ stream = ExtResource( 9 )
 [connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
 [connection signal="meta_clicked" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" method="_on_RichTextLabel_meta_clicked" flags=3]
+[connection signal="toggled" from="0,7-MapDownload/CenterContainer/VBoxContainer/DownloadMaps" to="0,7-MapDownload" method="_on_DownloadMaps_toggled" flags=7]
