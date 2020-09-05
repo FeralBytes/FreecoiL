@@ -32,14 +32,15 @@ func _ready():
     RadarPulseTimer.wait_time = RADAR_PULSE_RATE
     RadarPulseTimer.connect(\"timeout\", self, \"pulse_radar\")
     RadarPulseTimer.start(RadarPulseTimer.wait_time)
-    if check_for_existing_maps():
-        # Need to check if the existing tiles meet the needs of the current map origin.
-        var existing_close_tile = check_if_existing_tile_is_close()
-        if existing_close_tile == false:
-            pass  # Download new maps instead.
-        else:
-            pass  # Need to check if we have the neighbor tiles.
-    else:
+#    if check_for_existing_maps():
+#        # Need to check if the existing tiles meet the needs of the current map origin.
+#        var existing_close_tile = check_if_existing_tile_is_close()
+#        if existing_close_tile == false:
+#            pass  # Download new maps instead.
+#        else:
+#            pass  # Need to check if we have the neighbor tiles.
+#    else:
+    if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads\"]:
         MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
         last_downloaded_tile_coords = [current_location[\"latitude\"], current_location[\"longitude\"]]
         var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
