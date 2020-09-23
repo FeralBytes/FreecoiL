@@ -1,5 +1,7 @@
 extends Node
 
+# DEAD CODE
+
 signal my_data_changed
 var my_data = {} setget set_my_data, get_my_data
 

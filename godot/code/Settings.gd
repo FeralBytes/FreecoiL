@@ -23,7 +23,7 @@ var OVERRIDE_SEQUENCE_ENFORCER = false
 var DEBUG_GUI = false
 var experimental_toggles = {"hexes_flash_on_sensor_hit":true, "gun_test_screen":true,
         "background_resource_loader":true, "gps_location": true, "gun_names":false, 
-        "map_downloads": false, "map_downloads_testing": false}
+        "map_downloads": true, "map_downloads_testing": false, "respawn_via_gps": true}
 # warning-ignore:unused_class_variable
 var __signals_used = -1
 # warning-ignore:unused_class_variable
@@ -36,12 +36,33 @@ var InGame = Data.new("InGame", USER_DIR + "InGame.json", false, true, true)
 var Session = Data.new("Session", null, false, false, false)
 # warning-ignore:unused_class_variable
 var Network = Data.new("Network", null, false, false, true)
+# warning-ignore:unused_class_variable
+var LiteAutoLoads = AutoLoadsLite.new()
 
 func Log(to_print, level="debug"):
     if DEBUG_LEVELS.find(level) >= DEBUG_LEVEL:
         print(to_print)
         if DEBUG_GUI:
             get_tree().call_group("DebugOutput", "put", to_print)
+
+class AutoLoadsLite:
+    var __lite_auto_loads = {}
+    
+    func load_lightly(name, path):
+        if __lite_auto_loads.has(name):
+            return
+        # else
+        __lite_auto_loads[name] = load(path).new()
+    
+    func unload_lightly(name):
+        if __lite_auto_loads.has(name):
+            __lite_auto_loads.erase(name)
+        
+    func get_lightly(name):
+        return __lite_auto_loads[name]
+        
+    func check_if_loaded(name):
+        return __lite_auto_loads.has(name)
 
 class Data:
     var __settings = {}  # {"dumby": [1234, "S00"]}

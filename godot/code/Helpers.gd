@@ -142,14 +142,13 @@ func list_files_in_directory(path):
     var files = []
     var dir = Directory.new()
     dir.open(path)
+    print(dir.get_current_dir())
     dir.list_dir_begin(true)
-    while true:
-        var file = dir.get_next()
-        if file == "":
-            break
+    var file = dir.get_next()
+    while file != "":
+        if dir.current_is_dir():
+            pass
         else:
-            if dir.current_is_dir():
-                files.append(file)
-            else:
-                break
+            files.append(file)
+        file = dir.get_next()
     return files

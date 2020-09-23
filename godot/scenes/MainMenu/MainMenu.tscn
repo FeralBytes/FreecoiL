@@ -310,10 +310,13 @@ func force_player_name(current_menu):
                 LoginPlayerAudio.play()
             
 func play_audio_from_background(background_results):
+    if thread_num == null:
+        return
     var results = background_results[thread_num]
     if results == \"finished\":
         LoginPlayerAudio.stream = Helpers.get_loaded_resource_from_background(thread_num)
         LoginPlayerAudio.play()
+        thread_num = null
 "
 
 [sub_resource type="GDScript" id=12]
@@ -1071,7 +1074,6 @@ func check_if_visible(current_menu):
         clear_grid()
         build_grid()
         if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads\"]:
-            print(\"************* Here\")
             get_tree().call_group(\"Container\", \"next_menu\", \"0,7\")
         else:
             get_tree().call_group(\"Container\", \"next_menu\", \"5,1\")
@@ -1228,8 +1230,11 @@ var counter = 0
 var MapDownloader = HTTPRequest.new()
 var last_downloaded_tile_coords
 var current_location
+var downloading_of_maps_complete = false
+var downloading = false
+var background_loading = false
+var thread_num
 
-onready var Geodetic = preload(\"res://code/Geodetic.gd\").new()
 onready var Assessement = get_node(\"CenterContainer/VBoxContainer/Assessment\")
 onready var Accuracy = get_node(\"CenterContainer/VBoxContainer/Accuracy\")
 onready var Latitude = get_node(\"CenterContainer/VBoxContainer/Latitude\")
@@ -1239,57 +1244,153 @@ onready var DownloadMaps = get_node(\"CenterContainer/VBoxContainer/DownloadMaps
 # Called when the node enters the scene tree for the first time.
 func _ready():
     Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+    MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
+    if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
+        # API Key gets set here in testing.
+        FreecoiLInterface.API_KEY = \"AIzaSyDqOwvOlLBjgEU9KWgnA7jhUVmT_PLN0f0\"
 
 
 func check_if_visible(current_menu):
     if current_menu == my_menu:
+        Settings.LiteAutoLoads.load_lightly(\"Geodetic\", \"res://code/Geodetic.gd\")
         add_child(MapDownloader)
-        assess_gps_location()
-        
-
-func assess_gps_location():
-    if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
-        current_location = update_accuracy_over_time()
-    else:
-        current_location = Settings.Session.get_data(\"fi_current_location\")
-    var cont_yield = true
-    if \"accuracy\" in current_location:
-        if current_location[\"accuracy\"] < 10:
-            Assessement.text = \"Accuracy is sufficient.\"
-            DownloadMaps.disabled = false
-            cont_yield = false
+        if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
+            current_location = {\"latitude\": 41.850004, \"longitude\": -87.6521887, \"accuracy\": 15}
+            assess_gps_location_test()
         else:
-            Assessement.text = \"Accuracy is not sufficient yet.\"
-    else:
-        Assessement.text = \"Ensure device can see the sky.\"
-    if cont_yield:
-        yield(get_tree().create_timer(0.1), \"timeout\")
+            Settings.Session.connect(Settings.Session.monitor_data(\"fi_current_location\"), self, 
+                \"assess_gps_location\")
+            assess_gps_location(Settings.Session.get_data(\"fi_current_location\"))
+        
+func assess_gps_location(new_location):
+    Accuracy.text = \"Accuracy: \" + str(new_location[\"accuracy\"])
+    Latitude.text = \"Latitude: \" + str(new_location[\"latitude\"])
+    Longitude.text = \"Longitude: \" + str(new_location[\"longitude\"])
+    if \"accuracy\" in new_location:
+        if new_location[\"accuracy\"] < 10:
+            if not downloading_of_maps_complete:
+                Assessement.text = \"Accuracy is sufficient.\"
+                DownloadMaps.disabled = false
+        else:
+            if not downloading_of_maps_complete:
+                Assessement.text = \"Accuracy is not sufficient yet.\"
+    
+func assess_gps_location_test():
+    var cont_yield = true
+    while true:
+        if downloading_of_maps_complete:
+            break
+        if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
+            current_location = update_accuracy_over_time()
+        else:
+            current_location = Settings.Session.get_data(\"fi_current_location\")
+        Accuracy.text = \"Accuracy: \" + str(current_location[\"accuracy\"])
+        Latitude.text = \"Latitude: \" + str(current_location[\"latitude\"])
+        Longitude.text = \"Longitude: \" + str(current_location[\"longitude\"])
+        if \"accuracy\" in current_location:
+            if current_location[\"accuracy\"] < 10:
+                Assessement.text = \"Accuracy is sufficient.\"
+                DownloadMaps.disabled = false
+                cont_yield = false
+            else:
+                Assessement.text = \"Accuracy is not sufficient yet.\"
+        else:
+            Assessement.text = \"Ensure device can see the sky.\"
+        if cont_yield:
+            yield(get_tree().create_timer(0.1), \"timeout\")
+        else:
+            break
 
 func check_for_existing_maps():
     if check_for_any_existing_maps():
         # Need to check if the existing tiles meet the needs of the current map origin.
         var existing_close_tile = check_if_existing_tile_is_close()
-        if existing_close_tile == false:
-            pass  # Download new maps instead.
+        if typeof(existing_close_tile) == TYPE_BOOL:
+            Settings.LiteAutoLoads.get_lightly(\"Geodetic\").set_map_origin(
+                current_location[\"latitude\"], current_location[\"longitude\"], 19)
+            download_each_map(Settings.Session.get_data(\"map_origin_lat\"), 
+                Settings.Session.get_data(\"map_origin_long\"))
         else:
-            pass  # Need to check if we have the neighbor tiles.
+            # set the tile as the new center.
+            var coords = existing_close_tile.rsplit(\".png\")
+            coords = existing_close_tile.split(\",\")
+            var latitude = float(coords[0])
+            var longitude = float(coords[1])
+            Settings.LiteAutoLoads.get_lightly(\"Geodetic\").set_map_origin(
+                latitude, longitude, 19)
+            # Check if we have it's neighbors.
+            var neighbors = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_neighbor_tile_centers_2(
+                latitude, longitude)
+            var existing_tiles = get_existing_map_tiles()
+            var count = 2
+            for neighbor in neighbors:
+                var saveable_neighbor = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_saveable_center_point(
+                    neighbor[0], neighbor[1])
+                var file_name = str(saveable_neighbor[0]) + \",\" + str(saveable_neighbor[1]) + \".png\"
+                var download_needed = true
+                for existing_tile in existing_tiles:
+                    if file_name == existing_tile:
+                        download_needed = false
+                if download_needed:
+                    download_map(saveable_neighbor[0], saveable_neighbor[1])
+                    DownloadMaps.text = \"Downloading Missing Map \" + str(count) + \" of 9\"
+                    while downloading:
+                        yield(get_tree().create_timer(0.1), \"timeout\")
+                count += 1
+            ask_if_ready_to_preview_the_maps()
     else:
-        download_map(current_location[\"latitude\"], current_location[\"longitude\"])
-        
+        Settings.LiteAutoLoads.get_lightly(\"Geodetic\").set_map_origin(
+            current_location[\"latitude\"], current_location[\"longitude\"], 19)
+        download_each_map(Settings.Session.get_data(\"map_origin_lat\"), Settings.Session.get_data(\"map_origin_long\"))
+
+func download_each_map(latitude, longitude):
+    var neighbors = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_neighbor_tile_centers_2(latitude, longitude)
+    var count = 1
+    download_map(latitude, longitude)
+    DownloadMaps.text = \"Downloading Map \" + str(count) + \" of 9\"
+    while downloading:
+        yield(get_tree().create_timer(0.1), \"timeout\")
+    for neighbor in neighbors:
+        count += 1
+        while downloading:
+            yield(get_tree().create_timer(0.1), \"timeout\")
+        print(\"Real Coordinateds are just below this:\")
+        print(neighbor)
+        var saveable_neighbor = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_saveable_center_point(
+            neighbor[0], neighbor[1])
+        print(saveable_neighbor)
+        print(\"Saveable coordinates are just above this.\")
+        download_map(saveable_neighbor[0], saveable_neighbor[1])
+        DownloadMaps.text = \"Downloading Map \" + str(count) + \" of 9\"
+    ask_if_ready_to_preview_the_maps()
+       
 func download_map(latitude, longitude):
-        MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
+        downloading = true
+        var saveable_coords = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_saveable_center_point(
+            latitude, longitude)
+        latitude = saveable_coords[0]
+        longitude = saveable_coords[1]
         last_downloaded_tile_coords = [latitude, longitude]
-        var http_error = MapDownloader.request(\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
+        var download_str = (\"https://maps.googleapis.com/maps/api/staticmap?center=\" + 
             str(latitude) + \",\" + str(longitude) + 
             \"&zoom=19&scale=1&size=640x640&maptype=hybrid&key=\" + FreecoiLInterface.API_KEY)
+        var http_error = MapDownloader.request(download_str)
         if http_error != OK:
             print(\"An error occurred in the HTTP request.\")
 
-func _on_DownloadMaps_toggled(button_pressed):
-    pass # Replace with function body.
+func _on_DownloadMaps_pressed():
+    if downloading_of_maps_complete:
+        get_tree().call_group(\"Container\", \"next_menu\", \"1,7\")
+    else:
+        DownloadMaps.disabled = true
+        DownloadMaps.text = \"Downloading Maps\"
+        current_location = Settings.Session.get_data(\"fi_current_location\")
+        # API Key gets set here in testing.
+        check_for_existing_maps()
 
 func check_for_any_existing_maps():
-    var files = Helpers.list_files_in_directory(\"user://maps/\")
+    var files = Helpers.list_files_in_directory(\"user://maps\")
+    print(files)
     if files == []:
         return false
     else:
@@ -1299,6 +1400,10 @@ func get_existing_map_tiles():
     return Helpers.list_files_in_directory(\"user://maps/\")
 
 func check_if_existing_tile_is_close():
+    var dir_check = Directory.new()
+    dir_check.open(\"user://\")
+    if not dir_check.dir_exists(\"user://maps/\"):
+        dir_check.make_dir(\"user://maps/\")
     var saved_tiles = get_existing_map_tiles()
     var coordinates_only = []
     var coords_split = []
@@ -1308,11 +1413,55 @@ func check_if_existing_tile_is_close():
         coordinates_only.append(tile.rstrip(\".png\"))
     for coords in coordinates_only:
         coords_split = coords.split(\",\")
-        range_to = Geodetic.haversine_v0(Geodetic.map_origin_lat, Geodetic.map_origin_long, coords_split[0], coords_split[1])
-        if range_to < (Geodetic.get_meters_per_pixel(19, Geodetic.map_origin_lat) * 320):
+        range_to = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").haversine_v0(
+            current_location[\"latitude\"], current_location[\"longitude\"], float(coords_split[0]), 
+            float(coords_split[1]))
+        print(\"range_to = \" + str(range_to))
+        var with_in_range = (Settings.LiteAutoLoads.get_lightly(\"Geodetic\").get_meters_per_pixel(19, 
+            current_location[\"latitude\"]) * 320)
+        print(\"with_in_range = \" + str(with_in_range))
+        if range_to < with_in_range:
             return saved_tiles[count]
         count += 1
     return false
+
+func save_map_tile(map_tile_buffer, tile_coords):
+    var dir_check = Directory.new()
+    dir_check.open(\"user://\")
+    if not dir_check.dir_exists(\"user://maps/\"):
+        dir_check.make_dir(\"user://maps/\")
+    var map_tile_as_file = File.new()
+    var file_name = str(tile_coords[0]) + \",\" + str(tile_coords[1]) + \".png\"
+    map_tile_as_file.open(\"user://maps/\" + file_name, File.WRITE)
+    map_tile_as_file.store_buffer(map_tile_buffer)
+    map_tile_as_file.close()
+
+func map_tile_downloaded(result, response_code, headers, body):
+    var image = Image.new()
+    var image_error = image.load_png_from_buffer(body)
+    if image_error != OK:
+        print(\"An error occurred while trying to display the image.\")
+        print(result)
+        print(response_code)
+        print(headers)
+        print(body)
+    else:
+        if response_code == 403:  # Hit the Qouta Limit
+            var countdown = 60
+            while true:
+                if countdown <= 0:
+                    break
+                DownloadMaps.text = \"Waiting \" + str(countdown) + \"(Qouta Limit Exceeded)\"
+                yield(get_tree().create_timer(1.0), \"timeout\")
+                countdown -= 1
+            download_map(last_downloaded_tile_coords[0], last_downloaded_tile_coords[1])
+            DownloadMaps.text = \"Resuming Downloads...\"
+            return
+        elif response_code == 200:  # Good map download.
+            save_map_tile(body, last_downloaded_tile_coords)
+        else:  # Not sure what happened but you got an irregular response code.
+            print(response_code)
+    downloading = false
 
 func load_lobby():
     # Below is the End settings that need to be called prior to loading the lobby.
@@ -1323,13 +1472,36 @@ func load_lobby():
 
 func update_accuracy_over_time():
     var current_locale = {\"latitude\": 41.850004, \"longitude\": -87.6521887, \"accuracy\": 15}
-    if counter > 10:
+    if counter > 15 and counter < 25:
         current_locale[\"accuracy\"] = 10.1
-    elif counter > 15:
+    elif counter > 25:
         current_locale[\"accuracy\"] = 9
     counter += 1
     return current_locale
         
+func ask_if_ready_to_preview_the_maps():
+    if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
+        if not background_loading:
+            background_loading = true
+            thread_num = Helpers.threaded_background_loader(\"res://scenes/MainMenu/MapEditor.tscn\")
+            Settings.Session.connect(Settings.Session.monitor_data(\"Helpers_background_load_result\"), self,
+                \"go_to_next_menu\")
+    DownloadMaps.text = \"Downloading of Maps Completed\"
+    DownloadMaps.disabled = true
+    downloading_of_maps_complete = true
+
+func go_to_next_menu(background_results):
+    var results = background_results[thread_num]
+    if results == \"finished\":
+        var MapEditor = Helpers.get_loaded_resource_from_background(thread_num).instance()
+        get_parent().add_child(MapEditor)
+        get_parent().move_child(MapEditor, 0)
+        MapEditor.position.x = 1 * 540
+        MapEditor.position.y = 7 * 960
+    DownloadMaps.text = \"Next\"
+    DownloadMaps.disabled = false
+    get_tree().call_group(\"Container\", \"next_menu\", \"1,7\")
+
 "
 
 [node name="MainMenu" type="Control"]
@@ -3391,15 +3563,15 @@ __meta__ = {
 
 [node name="CenterContainer" type="CenterContainer" parent="0,7-MapDownload"]
 margin_right = 540.0
-margin_bottom = 960.0
+margin_bottom = 700.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="VBoxContainer" type="VBoxContainer" parent="0,7-MapDownload/CenterContainer"]
-margin_top = 370.0
+margin_top = 240.0
 margin_right = 540.0
-margin_bottom = 590.0
+margin_bottom = 460.0
 rect_min_size = Vector2( 540, 0 )
 
 [node name="Assessment" type="Label" parent="0,7-MapDownload/CenterContainer/VBoxContainer"]
@@ -3435,6 +3607,23 @@ margin_right = 540.0
 margin_bottom = 220.0
 disabled = true
 text = "Download Maps"
+
+[node name="Header2" parent="0,7-MapDownload" instance=ExtResource( 7 )]
+my_menu = "0,7"
+
+[node name="1,7-MapEditor" type="ReferenceRect" parent="."]
+margin_left = 540.0
+margin_top = 6720.0
+margin_right = 1080.0
+margin_bottom = 7680.0
+rect_min_size = Vector2( 540, 960 )
+script = SubResource( 48 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Header2" parent="1,7-MapEditor" instance=ExtResource( 7 )]
+my_menu = "1,7"
 
 [node name="EmptyGunShotSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource( 9 )
@@ -3483,8 +3672,7 @@ stream = ExtResource( 9 )
 [connection signal="pressed" from="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" to="4,4-Custom Setup 5,1/CenterContainer/VBoxContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button" to="0,6-Custom Setup 6/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="pressed" from="1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button" to="1,6-Custom Setup 7/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
-[connection signal="pressed" from="2,6-Custom Setup 8/CenterContainer/VBoxContainer/Button" to="2,6-Custom Setup 8/CenterContainer/VBoxContainer/Button" method="_on_Button_pressed" flags=3]
 [connection signal="item_selected" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_item_selected" flags=3]
 [connection signal="pressed" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/OptionButton" method="_on_OptionButton_pressed" flags=3]
 [connection signal="meta_clicked" from="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" to="-1,1-Networked IP Conflict/CenterContainer/VBoxContainer/RichTextLabel" method="_on_RichTextLabel_meta_clicked" flags=3]
-[connection signal="toggled" from="0,7-MapDownload/CenterContainer/VBoxContainer/DownloadMaps" to="0,7-MapDownload" method="_on_DownloadMaps_toggled" flags=7]
+[connection signal="pressed" from="0,7-MapDownload/CenterContainer/VBoxContainer/DownloadMaps" to="0,7-MapDownload" method="_on_DownloadMaps_pressed" flags=7]

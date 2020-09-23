@@ -98,41 +98,154 @@ func test_convert_projection_to_lat_long():
     
 func test_convert_pixel_to_lat_long():
     var results = _obj.convert_pixel_to_lat_long(34429759, 49899069, 19, 256)
-#    print("%0.14f" % results[0])
-#    print("%0.6f" % results[0])
-#    print("%0.14f" % 41.850004)
-#    print("%0.14f" % results[1])
-#    print("%0.6f" % results[1])
-#    print("%0.14f" % -87.6521887)
-    assert_almost_eq(results[0], 41.850004, 0.00001) # Accuracy is 76.2m or 250ft
+    assert_almost_eq(results[0], 41.850004, 0.00001) # Accuracy is 1.1 meter.
     assert_almost_eq(results[1], -87.6521887, 0.00001)
+    results = _obj.convert_pixel_to_lat_long(34429759, 49899069, 19, 256)
+    assert_almost_eq(results[0], 41.850004, 0.00001) # Accuracy is 1.1 meter.
+    assert_almost_eq(results[1], -87.6521887, 0.00001)
+    
+func test_convert_pixel_to_lat_long_from_origin():
+    _obj.set_map_origin(41.850000, -87.652194, 19)
+    var results = _obj.convert_pixel_to_lat_long_from_origin(-298, -303, 19) 
+    # Accuracy of the new method is well beyond 1 meter, not that we need that.
+    # {lat:41.85060337950517, lng:-87.65299029828644} px_x:22, px_y:17
+    assert_almost_eq(results[0], 41.85060337950517, 0.000001) # 6th Decimal Place Accuracy is 0.11 meters.
+    assert_almost_eq(results[1], -87.65299029828644, 0.000001)
+    # {lat:41.85055343091795, lng:-87.65195496560669} px_x:408, px_y:42
+    results = _obj.convert_pixel_to_lat_long_from_origin(88, -278, 19)
+    assert_almost_eq(results[0], 41.85055343091795, 0.000001) 
+    assert_almost_eq(results[1], -87.65195496560669, 0.000001)
+    # {lat:41.85055343091795, lng:-87.65131123544312} px_x:648, px_y:42
+    results = _obj.convert_pixel_to_lat_long_from_origin(328, -278, 19)
+    assert_almost_eq(results[0], 41.85055343091795, 0.000001) 
+    assert_almost_eq(results[1], -87.65131123544312, 0.000001)
+    # {lat:41.85055343091795, lng:-87.65307076455689} px_x:-8, px_y:42
+    results = _obj.convert_pixel_to_lat_long_from_origin(-328, -278, 19)
+    assert_almost_eq(results[0], 41.85055343091795, 0.000001) 
+    assert_almost_eq(results[1], -87.65307076455689, 0.000001)
+    # {lat:41.85065133011219, lng:-87.65307076455689} px_x:-8, px_y:-7
+    results = _obj.convert_pixel_to_lat_long_from_origin(-328, -327, 19)
+    assert_almost_eq(results[0], 41.85065133011219, 0.000001) 
+    assert_almost_eq(results[1], -87.65307076455689, 0.000001)
+    # {lat:41.84934466321518, lng:-87.65307076455689} px_x:-8, px_y:647
+    results = _obj.convert_pixel_to_lat_long_from_origin(-328, 327, 19)
+    assert_almost_eq(results[0], 41.84934466321518, 0.000001) 
+    assert_almost_eq(results[1], -87.65307076455689, 0.000001)
+    # GPS Percision by decimal place: 
+    # https://gis.stackexchange.com/questions/8650/measuring-accuracy-of-latitude-and-longitude
+    
 
 func test_calc_map_movement():
-    _obj.set_map_origin(41.850004, -87.6521887, 19)
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521887, 19), [0, 0])
+    _obj.set_map_origin(41.850002, -87.652191, 19)
+    assert_eq(_obj.calc_map_movement(41.850002, -87.652191, 19), [0, 0])
     # Move North which will cause the map to shift to the South.
-    assert_eq(_obj.calc_map_movement(41.850006, -87.6521887, 19), [0, 1])
+    assert_eq(_obj.calc_map_movement(41.850004, -87.652191, 19), [0, 1])
     # Move South which will cause the map to shift to the North.
-    assert_eq(_obj.calc_map_movement(41.850002, -87.6521887, 19), [0, -1])
+    assert_eq(_obj.calc_map_movement(41.850000, -87.652191, 19), [0, -1])
     # Reset to center.
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521887, 19), [0, 0])
+    assert_eq(_obj.calc_map_movement(41.850002, -87.652191, 19), [0, 0])
     # Move East which will cause the map to shift to the West.
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521873, 19), [1, 0])
+    assert_eq(_obj.calc_map_movement(41.850002, -87.652193, 19), [1, 0])
     # Move West which will cause the map to shift to the East.
-    assert_eq(_obj.calc_map_movement(41.850004, -87.6521901, 19), [-1, 0])
+    assert_eq(_obj.calc_map_movement(41.850002, -87.652188, 19), [-1, 0])
     
 func test_plot_entity():
-    _obj.set_map_origin(41.850004, -87.6521887, 19)
+    _obj.set_map_origin(41.850002, -87.652191, 19)
     # Plot entity to the North.
-    assert_eq(_obj.plot_entity(41.850006, -87.6521887, 19), [0, -1])
+    assert_eq(_obj.plot_entity(41.850004, -87.652191, 19), [0, -1])
     # Plot entity to the South.
-    assert_eq(_obj.plot_entity(41.850002, -87.6521887, 19), [0, 1])
+    assert_eq(_obj.plot_entity(41.850000, -87.652191, 19), [0, 1])
     # Plot entity at map origin.
-    assert_eq(_obj.plot_entity(41.850004, -87.6521887, 19), [0, 0])
+    assert_eq(_obj.plot_entity(41.850002, -87.652191, 19), [0, 0])
     # Plot entity to the East.
-    assert_eq(_obj.plot_entity(41.850004, -87.6521873, 19), [-1, 0])
+    assert_eq(_obj.plot_entity(41.850002, -87.652189, 19), [-1, 0])
     # Plot entity to the West.
-    assert_eq(_obj.plot_entity(41.850004, -87.6521901, 19), [1, 0])
+    assert_eq(_obj.plot_entity(41.850002, -87.652193, 19), [1, 0])
+
+func test_normalize_longitude():
+    assert_eq(_obj.normalize_longitude(-87.6521887), -87.6521887)
+
+func test_get_next_tile_from_center():
+    # Invalid test at this time.
+    _obj.set_map_origin(41.850004, -87.6521887, 19)
+    var result = _obj.get_next_tile_from_center(41.850004, -87.6521887, 19, 90)
+    print("%0.14f" % result[0])
+    print("%0.14f" % result[1])
+    assert_almost_eq(result[0], 41.84971720170569, 0.00000000000001)
+    assert_almost_eq(result[1], -87.65142052037216, 0.00000000000001)
+    
+func test_get_neighbor_tile_centers_2():
+    var lat = 41.850004
+    var long = -87.6521887
+    var result = _obj.get_neighbor_tile_centers_2(lat, long)
+    assert_almost_eq(result[0][0], 41.851281, 0.000001)
+    assert_almost_eq(result[0][1], -87.652191, 0.000001)
+    assert_almost_eq(result[1][0], 41.851281, 0.000001)
+    assert_almost_eq(result[1][1], -87.650475, 0.000001)
+    assert_almost_eq(result[2][0], 41.850002, 0.000001)
+    assert_almost_eq(result[2][1], -87.650475, 0.000001)
+    assert_almost_eq(result[3][0], 41.848724, 0.000001)
+    assert_almost_eq(result[3][1], -87.650475, 0.000001)
+    assert_almost_eq(result[4][0], 41.848724, 0.000001)
+    assert_almost_eq(result[4][1], -87.652191, 0.000001)
+    assert_almost_eq(result[5][0], 41.848724, 0.000001)
+    assert_almost_eq(result[5][1], -87.653908, 0.000001)
+    assert_almost_eq(result[6][0], 41.850002, 0.000001)
+    assert_almost_eq(result[6][1], -87.653908, 0.000001)
+    assert_almost_eq(result[7][0], 41.851281, 0.000001)
+    assert_almost_eq(result[7][1], -87.653908, 0.000001)
+    lat = 41.850002
+    long = -87.652191
+    result = _obj.get_neighbor_tile_centers_2(lat, long)
+    assert_almost_eq(result[0][0], 41.851281, 0.000001)
+    assert_almost_eq(result[0][1], -87.652191, 0.000001)
+    assert_almost_eq(result[1][0], 41.851281, 0.000001)
+    assert_almost_eq(result[1][1], -87.650475, 0.000001)
+    assert_almost_eq(result[2][0], 41.850002, 0.000001)
+    assert_almost_eq(result[2][1], -87.650475, 0.000001)
+    assert_almost_eq(result[3][0], 41.848724, 0.000001)
+    assert_almost_eq(result[3][1], -87.650475, 0.000001)
+    assert_almost_eq(result[4][0], 41.848724, 0.000001)
+    assert_almost_eq(result[4][1], -87.652191, 0.000001)
+    assert_almost_eq(result[5][0], 41.848724, 0.000001)
+    assert_almost_eq(result[5][1], -87.653908, 0.000001)
+    assert_almost_eq(result[6][0], 41.850002, 0.000001)
+    assert_almost_eq(result[6][1], -87.653908, 0.000001)
+    assert_almost_eq(result[7][0], 41.851281, 0.000001)
+    assert_almost_eq(result[7][1], -87.653908, 0.000001)
+    
+func test_get_saveable_center_point():
+    var lat = 41.850004
+    var long = -179.6521887
+    var result = _obj.get_saveable_center_point(lat, long)
+    assert_almost_eq(result[0], 41.850002, 0.000001)
+    assert_almost_eq(result[1], -179.652191, 0.000001)
+    lat = 41.850002
+    long = -179.652191
+    result = _obj.get_saveable_center_point(lat, long)
+    assert_almost_eq(result[0], 41.850002, 0.000001)
+    assert_almost_eq(result[1], -179.652191, 0.000001)
+
+#func test_convert_pixel_to_lat_long_and_back():
+#    assert_eq(_obj.convert_lat_long_to_pixel(41.850004, -87.6521887, 19), [34429759, 49899069])
+#    var results = _obj.convert_pixel_to_lat_long(34429759, 49899069, 19, 256)
+#    assert_almost_eq(results[0], 41.850004, 0.000001) 
+#    assert_almost_eq(results[1], -87.6521887, 0.000001)
+#    results = _obj.convert_pixel_to_lat_long(34429759, 49899069, 19, 256)
+#    assert_almost_eq(results[0], 41.850004, 0.00001) # Accuracy is 1.1 meter.
+#    assert_almost_eq(results[1], -87.6521887, 0.00001)
+#     # Chicago, Illionois, USA
+#    assert_eq(_obj.convert_lat_long_to_pixel(41.850004, -87.6521887, 19), [34429759, 49899069])
+#    #    print("%0.14f" % results[0])
+#    #    print("%0.6f" % results[0])
+#    #    print("%0.14f" % 41.850004)
+#    #    print("%0.14f" % results[1])
+#    #    print("%0.6f" % results[1])
+#    #    print("%0.14f" % -87.6521887)
+#    # Test the New Method.
+#    results = _obj.convert_pixel_to_lat_long_from_tile(34429759, 49899069, 0, 0, 19)
+#    assert_almost_eq(results[0], 41.850004, 0.00000001) # 8th Decimal Place Accuracy is 1.1 milimeter or 0.0011 meters.
+#    assert_almost_eq(results[1], -87.6521887, 0.00000001)    
 
 #########################################
 # Example Data

@@ -149,8 +149,8 @@ script = SubResource( 1 )
 
 [node name="Center" type="Sprite" parent="MapMoverContainer"]
 show_behind_parent = true
+position = Vector2( 270, 403 )
 texture = ExtResource( 2 )
-offset = Vector2( 270, 403 )
 
 [node name="MapOrigin" type="Node2D" parent="MapMoverContainer/Center"]
 script = ExtResource( 1 )
@@ -158,7 +158,11 @@ centered = true
 num_sides = 5
 size = 20.0
 polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
+polygon_texture = null
+border_size = 4.0
 border_color = Color( 0.258824, 0.258824, 0.258824, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="West" type="Sprite" parent="MapMoverContainer"]
 show_behind_parent = true
@@ -211,16 +215,23 @@ centered = true
 num_sides = 6
 size = 540.0
 polygon_color = Color( 1, 1, 1, 0 )
+polygon_texture = null
 border_size = 0.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="PlayerMarker" type="Node2D" parent="Hexagon2"]
 script = ExtResource( 1 )
 centered = true
+num_sides = 3
 size = 26.0
 polygon_color = Color( 0, 0.0941176, 0.847059, 1 )
+polygon_texture = null
 border_size = 0.0
 border_color = Color( 0, 0.0941176, 0.847059, 1 )
 polygon_rotation = -90.0
+collision_shape = true
 
 [node name="Radar" type="Node2D" parent="Hexagon2/PlayerMarker"]
 visible = false
@@ -230,8 +241,11 @@ centered = true
 num_sides = 6
 size = 10.0
 polygon_color = Color( 0, 0.0156863, 1, 0.121569 )
+polygon_texture = null
 border_size = 2.0
 border_color = Color( 0, 0.0156863, 1, 0.231373 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingNodes" type="Node2D" parent="."]
 
@@ -239,43 +253,85 @@ border_color = Color( 0, 0.0156863, 1, 0.231373 )
 position = Vector2( 874, -471 )
 rotation = 1.0472
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingTriangle2" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 21, -471 )
 rotation = 1.0472
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingTriangle3" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 448, 218 )
 rotation = 1.0472
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingTriangle4" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 90, 588 )
 rotation = -2.09439
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingTriangle5" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 516, 1284 )
 rotation = -2.09439
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="BlockingTriangle6" type="Node2D" parent="BlockingNodes"]
 position = Vector2( -330, 1284 )
 rotation = -2.09439
 script = ExtResource( 1 )
+centered = false
+num_sides = 3
 size = 960.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 0.0
+collision_shape = true
 
 [node name="LeftRect" type="Node2D" parent="BlockingNodes"]
 position = Vector2( -1822, 432 )
@@ -284,7 +340,11 @@ centered = true
 num_sides = 4
 size = 4320.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 45.0
+collision_shape = true
 
 [node name="RightRect" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 2374, 408 )
@@ -293,7 +353,11 @@ centered = true
 num_sides = 4
 size = 4320.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 45.0
+collision_shape = true
 
 [node name="TopRect" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 286, -1542 )
@@ -302,7 +366,11 @@ centered = true
 num_sides = 4
 size = 4320.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 45.0
+collision_shape = true
 
 [node name="BottomRect" type="Node2D" parent="BlockingNodes"]
 position = Vector2( 334, 2354 )
@@ -311,7 +379,11 @@ centered = true
 num_sides = 4
 size = 4320.0
 polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
 polygon_rotation = 45.0
+collision_shape = true
 
 [node name="RadarPulse" type="Timer" parent="."]
 wait_time = 6.0

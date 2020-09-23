@@ -25,12 +25,10 @@ const EARTH_RADIUS = 6371000.0  # in meters
 #the great circle and geodesic distance.
 # https://www.movable-type.co.uk/scripts/latlong.html
 
-var map_origin_lat
-var map_origin_long
-var map_origin_x
-var map_origin_y
-var player_x
-var player_y
+var map_origin_top_left_x
+var map_origin_top_left_y
+var map_origin_width
+var map_origin_height
 var moved_x
 var moved_y
 
@@ -77,6 +75,11 @@ func wrap360(degrees_beyond):
     else:
         return fmod((fmod(degrees_beyond, 360.0) + 360.0), 360.0)
         
+func normalize_longitude(longitude_unnormal):
+    if longitude_unnormal > -180 and longitude_unnormal <= 180:
+        return longitude_unnormal
+    return fmod((longitude_unnormal + 540.0), 180.0)
+        
 func midpoint(lat1, long1, lat2, long2):
     var rlat1 = deg2rad(lat1)
     var rlat2 = deg2rad(lat2)
@@ -94,10 +97,10 @@ func get_dest_from_bearing_range(start_lat, start_long, distance, bearing):
         sin(distance / EARTH_RADIUS) * cos(bearing))
     var dest_rlong = start_rlong + atan2(sin(bearing) * sin(distance / EARTH_RADIUS) * 
         cos(start_rlat), cos(distance / EARTH_RADIUS) - sin(start_rlat) * sin(dest_rlat))
-    return [wrap360(rad2deg(dest_rlat)), wrap360(rad2deg(dest_rlong))]
+    return [wrap360(rad2deg(dest_rlat)), normalize_longitude(rad2deg(dest_rlong))]
     
 func get_meters_per_pixel(zoom_lvl, latitude):
-    return 156543.03392 * cos(latitude * PI / 180) / pow(2, zoom_lvl + 1)
+    return 156543.03392 * cos(latitude * PI / 180.0) / pow(2.0, zoom_lvl + 1.0)
     
 func get_next_tile_from_center(center_lat, center_long, zoom_lvl, bearing):
     var meters_per_px = get_meters_per_pixel(zoom_lvl, center_lat)
@@ -116,7 +119,27 @@ func get_neighbor_tile_centers(center_lat, center_long, zoom_lvl):
     var north_west_tile_center = get_next_tile_from_center(west_tile_center[0], west_tile_center[1], zoom_lvl, 0)
     return [north_tile_center, north_east_tile_center, east_tile_center, south_east_tile_center, south_tile_center, 
             south_west_tile_center, west_tile_center, north_west_tile_center]
-   
+
+func get_saveable_center_point(original_center_lat, original_center_long):
+    var saveable_lat = float("%0.6f" % original_center_lat)
+    var saveable_long = float("%0.6f" % original_center_long)
+    return [saveable_lat, saveable_long]
+
+func get_neighbor_tile_centers_2(center_lat, center_long):
+    var saveable_coords = get_saveable_center_point(center_lat, center_long)
+    center_lat = saveable_coords[0]
+    center_long = saveable_coords[1]
+    var north_tile_center = convert_pixel_to_lat_long_from_tile(center_lat, center_long, 0, -640, 19) # 0° or 360°
+    var north_east_tile_center = convert_pixel_to_lat_long_from_tile(north_tile_center[0], north_tile_center[1], 640, 0, 19) # 90°
+    var east_tile_center = convert_pixel_to_lat_long_from_tile(center_lat, center_long, 640, 0, 19) # 90°
+    var south_east_tile_center = convert_pixel_to_lat_long_from_tile(east_tile_center[0], east_tile_center[1], 0, 640, 19) # 180°
+    var south_tile_center = convert_pixel_to_lat_long_from_tile(center_lat, center_long, 0, 640, 19) # 180°
+    var south_west_tile_center = convert_pixel_to_lat_long_from_tile(south_tile_center[0], south_tile_center[1], -640, 0, 19) # 270°
+    var west_tile_center = convert_pixel_to_lat_long_from_tile(center_lat, center_long, -640, 0, 19) # 270°
+    var north_west_tile_center = convert_pixel_to_lat_long_from_tile(west_tile_center[0], west_tile_center[1], 0, -640, 19) # 0° or 360°
+    return [north_tile_center, north_east_tile_center, east_tile_center, south_east_tile_center, south_tile_center, 
+            south_west_tile_center, west_tile_center, north_west_tile_center]
+
 func get_bearing_n_range(lat1, long1, lat2, long2):
     var distance = haversine_v0(lat1, long1, lat2, long2)  # distance == range
     var bearing = bearing_from_to(lat1, long1, lat2, long2)
@@ -153,8 +176,6 @@ func convert_pixel_to_projection(x, y, zoom):
     return [projection_x, projection_y]
 
 func convert_pixel_to_projection_attempt_beter(x, y, zoom):
-    # Ultimately this failed: time to move on.
-    # https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
     var scale = pow(2, zoom)
     var lat_quotient = floor(x / 256)
     var long_qoutient = floor(y / 256)
@@ -201,73 +222,106 @@ func convert_projection_to_lat_long(projected_x, projected_y, zoom, tile_size): 
 func convert_pixel_to_lat_long(x, y, zoom, tile_size):
     var result = convert_pixel_to_projection(x, y, zoom)
     return convert_projection_to_lat_long(result[0], result[1], zoom, tile_size)
+    
+func convert_pixel_to_lat_long_from_tile(center_lat, center_long, x, y, zoom):
+    # https://stackoverflow.com/questions/19266002/get-latitude-and-longitude-from-static-google-map
+    # This formula utilizes the top_left of the image as a x & y reference.
+    x = x - -320
+    y = y - -320
+    var new_x = x - 640 / 2
+    var new_y = y - 640 / 2
+    var siny = sin(center_lat * (PI/ 180.0))
+    # Truncating to 0.9999 effectively limits latitude to 89.189. This is
+    # about a third of a tile past the edge of the world tile.
+    if siny < -0.9999:
+        siny = -0.9999
+    if siny > 0.9999:
+        siny = 0.9999
+    var tiles = 1 << zoom
+    var center_point_x = 128.0 + center_long * (256.0/360.0)
+    var center_point_y = 128.0 + 0.5 * log((1 + siny) / (1 - siny)) * -(256.0 / (2.0 * PI))
+    var projection_x = center_point_x * tiles + new_x
+    var projection_y = center_point_y * tiles + new_y
+    var x_lat = (2.0 * atan(exp(((projection_y / tiles) - 128.0) / -(256.0/ (2.0 * PI)))) - PI / 2.0) / (PI / 180.0)
+    var y_long = (((projection_x / tiles) - 128.0) / (256.0 / 360.0))
+    return [x_lat, y_long]
+
+
+func convert_pixel_to_lat_long_from_origin(x, y, zoom):
+    return convert_pixel_to_lat_long_from_tile(Settings.Session.get_data("map_origin_lat"), 
+        Settings.Session.get_data("map_origin_long"), x, y, zoom)
 
 func set_map_origin(lat, long, zoom):
-    map_origin_lat = lat
-    map_origin_long = long
-    var results = convert_lat_long_to_pixel(lat, long, zoom)
-    map_origin_x = results[0]
-    map_origin_y = results[1]
+    var saveable_lat_long = get_saveable_center_point(lat, long)
+    Settings.Session.set_data("map_origin_lat", saveable_lat_long[0])
+    Settings.Session.set_data("map_origin_long", saveable_lat_long[1])
+    map_origin_width = 640
+    map_origin_height = 640
+    map_origin_top_left_x = -320
+    map_origin_top_left_y = -320
+    var results = convert_lat_long_to_pixel(saveable_lat_long[0], saveable_lat_long[1], zoom)
+    Settings.Session.set_data("map_origin_x", results[0])
+    Settings.Session.set_data("map_origin_y", results[1])
 
 func calc_map_movement(player_new_lat, player_new_long, zoom):  # We move the map because the player is the center of our universe.
     var results = convert_lat_long_to_pixel(player_new_lat, player_new_long, zoom)
-    moved_x = results[0] - map_origin_x
-    moved_y = map_origin_y - results[1]
+    moved_x = Settings.Session.get_data("map_origin_x") - results[0]
+    moved_y = Settings.Session.get_data("map_origin_y") - results[1]
     return [moved_x, moved_y]
 
 # Long Name: plot_entity_by_lat_long_from_origin_in_px()
 func plot_entity(entity_lat, entity_long, zoom):
     var results = convert_lat_long_to_pixel(entity_lat, entity_long, zoom)
-    var entity_x = map_origin_x - results[0]
-    var entity_y = results[1] - map_origin_y
+    var entity_x = Settings.Session.get_data("map_origin_x") - results[0]
+    var entity_y = results[1] - Settings.Session.get_data("map_origin_y")
     return [entity_x, entity_y]
 
 # Specifically when enough of a difference in latitude will cause a change in "y" pixel coordinates.
 func calc_difference_for_lat_change(zoom):
-    if map_origin_lat == null:
+    if Settings.Session.get_data("map_origin_lat") == null:
         return null
     var diff = 0.0
-    var var_lat = map_origin_lat
+    var var_lat = Settings.Session.get_data("map_origin_lat")
     var pos_diff_lat = 0.0
     var neg_diff_lat = 0.0
     var temp_y
     while true:
         var_lat += 0.0000001
-        temp_y = plot_entity(var_lat, map_origin_long, zoom)[1]
+        temp_y = plot_entity(var_lat, Settings.Session.get_data("map_origin_long"), zoom)[1]
         if temp_y == 1:
-            pos_diff_lat = var_lat - map_origin_lat
+            pos_diff_lat = var_lat - Settings.Session.get_data("map_origin_lat")
             break
-    var_lat = map_origin_lat
+    var_lat = Settings.Session.get_data("map_origin_lat")
     while true:
         var_lat -= 0.0000001
-        temp_y = plot_entity(var_lat, map_origin_long, zoom)[1]
+        temp_y = plot_entity(var_lat, Settings.Session.get_data("map_origin_long"), zoom)[1]
         if temp_y == -1:
-            neg_diff_lat = map_origin_lat - var_lat
+            neg_diff_lat = Settings.Session.get_data("map_origin_lat") - var_lat
             break
     diff = neg_diff_lat + pos_diff_lat
     return diff
 
 # Specifically when enough of a difference in longitude will cause a change in "x" pixel coordinates.
 func calc_difference_for_long_change(zoom):  
-    if map_origin_long == null:
+    if Settings.Session.get_data("map_origin_long") == null:
         return null
     var diff = 0.0
-    var var_long = map_origin_long
+    var var_long = Settings.Session.get_data("map_origin_long")
     var pos_diff_long = 0.0
     var neg_diff_long = 0.0
     var temp_x
     while true:
         var_long += 0.0000001
-        temp_x = plot_entity(map_origin_lat, var_long, zoom)[0]
+        temp_x = plot_entity(Settings.Session.get_data("map_origin_lat"), var_long, zoom)[0]
         if temp_x == 1:
-            pos_diff_long = var_long - map_origin_long
+            pos_diff_long = var_long - Settings.Session.get_data("map_origin_long")
             break
-    var_long = map_origin_long
+    var_long = Settings.Session.get_data("map_origin_long")
     while true:
         var_long -= 0.0000001
-        temp_x = plot_entity(map_origin_lat, var_long, zoom)[0]
+        temp_x = plot_entity(Settings.Session.get_data("map_origin_lat"), var_long, zoom)[0]
         if temp_x == -1:
-            neg_diff_long = map_origin_long - var_long
+            neg_diff_long = Settings.Session.get_data("map_origin_long") - var_long
             break
     diff = neg_diff_long + pos_diff_long
     return diff

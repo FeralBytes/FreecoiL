@@ -50,6 +50,7 @@ multiplayer_integration_tests:
 
 build_apk:
   stage: build_for_android
+  allow_failure: true
   script:
     # Fix Export Presets for the gitlab CI.
     - cp $DOCKER_HOME/.gitlab/ci_scripts/export_presets.cfg $DOCKER_HOME/godot/export_presets.cfg

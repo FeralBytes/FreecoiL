@@ -1,0 +1,262 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://addons/regular_polygon2d_node/RegularPolygon2D.gd" type="Script" id=1]
+[ext_resource path="res://assets/images/staticmap.png" type="Texture" id=2]
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=4]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+const RADAR_PULSE_RATE = 0.2
+
+var player_position = {}
+var count = 0
+var last_downloaded_tile_coords
+var my_menu = \"1,7\"
+
+onready var MapDownloader = get_node(\"MapDownloader\")
+onready var CenterTile = get_node(\"MapMoverContainer/Center\")
+onready var RegularPolygon2D = preload(\"res://addons/regular_polygon2d_node/RegularPolygon2D.gd\")
+onready var MapContainer = get_node(\"MapMoverContainer\")
+onready var PlayerMarker = get_node(\"PlayerMarker\")
+onready var Accuracy = get_node(\"UI/Label2\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    Settings.Session.connect(Settings.Session.monitor_data(\"current_menu\"), self, \"check_if_visible\")
+    if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
+        Settings.LiteAutoLoads.load_lightly(\"Geodetic\", \"res://code/Geodetic.gd\")
+        var initial_location = {\"latitude\": 41.850002, \"longitude\": -87.652191, \"accuracy\": 5, \"timestamp\": OS.get_unix_time()}
+        Settings.Session.set_data(\"fi_current_location\", initial_location)
+        Settings.LiteAutoLoads.get_lightly(\"Geodetic\").set_map_origin(
+                41.850002,-87.652191, 19)
+        Settings.Session.connect(Settings.Session.monitor_data(\"fi_current_location\"), self, 
+            \"update_player_location\")
+        display_maps()
+        change_player_location()
+    
+func check_if_visible(current_menu):
+    if current_menu == my_menu:
+        Settings.Session.connect(Settings.Session.monitor_data(\"fi_current_location\"), self, 
+            \"update_player_location\")
+        display_maps()
+        Accuracy.text = \"Accuracy: \" + str(Settings.Session.get_data(\"fi_current_location\")[\"accuracy\"])
+    else:
+        if is_connected(Settings.Session.monitor_data(\"fi_current_location\"), self, \"update_player_location\"):
+            Settings.Session.disconnect(Settings.Session.monitor_data(\"fi_current_location\"), self, 
+                \"update_player_location\")
+
+
+func update_player_location(new_location):
+    var map_container_new_xy = Settings.LiteAutoLoads.get_lightly(\"Geodetic\").calc_map_movement(
+        new_location[\"latitude\"], new_location[\"longitude\"], 19)
+    print(\"New Map XY = \" + str(map_container_new_xy))
+    MapContainer.position.x = map_container_new_xy[0]
+    MapContainer.position.y = map_container_new_xy[1]
+    Accuracy.text = \"Accuracy: \" + str(new_location[\"accuracy\"])
+    highlight_player_marker()
+
+func highlight_player_marker():
+    PlayerMarker.polygon_color = Color(\"4f568c\")
+    yield(get_tree().create_timer(0.5), \"timeout\")
+    PlayerMarker.polygon_color = Color(\"0018d8\")
+    
+func display_maps():
+    var texture = ImageTexture.new()
+    var image = Image.new()
+    image.load(\"user://maps/\" + str(Settings.Session.get_data(\"map_origin_lat\")) + \",\" +
+        str(Settings.Session.get_data(\"map_origin_long\")) + \".png\")
+    texture.create_from_image(image)
+    CenterTile.texture = texture
+    
+func change_player_location():
+    while true:
+        var new_long = Settings.Session.get_data(\"fi_current_location\") 
+        new_long[\"latitude\"] += 0.0001
+        new_long[\"timestamp\"] = OS.get_unix_time()
+        Settings.Session.set_data(\"fi_current_location\", new_long)
+        yield(get_tree().create_timer(5.0), \"timeout\")
+"
+
+[node name="MapEditor" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="MapMoverContainer" type="Node2D" parent="."]
+
+[node name="Center" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, 403 )
+texture = ExtResource( 2 )
+
+[node name="WiFiHub" type="Node2D" parent="MapMoverContainer/Center"]
+visible = false
+script = ExtResource( 1 )
+centered = true
+num_sides = 5
+size = 20.0
+polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0.258824, 0.258824, 0.258824, 1 )
+polygon_rotation = 0.0
+collision_shape = true
+
+[node name="West" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 403 )
+texture = ExtResource( 2 )
+
+[node name="NorthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, -237 )
+texture = ExtResource( 2 )
+
+[node name="North" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, -237 )
+texture = ExtResource( 2 )
+
+[node name="NorthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, -237 )
+texture = ExtResource( 2 )
+
+[node name="East" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 403 )
+texture = ExtResource( 2 )
+
+[node name="SouthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 1043 )
+texture = ExtResource( 2 )
+
+[node name="South" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, 1043 )
+texture = ExtResource( 2 )
+
+[node name="SouthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 1043 )
+texture = ExtResource( 2 )
+
+[node name="BlockingNodes" type="Node2D" parent="."]
+
+[node name="LeftRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( -1531, 432 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+collision_shape = true
+
+[node name="RightRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 2070, 408 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+collision_shape = true
+
+[node name="TopRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 286, -1460 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+collision_shape = true
+
+[node name="BottomRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 334, 2491 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_texture = null
+border_size = 4.0
+border_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+collision_shape = true
+
+[node name="MapDownloader" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 30
+
+[node name="PlayerMarker" type="Node2D" parent="."]
+position = Vector2( 270, 403 )
+rotation = 1.5708
+script = ExtResource( 1 )
+centered = true
+num_sides = 3
+size = 26.0
+polygon_color = Color( 0.309804, 0.337255, 0.54902, 1 )
+polygon_texture = null
+border_size = 0.0
+border_color = Color( 0, 0.0941176, 0.847059, 1 )
+polygon_rotation = -90.0
+collision_shape = true
+
+[node name="Radar" type="Node2D" parent="PlayerMarker"]
+visible = false
+show_behind_parent = true
+script = ExtResource( 1 )
+centered = true
+num_sides = 6
+size = 10.0
+polygon_color = Color( 0, 0.0156863, 1, 0.121569 )
+polygon_texture = null
+border_size = 2.0
+border_color = Color( 0, 0.0156863, 1, 0.231373 )
+polygon_rotation = 0.0
+collision_shape = true
+
+[node name="UI" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+theme = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="UI"]
+margin_top = 70.0
+margin_right = 540.0
+margin_bottom = 145.0
+text = "Please move to and set the location of the WIFI Hub/Router."
+align = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SetPositionBtn" type="Button" parent="UI"]
+margin_top = 916.0
+margin_right = 540.0
+margin_bottom = 960.0
+text = "Set WiFi Hub Position"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="UI"]
+margin_top = 146.0
+margin_right = 175.0
+margin_bottom = 182.0
+text = "Accuracy: "

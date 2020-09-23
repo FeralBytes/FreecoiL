@@ -16,9 +16,6 @@ extends Node
 # fi_thumb_btn_pushed
 # fi_power_btn_pushed
 # fi_got_shot(shooter_id)
-const TWO_MIN_IN_MILI_SECS = 120000
-const ONE_MIN_IN_MILI_SECS = 60000
-const HALF_MIN_IN_MILI_SECS = 30000
 # The FreecoiL Singleton
 var FreecoiL = null
 var API_KEY = ""
@@ -585,8 +582,9 @@ func _new_location_data(location):
         new_location_is_better = true
     else:
         var time_delta = timestamp - current_location["timestamp"]
-        var is_much_newer = time_delta > TWO_MIN_IN_MILI_SECS
+        var is_much_newer = time_delta > 120000  # 2 minutes in miliseconds.
         var is_much_older = time_delta < 120000
+        var is_10_secs_newer = time_delta > 10000
         var is_newer = time_delta > 0
         var accuracy_delta = accuracy - current_location["accuracy"]
         var is_more_accurate = accuracy_delta < 0
@@ -596,6 +594,10 @@ func _new_location_data(location):
             new_location_is_better = true
         elif is_much_newer:
             new_location_is_better = true
+        # Need better update rate:
+        elif is_10_secs_newer:
+            if is_slightly_less_accurate:
+                new_location_is_better = true
     if new_location_is_better:
         Settings.Session.set_data("fi_current_location", {"latitude": latitude, 
             "longitude": longitude, "altitude": altitude, "speed": speed,
@@ -614,11 +616,11 @@ func _update_location_quality(current_location):
         location_quality = 0
     else:
         var time_delta = OS.get_unix_time() - current_location["timestamp"]
-        if current_location["accuracy"] > 20 or time_delta > TWO_MIN_IN_MILI_SECS :
+        if current_location["accuracy"] > 20 or time_delta > 120000 :
             location_quality = 1
-        elif current_location["accuracy"] > 10 or time_delta > ONE_MIN_IN_MILI_SECS:
+        elif current_location["accuracy"] > 10 or time_delta > 60000:
             location_quality = 2
-        elif current_location["accuracy"] > 6 or time_delta > HALF_MIN_IN_MILI_SECS:
+        elif current_location["accuracy"] > 6 or time_delta > 30000:
             location_quality = 3
         else:
             location_quality = 4
