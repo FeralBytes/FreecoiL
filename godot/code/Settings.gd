@@ -63,6 +63,9 @@ class AutoLoadsLite:
         
     func check_if_loaded(name):
         return __lite_auto_loads.has(name)
+        
+    func get(name):
+        return __lite_auto_loads[name]
 
 class Data:
     var __settings = {}  # {"dumby": [1234, "S00"]}

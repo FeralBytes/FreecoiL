@@ -1,0 +1,155 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://addons/regular_polygon2d_node/RegularPolygon2D.gd" type="Script" id=1]
+[ext_resource path="res://assets/images/staticmap.png" type="Texture" id=2]
+[ext_resource path="res://scenes/Maps/MapEditor.gd" type="Script" id=3]
+[ext_resource path="res://assets/themes/default/default.theme" type="Theme" id=4]
+
+[node name="MapEditor" type="Node2D"]
+script = ExtResource( 3 )
+
+[node name="MapMoverContainer" type="Node2D" parent="."]
+
+[node name="Center" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, 403 )
+texture = ExtResource( 2 )
+
+[node name="West" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 403 )
+texture = ExtResource( 2 )
+
+[node name="NorthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, -237 )
+texture = ExtResource( 2 )
+
+[node name="North" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, -237 )
+texture = ExtResource( 2 )
+
+[node name="NorthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, -237 )
+texture = ExtResource( 2 )
+
+[node name="East" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 403 )
+texture = ExtResource( 2 )
+
+[node name="SouthEast" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 910, 1043 )
+texture = ExtResource( 2 )
+
+[node name="South" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( 270, 1043 )
+texture = ExtResource( 2 )
+
+[node name="SouthWest" type="Sprite" parent="MapMoverContainer"]
+show_behind_parent = true
+position = Vector2( -370, 1043 )
+texture = ExtResource( 2 )
+
+[node name="BlockingNodes" type="Node2D" parent="."]
+
+[node name="LeftRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( -1531, 432 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="RightRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 2070, 408 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="TopRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 286, -1460 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="BottomRect" type="Node2D" parent="BlockingNodes"]
+position = Vector2( 334, 2491 )
+script = ExtResource( 1 )
+centered = true
+num_sides = 4
+size = 4320.0
+polygon_color = Color( 0, 0, 0, 1 )
+polygon_rotation = 45.0
+
+[node name="MapDownloader" type="HTTPRequest" parent="."]
+use_threads = true
+timeout = 30
+
+[node name="PlayerMarker" type="Node2D" parent="."]
+position = Vector2( 270, 403 )
+rotation = 1.5708
+script = ExtResource( 1 )
+centered = true
+size = 26.0
+polygon_color = Color( 0.309804, 0.337255, 0.54902, 1 )
+border_size = 0.0
+border_color = Color( 0, 0.0941176, 0.847059, 1 )
+polygon_rotation = -90.0
+
+[node name="Radar" type="Node2D" parent="PlayerMarker"]
+visible = false
+show_behind_parent = true
+script = ExtResource( 1 )
+centered = true
+num_sides = 6
+size = 10.0
+polygon_color = Color( 0, 0.0156863, 1, 0.121569 )
+border_size = 2.0
+border_color = Color( 0, 0.0156863, 1, 0.231373 )
+
+[node name="UI" type="Control" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+theme = ExtResource( 4 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="UI"]
+margin_top = 70.0
+margin_right = 540.0
+margin_bottom = 145.0
+text = "Please move to and set the location of the WIFI Hub/Router."
+align = 1
+autowrap = true
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="SetPositionBtn" type="Button" parent="UI"]
+margin_top = 916.0
+margin_right = 540.0
+margin_bottom = 960.0
+text = "Set WiFi Hub Position"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label2" type="Label" parent="UI"]
+margin_top = 146.0
+margin_right = 175.0
+margin_bottom = 182.0
+text = "Accuracy: "
+[connection signal="pressed" from="UI/SetPositionBtn" to="." method="_on_SetPositionBtn_pressed" flags=3]

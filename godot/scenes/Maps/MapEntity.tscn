@@ -1,0 +1,34 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://addons/regular_polygon2d_node/RegularPolygon2D.gd" type="Script" id=1]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+export(bool) var visibility = false
+export(String) var latitude = \"\" setget set_latitude 
+export(String) var longitude = \"\" setget set_longitude
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+    pass # Replace with function body.
+
+
+func set_latitude(new_lat):
+    latitude = new_lat
+
+func set_longitude(new_long):
+    longitude = new_long
+"
+
+[node name="MapEntity" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="MapEntityShape" type="Node2D" parent="."]
+script = ExtResource( 1 )
+centered = true
+num_sides = 5
+size = 20.0
+polygon_color = Color( 0.992157, 0.992157, 0.992157, 1 )
+border_color = Color( 0.258824, 0.258824, 0.258824, 1 )

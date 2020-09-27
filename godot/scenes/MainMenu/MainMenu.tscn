@@ -1247,7 +1247,7 @@ func _ready():
     MapDownloader.connect(\"request_completed\", self, \"map_tile_downloaded\")
     if Settings.Session.get_data(\"experimental_toggles\")[\"map_downloads_testing\"]:
         # API Key gets set here in testing.
-        FreecoiLInterface.API_KEY = \"AIzaSyDqOwvOlLBjgEU9KWgnA7jhUVmT_PLN0f0\"
+        pass
 
 
 func check_if_visible(current_menu):
@@ -1483,7 +1483,7 @@ func ask_if_ready_to_preview_the_maps():
     if Settings.Session.get_data(\"experimental_toggles\")[\"background_resource_loader\"]:
         if not background_loading:
             background_loading = true
-            thread_num = Helpers.threaded_background_loader(\"res://scenes/MainMenu/MapEditor.tscn\")
+            thread_num = Helpers.threaded_background_loader(\"res://scenes/Maps/MapEditor.tscn\")
             Settings.Session.connect(Settings.Session.monitor_data(\"Helpers_background_load_result\"), self,
                 \"go_to_next_menu\")
     DownloadMaps.text = \"Downloading of Maps Completed\"
@@ -3617,7 +3617,6 @@ margin_top = 6720.0
 margin_right = 1080.0
 margin_bottom = 7680.0
 rect_min_size = Vector2( 540, 960 )
-script = SubResource( 48 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
