@@ -7,7 +7,8 @@ var count = 0
 var last_downloaded_tile_coords
 var my_menu = "1,7"
 var wifi_hub_set = false
-var respawn_for_each_team_set = null
+var respawn_for_each_team_set = false
+var num_of_respawns_plotted = 0
 
 onready var MapDownloader = get_node("MapDownloader")
 onready var CenterTile = get_node("MapMoverContainer/Center")
@@ -78,16 +79,30 @@ func _on_SetPositionBtn_pressed():
         # plot the wifi hub
         var wifi_hub_location = Settings.Session.get_data("fi_current_location")
         var WiFiHub = MapEntity.instance()
-        MapEntity.name = "WiFiHub"
-        CenterTile.add_child(MapEntity)
+        WiFiHub.name = "WiFiHub"
+        CenterTile.add_child(WiFiHub)
         var entity_x_y = Settings.LiteAutoLoads.get("Geodetic").plot_entity(wifi_hub_location["latitude"], 
             wifi_hub_location["longitude"], 19)
-        MapEntity.position.x = entity_x_y[0]
-        MapEntity.position.y = entity_x_y[1]
+        WiFiHub.position.x = entity_x_y[0]
+        WiFiHub.position.y = entity_x_y[1]
         # build the team array.
         Settings.Session.set_data("maps_wifi_hub_location", wifi_hub_location)
         if Settings.InGame.get_data("game_teams"):
-            Settings.InGame.get_data("game_number_of_teams")
+            pass
         else:
             pass
             # Get the number of respawn locations choosen.
+    elif not respawn_for_each_team_set:
+        var RespawnPoint = MapEntity.instance()
+        RespawnPoint.name = "RespawnPoint" + str(num_of_respawns_plotted + 1)
+        CenterTile.add_child(RespawnPoint)
+        var entity_x_y = Settings.LiteAutoLoads.get("Geodetic").plot_entity(wifi_hub_location["latitude"], 
+            wifi_hub_location["longitude"], 19)
+        RespawnPoint.position.x = entity_x_y[0]
+        RespawnPoint.position.y = entity_x_y[1]
+        num_of_respawns_plotted += 1
+        if num_of_respawns_plotted == Settings.InGame.get_data("game_number_of_teams"):
+            respawn_for_each_team_set = true
+    else:
+        pass
+        # Move on to loading the lobby.
